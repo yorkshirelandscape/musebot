@@ -19,7 +19,8 @@ client.on('message', message => {
 	// while ((match = re.exec(message.content)) != null) {
 	// 	emojis.push(match[0]);
 	//   }
-	client.emojis.cache.each((e) => console.log(e.id + ': ' + e.name));
+	emojis = message.guild.emojis.cache.map((e, x) => (x + ' = ' + e) + ' | ' +e.name).join('\n');
+	message.channel.send(emojis);
 	e1 = message.content.match(/:.+?:/g);
 	console.log(e1);
 	if (e1) { 
