@@ -17,7 +17,7 @@ client.on('message', message => {
 	while ((match = re.exec(message.content)) != null) {
 		emojis.push(match[0]);
 	  }
-	console.log(message.content);
+	console.log(message);
 	if (emojis) {
 		emojis.forEach( e => {
 			message.react(e);
