@@ -8,6 +8,7 @@ client.once('ready', () => {
 	console.log('Ready!');
 });
 
+const enm = require("emoji-name-map");
 // const emojiRegex = require('emoji-regex/RGI_Emoji.js');
 
 // const frog = client.emojis.cache.find(emoji => emoji.name === "frog");
@@ -31,14 +32,14 @@ client.on('message', message => {
 	console.log(e1);
 	if (e1) { 
 		e1.forEach( e => {
-			e2.push( {d: e.match(/[a-zA-Z0-9_]+/g).toString(), c: null} );
+			e2.push( {name: e.match(/[a-zA-Z0-9_]+/g).toString(), id: null} );
 		})
 	}
 	console.log(e2);
 	if (e2) {
 		e2.forEach( e => {
 			try {
-				e.c = client.emojis.cache.find(emoji => emoji.name === e.d);
+				e.id = client.emojis.cache.find(emoji => emoji.name === e.name);
 			} catch (err) {
 				console.log(err);
 			}
@@ -47,10 +48,10 @@ client.on('message', message => {
 	console.log(e2);
 	if (e2) {
 		e2.forEach( e => {
-			if (typeof e.c != 'undefined') {
-				message.react(e.c);
+			if (typeof e.id != 'undefined') {
+				message.react(e.id);
 			} else {
-				message.react(e.d);
+				message.react(enm.get(e.name));
 			}
 		})
 	}
