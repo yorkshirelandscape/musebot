@@ -9,6 +9,8 @@ client.once('ready', () => {
 });
 
 const enm = require("emoji-name-map");
+const one = enm.get('one');
+const two = enm.get('two');
 // const emojiRegex = require('emoji-regex/RGI_Emoji.js');
 
 // const frog = client.emojis.cache.find(emoji => emoji.name === "frog");
@@ -17,7 +19,6 @@ const enm = require("emoji-name-map");
 client.on('message', message => {
 	// const re = emojiRegex();
 	// let match;
-	let emojis = [];
 	let e1 = [];
 	let e2 = [];
 	// while ((match = re.exec(message.content)) != null) {
@@ -52,12 +53,14 @@ client.on('message', message => {
 	}
 	console.log(e2);
 	if (e2) {
+		let i = 0;
 		e2.forEach( e => {
 			if (typeof e.id != 'undefined') {
 				message.react(e.id);
 			} else if (typeof e.unicode != 'undefined' ) {
 				message.react(e.unicode);
-			}
+			} else { message.react( i === 0 ? one : two ) };
+			i++;
 		})
 	}
 });
