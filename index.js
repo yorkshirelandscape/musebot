@@ -55,7 +55,7 @@ client.on('message', message => {
 		e2.forEach( e => {
 			if (typeof e.id != 'undefined') {
 				message.react(e.id);
-			} else {
+			} else if (typeof e.unicode != 'undefined' ) {
 				message.react(e.unicode);
 			}
 		})
