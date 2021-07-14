@@ -21,7 +21,10 @@ client.on('message', message => {
 	//   }
 	e1 = message.content.match(/:.+?:/g);
 	console.log(e1);
-	if (e1) { e2 = e1.match(/[a-zA-Z0-9]+/g) };
+	if (e1) { 
+		e1.forEach( e => {
+			e2.push(e1.match(/[a-zA-Z0-9]+/g));
+		})
 	console.log(e2);
 	if (e2) {
 		e2.forEach( e => {
