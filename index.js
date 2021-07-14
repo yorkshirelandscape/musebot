@@ -13,7 +13,7 @@ var result = [];
 
 client.on('message', message => {
 
-	console.log(message.channel);
+	console.log(message);
 	if (message.channel === 'skynet') {
 	const enm = require("emoji-name-map");
 	const one = enm.get('one');
