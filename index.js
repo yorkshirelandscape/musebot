@@ -11,7 +11,7 @@ client.once('ready', () => {
 const dismoji = require('discord-emoji');
 const search = 'wilted_rose';
 const result = '';
-for (var i in dismoji ) {
+for (var i in JSON.parse(dismoji) ) {
 	if (search in i) { result = i[search] }
 }
 console.log(result);
