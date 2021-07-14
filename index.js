@@ -18,7 +18,7 @@ client.on('message', message => {
 	// let match;
 	let emojis = [];
 	let e1 = [];
-	let e2 = [];
+	let e2 = new Map();
 	// while ((match = re.exec(message.content)) != null) {
 	// 	emojis.push(match[0]);
 	//   }
@@ -31,16 +31,16 @@ client.on('message', message => {
 	console.log(e1);
 	if (e1) { 
 		e1.forEach( e => {
-			e2.push(e.match(/[a-zA-Z0-9_]+/g).toString());
+			e2.set( e.match(/[a-zA-Z0-9_]+/g).toString(), '');
 		})
 	}
 	console.log(e2);
 	if (e2) {
 		e2.forEach( e => {
-			emojis.push(client.emojis.cache.find(emoji => emoji.name === e));
+			e2.set( e, emojis.push(client.emojis.cache.find(emoji => emoji.name === e)));
 		})
 	}
-	console.log(emojis);
+	console.log(e2);
 	if (emojis) {
 		emojis.forEach( e => {
 			message.react(e);
