@@ -16,7 +16,7 @@ client.on('message', message => {
 	const enm = require("emoji-name-map");
 	const one = enm.get('one');
 	const two = enm.get('two');
-	const result = [];
+	var result = [];
 
 
 	let e1 = [];
