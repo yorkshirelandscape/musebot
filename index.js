@@ -10,6 +10,7 @@ client.once('ready', () => {
 
 client.on('message', message => {
 	let emojis = message.content.match(/<:.+?:\d+>/g);
+	console.log(message.content);
 	console.log(emojis);
 	if (emojis) {
 		emojis.forEach( e => {
