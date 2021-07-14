@@ -8,18 +8,6 @@ client.once('ready', () => {
 	console.log('Ready!');
 });
 
-function getNames(obj, name) {
-	for (var key in obj) {
-	  if (obj.hasOwnProperty(key)) {
-		if ("object" == typeof(obj[key])) {
-		  getNames(obj[key], name);
-		} else if (key == name) {
-		  result.push(obj[key]);
-		}
-	  }
-	}
-  }
-
 const dismoji = require('discord-emoji');
 
 
@@ -72,5 +60,17 @@ client.on('message', message => {
 		})
 	}
 });
+
+function getNames(obj, name) {
+	for (var key in obj) {
+	  if (obj.hasOwnProperty(key)) {
+		if ("object" == typeof(obj[key])) {
+		  getNames(obj[key], name);
+		} else if (key == name) {
+		  result.push(obj[key]);
+		}
+	  }
+	}
+  }
 
 client.login(process.env.TOKEN);
