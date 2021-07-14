@@ -19,6 +19,7 @@ client.on('message', message => {
 	// while ((match = re.exec(message.content)) != null) {
 	// 	emojis.push(match[0]);
 	//   }
+	console.log(message.guild.emojis.cache);
 	e1 = message.content.match(/:.+?:/g);
 	console.log(e1);
 	if (e1) { 
