@@ -31,7 +31,7 @@ client.on('message', message => {
 	console.log(e1);
 	if (e1) { 
 		e1.forEach( e => {
-			e2.add( {d: e.match(/[a-zA-Z0-9_]+/g).toString(), c: null} );
+			e2.push( {d: e.match(/[a-zA-Z0-9_]+/g).toString(), c: null} );
 		})
 	}
 	console.log(e2);
