@@ -15,7 +15,7 @@ client.on('message', message => {
 
 	if (message.channel.name === 'skynet') {
 
-	console.log(message.channel.name);
+	console.log(message.content);
 
 	const enm = require("emoji-name-map");
 	const one = enm.get('one');
