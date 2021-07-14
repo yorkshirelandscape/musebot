@@ -20,13 +20,13 @@ client.on('message', message => {
 	let e2 = [];
 
 	e1 = message.content.match(/:.+?:/g);
-	console.log(e1);
+	// console.log(e1);
 	if (e1) { 
 		e1.forEach( e => {
 			e2.push( {name: e.match(/[a-zA-Z0-9_]+/g).toString(), id: null, unicode: null} );
 		})
 	}
-	console.log(e2);
+	// console.log(e2);
 	if (e2) {
 		e2.forEach( e => {
 			try {
@@ -43,7 +43,7 @@ client.on('message', message => {
 			}
 		})
 	}
-	console.log(e2);
+	// console.log(e2);
 	if (e2) {
 		let i = 0;
 		e2.forEach( e => {
