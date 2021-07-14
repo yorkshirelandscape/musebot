@@ -13,7 +13,6 @@ var result = [];
 
 client.on('message', message => {
 
-	const enm = require("emoji-name-map");
 	const one = enm.get('one');
 	const two = enm.get('two');
 
@@ -36,10 +35,8 @@ client.on('message', message => {
 				console.log(err);
 			};
 			try {
-				// e.unicode = enm.get(e.name);
 				result = [];
 				getNames(dismoji, e.name);
-				console.log(result[0].toString());
 				e.unicode = result[0].toString();
 			} catch (err) {
 				console.log(err);
