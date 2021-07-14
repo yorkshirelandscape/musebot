@@ -8,26 +8,18 @@ client.once('ready', () => {
 	console.log('Ready!');
 });
 
-const enm = require("emoji-name-map");
-const one = enm.get('one');
-const two = enm.get('two');
-// const emojiRegex = require('emoji-regex/RGI_Emoji.js');
-
-// const frog = client.emojis.cache.find(emoji => emoji.name === "frog");
-// console.log(frog);
+const discordEmoji = require('discord-emoji');
+console.log(discordEmoji.nature.wilted_rose);
 
 client.on('message', message => {
-	// const re = emojiRegex();
-	// let match;
+
+	const enm = require("emoji-name-map");
+	const one = enm.get('one');
+	const two = enm.get('two');
+
+
 	let e1 = [];
 	let e2 = [];
-	// while ((match = re.exec(message.content)) != null) {
-	// 	emojis.push(match[0]);
-	//   }
-
-	// let test = [];
-	// test = client.emojis.cache.map((e, x) => (x + ' = ' + e) + ' | ' +e.name).join('\n');
-	// console.log(test);
 
 	e1 = message.content.match(/:.+?:/g);
 	console.log(e1);
