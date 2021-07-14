@@ -20,7 +20,7 @@ client.on('message', message => {
 	console.log(emojis);
 	if (emojis) {
 		emojis.forEach( e => {
-			message.channel.send('+' + e);
+			message.react(e);
 		})
 	}
 });
