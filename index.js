@@ -8,13 +8,23 @@ client.once('ready', () => {
 	console.log('Ready!');
 });
 
+function getNames(obj, name) {
+	for (var key in obj) {
+	  if (obj.hasOwnProperty(key)) {
+		if ("object" == typeof(obj[key])) {
+		  getNames(obj[key], name);
+		} else if (key == name) {
+		  result.push(obj[key]);
+		}
+	  }
+	}
+  }
+
 const dismoji = require('discord-emoji');
 const search = 'wilted_rose';
-const result = '';
-for (var i in dismoji) {
-	if (search in JSON.parse(i)) { result = i[search] }
-}
-console.log(result);
+let result = [];
+getNames(dismoji, search);
+console.log(result.toString());
 
 client.on('message', message => {
 
