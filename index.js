@@ -12,7 +12,7 @@ const dismoji = require('discord-emoji');
 const search = 'wilted_rose';
 const result = '';
 for (var i in dismoji ) {
-	if (i.hasOwnProperty(search)) { result = i[search] }
+	if (search in i) { result = i[search] }
 }
 console.log(result);
 
