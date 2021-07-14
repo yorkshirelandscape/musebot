@@ -8,7 +8,7 @@ client.once('ready', () => {
 	console.log('Ready!');
 });
 
-const emojiRegex = require('emoji-regex/RGI_Emoji.js');
+const emojiRegex = require('emoji-regex/text.js');
 
 client.on('message', message => {
 	const re = emojiRegex();
