@@ -18,7 +18,7 @@ client.on('message', message => {
 		emojis.push(match[0]);
 	  }
 	// emojis = message.content.match(/:.+?:/g);
-	console.log(emojis);
+	console.log(message);
 	if (emojis) {
 		emojis.forEach( e => {
 			message.react(e);
