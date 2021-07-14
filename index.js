@@ -8,16 +8,16 @@ client.once('ready', () => {
 	console.log('Ready!');
 });
 
-//const emojiRegex = require('emoji-regex/RGI_Emoji.js');
+const emojiRegex = require('emoji-regex/RGI_Emoji.js');
 
 client.on('message', message => {
-	//const re = emojiRegex();
-	//let match;
+	const re = emojiRegex();
+	let match;
 	let emojis = [];
-	//while ((match = re.exec(message.content)) != null) {
-	//	emojis.push(match[0]);
-	//  }
-	emojis = message.content.match(/:.+?:/g);
+	while ((match = re.exec(message.content)) != null) {
+		emojis.push(match[0]);
+	  }
+	// emojis = message.content.match(/:.+?:/g);
 	console.log(emojis);
 	if (emojis) {
 		emojis.forEach( e => {
