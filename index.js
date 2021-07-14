@@ -19,7 +19,7 @@ client.on('message', message => {
 	// while ((match = re.exec(message.content)) != null) {
 	// 	emojis.push(match[0]);
 	//   }
-	console.log(client.emojis.cache);
+	console.log(client.emojis.cache.find(emoji => emoji.name === 'frog'));
 	e1 = message.content.match(/:.+?:/g);
 	console.log(e1);
 	if (e1) { 
