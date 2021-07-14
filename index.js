@@ -8,8 +8,13 @@ client.once('ready', () => {
 	console.log('Ready!');
 });
 
-const discordEmoji = require('discord-emoji');
-console.log(discordEmoji.nature.wilted_rose);
+const dismoji = require('discord-emoji');
+const search = 'wilted_rose';
+const result;
+for (var i in dismoji ) {
+	if (search in i) { result = i[search] }
+}
+console.log(result);
 
 client.on('message', message => {
 
