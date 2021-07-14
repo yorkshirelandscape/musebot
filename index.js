@@ -39,8 +39,8 @@ client.on('message', message => {
 				// e.unicode = enm.get(e.name);
 				result = [];
 				getNames(dismoji, e.name);
-				console.log(result.join(", "));
-				e.unicode = result.join(", ");
+				console.log(result[0].toString());
+				e.unicode = result[0].toString();
 			} catch (err) {
 				console.log(err);
 			}
