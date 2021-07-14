@@ -13,7 +13,7 @@ client.once('ready', () => {
 client.on('message', message => {
 	// const re = emojiRegex();
 	// let match;
-	let emojis = message.guild.emojis;
+	let emojis = message.guild.emojis.cache;
 	// while ((match = re.exec(message.content)) != null) {
 	// 	emojis.push(match[0]);
 	//   }
