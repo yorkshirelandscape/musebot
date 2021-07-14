@@ -14,11 +14,15 @@ client.on('message', message => {
 	// const re = emojiRegex();
 	// let match;
 	let emojis = [];
+	let e1 = [];
+	let e2 = [];
 	// while ((match = re.exec(message.content)) != null) {
 	// 	emojis.push(match[0]);
 	//   }
 	e1 = message.content.match(/:.+?:/g);
-	e2 = e1.match(/[a-zA-Z0-9]+/g)
+	console.log(e1);
+	if (e1) { e2 = e1.match(/[a-zA-Z0-9]+/g) };
+	console.log(e2);
 	if (e2) {
 		e2.forEach( e => {
 			emojis.push(client.emojis.cache.find(emoji => emoji.name === e));
