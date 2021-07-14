@@ -22,7 +22,7 @@ client.on('message', message => {
 
 	let test = [];
 	test = client.emojis.cache.map((e, x) => (x + ' = ' + e) + ' | ' +e.name).join('\n');
-	message.channel.send(test);
+	console.log(test);
 
 	e1 = message.content.match(/:.+?:/g);
 	console.log(e1);
