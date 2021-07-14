@@ -10,6 +10,9 @@ client.once('ready', () => {
 
 // const emojiRegex = require('emoji-regex/RGI_Emoji.js');
 
+const frog = client.emojis.cache.find(emoji => emoji.name === "frog");
+console.log(frog);
+
 client.on('message', message => {
 	// const re = emojiRegex();
 	// let match;
@@ -20,9 +23,9 @@ client.on('message', message => {
 	// 	emojis.push(match[0]);
 	//   }
 
-	let test = [];
-	test = client.emojis.cache.map((e, x) => (x + ' = ' + e) + ' | ' +e.name).join('\n');
-	console.log(test);
+	// let test = [];
+	// test = client.emojis.cache.map((e, x) => (x + ' = ' + e) + ' | ' +e.name).join('\n');
+	// console.log(test);
 
 	e1 = message.content.match(/:.+?:/g);
 	console.log(e1);
