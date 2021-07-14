@@ -9,6 +9,9 @@ client.once('ready', () => {
 });
 
 // const emojiRegex = require('emoji-regex/RGI_Emoji.js');
+let test = [];
+test = client.emojis.cache.map((e, x) => (x + ' = ' + e) + ' | ' +e.name).join('\n');
+message.channel.send(test);
 
 client.on('message', message => {
 	// const re = emojiRegex();
@@ -19,8 +22,6 @@ client.on('message', message => {
 	// while ((match = re.exec(message.content)) != null) {
 	// 	emojis.push(match[0]);
 	//   }
-	emojis = message.guild.emojis.cache.map((e, x) => (x + ' = ' + e) + ' | ' +e.name).join('\n');
-	message.channel.send(emojis);
 	e1 = message.content.match(/:.+?:/g);
 	console.log(e1);
 	if (e1) { 
