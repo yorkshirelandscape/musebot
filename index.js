@@ -23,7 +23,7 @@ client.on('message', message => {
 	console.log(e1);
 	if (e1) { 
 		e1.forEach( e => {
-			e2.push(e1.match(/[a-zA-Z0-9]+/g));
+			e2.push(e.match(/[a-zA-Z0-9]+/g));
 		})
 	}
 	console.log(e2);
