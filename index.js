@@ -9,15 +9,13 @@ client.once('ready', () => {
 });
 
 const dismoji = require('discord-emoji');
-
+var result = [];
 
 client.on('message', message => {
 
 	const enm = require("emoji-name-map");
 	const one = enm.get('one');
 	const two = enm.get('two');
-	var result = [];
-
 
 	let e1 = [];
 	let e2 = [];
