@@ -32,7 +32,7 @@ client.on('message', message => {
 	console.log(e1);
 	if (e1) { 
 		e1.forEach( e => {
-			e2.push( {name: e.match(/[a-zA-Z0-9_]+/g).toString(), id: null} );
+			e2.push( {name: e.match(/[a-zA-Z0-9_]+/g).toString(), id: null, unicode: null} );
 		})
 	}
 	console.log(e2);
@@ -40,6 +40,11 @@ client.on('message', message => {
 		e2.forEach( e => {
 			try {
 				e.id = client.emojis.cache.find(emoji => emoji.name === e.name);
+			} catch (err) {
+				console.log(err);
+			};
+			try {
+				e.unicode = enm.get(e.name);
 			} catch (err) {
 				console.log(err);
 			}
@@ -51,7 +56,7 @@ client.on('message', message => {
 			if (typeof e.id != 'undefined') {
 				message.react(e.id);
 			} else {
-				message.react(enm.get(e.name));
+				message.react(e.unicode);
 			}
 		})
 	}
