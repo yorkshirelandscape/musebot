@@ -11,7 +11,7 @@ client.once('ready', () => {
 client.on('message', message => {
 	let emojis = message.content.match(/<:.+?:\d+>/g);
 	if (emojis) {
-		// send back "Pong." to the channel the message was sent in
+		console.log(emojis);
 		emojis.forEach( e => {
 			message.channel.send('+' + e);
 		})
