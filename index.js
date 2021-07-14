@@ -25,6 +25,7 @@ client.on('message', message => {
 		e1.forEach( e => {
 			e2.push(e1.match(/[a-zA-Z0-9]+/g));
 		})
+	}
 	console.log(e2);
 	if (e2) {
 		e2.forEach( e => {
