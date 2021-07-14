@@ -29,7 +29,7 @@ client.on('message', message => {
 	console.log(e2);
 	if (e2) {
 		e2.forEach( e => {
-			emojis.push(client.emojis.cache.find(emoji => emoji.name === e));
+			emojis.push(message.guild.emojis.cache.find((emoji) => emoji.name === e));
 		})
 	}
 	console.log(emojis);
