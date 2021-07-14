@@ -21,10 +21,7 @@ function getNames(obj, name) {
   }
 
 const dismoji = require('discord-emoji');
-const search = 'wilted_rose';
-let result = [];
-getNames(dismoji, search);
-console.log(result.toString());
+
 
 client.on('message', message => {
 
@@ -52,7 +49,10 @@ client.on('message', message => {
 				console.log(err);
 			};
 			try {
-				e.unicode = enm.get(e.name);
+				// e.unicode = enm.get(e.name);
+				let result = [];
+				getNames(dismoji, e.name);
+				e.unicode = result.toString();
 			} catch (err) {
 				console.log(err);
 			}
