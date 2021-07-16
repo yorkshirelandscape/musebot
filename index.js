@@ -87,15 +87,15 @@ function getvalue(auth) {
 	const sheets = google.sheets({version: 'v4', auth});
 	sheets.spreadsheets.values.get({
 	spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
-	range: 'Dashboard!D4:D6',
+	range: 'Dashboard!D4',
 	},(err, res) => {
 	if (err) return console.log('The API returned an error: ' + err);
 	emoji1 = res.data.values[0];
-	emoji2 = res.data.values[1];
+	// emoji2 = res.data.values[1];
 	});
 }
 
-console.log(emoji1 + ' ' + emoji2)
+console.log(emoji1)
 
 client.on('message', message => {
 
