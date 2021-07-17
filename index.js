@@ -66,6 +66,12 @@ function getNewToken(oAuth2Client, callback) {
 }
 
 
+client.once('ready', () => {
+	const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
+	console.log('Ready!');
+});
+
+
 function getValue(rng, auth) {
 	const sheets = google.sheets({version: 'v4', auth});
 	let msg = '';
@@ -98,11 +104,6 @@ function postMsg(rng) {
 	});
 }
 
-
-client.once('ready', () => {
-	const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
-	console.log('Ready!');
-});
 
 // let test = getValue('Dashboard!D3:E6');
 // console.log(test);
