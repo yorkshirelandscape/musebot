@@ -77,22 +77,24 @@ function getValue(rng, auth) {
 	  const rows = res.data.values;
 	  if (rows.length) {
 		// Print columns A and E, which correspond to indices 0 and 4.
-		var msg = '';
+		let msg = '';
 		rows.map((row) => {
 			msg = msg.concat('\n',`${row[0]} ${row[1]}`);
 		});
 	  } else {
+		msg = '';
 		console.log('No data found.');
 	  }
 	});
+	return msg;
   }
 
 function postMsg(rng) {
 	// Load client secrets from a local file.
 	fs.readFile('credentials.json', (err, content) => {
 		if (err) return console.log('Error loading client secret file:', err);
-		getValue(rng);
-		let channel = client.channels.cache.get('864768873270345788') //751893730117812225
+		let msg = getValue(rng);
+		let channel = client.channels.cache.get('864768873270345788'); //751893730117812225
 		// Authorize a client with credentials, then call the Google Sheets API.
 		authorize(JSON.parse(content), channel.send(msg));
 	});
