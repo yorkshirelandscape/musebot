@@ -66,7 +66,7 @@ client.on('ready', () => {
 	// 	}
 	// }
 
-	async function getValue(rng) {
+	function getValue(rng) {
 		// Load client secrets from a local file.
 
 		// fs.readFile('credentials.json', (err, content) => {
@@ -80,7 +80,6 @@ client.on('ready', () => {
 			// var val = await authorize(JSON.parse(content), rng, getMsg);
 			authorize(JSON.parse(content), rng, getMsg).then((val) => {
 				return val;
-				// console.log(val);
 			})
 		  } catch (err) {
 			return console.log('Error loading client secret file:', err);
