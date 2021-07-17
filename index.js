@@ -66,23 +66,23 @@ client.on('ready', () => {
 	// 	}
 	// }
 
-	function getValue(rng) {
+	async function getValue(rng) {
 		// Load client secrets from a local file.
 
-		fs.readFile('credentials.json', (err, content) => {
-			if (err) return console.log('Error loading client secret file:', err);
-			// Authorize a client with credentials, then call the Google Sheets API.
-			var val = authorize(JSON.parse(content), rng, getMsg);
-		});
+		// fs.readFile('credentials.json', (err, content) => {
+		// 	if (err) return console.log('Error loading client secret file:', err);
+		// 	// Authorize a client with credentials, then call the Google Sheets API.
+		// 	var val = authorize(JSON.parse(content), rng, getMsg);
+		// });
 
-		// try {
-		// 	let content = fs.readFileSync('credentials.json')
-		// 	var val = await authorize(JSON.parse(content), rng, getMsg);
-		// 	// console.log(val);
-		// 	// channel.send(msg);
-		//   } catch (err) {
-		// 	return console.log('Error loading client secret file:', err);
-		//   }
+		try {
+			let content = fs.readFileSync('credentials.json')
+			var val = await authorize(JSON.parse(content), rng, getMsg);
+			// console.log(val);
+			// channel.send(msg);
+		  } catch (err) {
+			return console.log('Error loading client secret file:', err);
+		  }
 
 		console.log(val);
 		return val;
