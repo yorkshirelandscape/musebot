@@ -74,7 +74,7 @@ function authorize(credentials, rng, callback) {
 	return getNewToken(oAuth2Client, callback);
   }
   console.log(rng);
-  return callback(rng, oAuth2Client);
+  return await callback(rng, oAuth2Client);
 }
 
 /**
@@ -110,27 +110,28 @@ function getNewToken(oAuth2Client, callback) {
 
 
 function getValue(rng, auth) {
-	console.log(rng);
-	const sheets = google.sheets({version: 'v4', auth});
-	var msg = '';
-	sheets.spreadsheets.values.get({
-	  spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
-	  range: rng,
-	}, (err, res) => {
-	  if (err) return console.log('The API returned an error: ' + err);
-	  const rows = res.data.values;
-	  if (rows.length) {
-		// Print columns A and E, which correspond to indices 0 and 4.
-		rows.map((row) => {
-			msg = msg.concat('\n',`${row[0]} ${row[1]}`);
+	return new Promise(resolve => {
+		const sheets = google.sheets({version: 'v4', auth});
+		var msg = '';
+		sheets.spreadsheets.values.get({
+		spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
+		range: rng,
+		}, (err, res) => {
+		if (err) return console.log('The API returned an error: ' + err);
+		const rows = res.data.values;
+		if (rows.length) {
+			// Print columns A and E, which correspond to indices 0 and 4.
+			rows.map((row) => {
+				msg = msg.concat('\n',`${row[0]} ${row[1]}`);
+			});
+		} else {
+			msg = '';
+			console.log('No data found.');
+		}
+		resolve(msg);
 		});
-	  } else {
-		msg = '';
-		console.log('No data found.');
-	  }
-	  return msg;
 	});
-  }
+}
 
 
 const dismoji = require('discord-emoji');
