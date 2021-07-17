@@ -37,7 +37,7 @@ client.on('ready', () => {
 	// setInterval( postMatch(), 7200000 );
 	// postMatch;
 
-	match = getValues("Dashboard!D3:E6");
+	match = getValue("Dashboard!D3:E6");
 	console.log(getValue(match));
 	
 	function postMatch() {
