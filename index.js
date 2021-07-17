@@ -32,10 +32,31 @@ client.on('ready', () => {
 		fs.readFile('credentials.json', (err, content) => {
 			if (err) return console.log('Error loading client secret file:', err);
 			// Authorize a client with credentials, then call the Google Sheets API.
-			var msg = authorize(JSON.parse(content), getValue);
-			channel.send(msg);
+			authorize(JSON.parse(content), getValue);
 		});
 	}
+
+	function getValue(auth) {
+		const sheets = google.sheets({version: 'v4', auth});
+		var msg = '';
+		sheets.spreadsheets.values.get({
+		  spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
+		  range: 'Dashboard!D3:E6',
+		}, (err, res) => {
+		  if (err) return console.log('The API returned an error: ' + err);
+		  const rows = res.data.values;
+		  if (rows.length) {
+			// Print columns A and E, which correspond to indices 0 and 4.
+			rows.map((row) => {
+				msg = msg.concat('\n',`${row[0]} ${row[1]}`);
+			});
+		  } else {
+			msg = '';
+			console.log('No data found.');
+		  }
+		});
+		channel.send(msg);
+	  }
 
 });
 
@@ -89,33 +110,6 @@ function getNewToken(oAuth2Client, callback) {
     });
   });
 }
-
-
-
-function getValue(auth) {
-	const sheets = google.sheets({version: 'v4', auth});
-	let msg = '';
-	sheets.spreadsheets.values.get({
-	  spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
-	  range: 'Dashboard!D3:E6',
-	}, (err, res) => {
-	  if (err) return console.log('The API returned an error: ' + err);
-	  const rows = res.data.values;
-	  if (rows.length) {
-		// Print columns A and E, which correspond to indices 0 and 4.
-		rows.map((row) => {
-			msg = msg.concat('\n',`${row[0]} ${row[1]}`);
-		});
-	  } else {
-		msg = '';
-		console.log('No data found.');
-	  }
-	});
-	return msg;
-  }
-
-
-
 
 
 const dismoji = require('discord-emoji');
