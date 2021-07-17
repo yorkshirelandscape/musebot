@@ -38,7 +38,7 @@ client.on('ready', () => {
 	// postMatch;
 
 	match = getValue("Dashboard!D3:E6");
-	// console.log(match);
+	console.log(match);
 	
 	// function postMatch() {
 	// 	if (now >= sixam && now <= tenpm && getValue(botStat) === 'GO' ) {
