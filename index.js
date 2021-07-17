@@ -1,3 +1,9 @@
+const dotenv = require('dotenv');
+dotenv.config();
+
+const Discord = require('discord.js');
+const client = new Discord.Client();
+
 const fs = require('fs');
 const readline = require('readline');
 const {google} = require('googleapis');
@@ -8,37 +14,6 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // created automatically when the authorization flow completes for the first
 // time.
 const TOKEN_PATH = 'token.json';
-
-// Load client secrets from a local file.
-fs.readFile('credentials.json', (err, content) => {
-  if (err) return console.log('Error loading client secret file:', err);
-  // Authorize a client with credentials, then call the Google Sheets API.
-  authorize(JSON.parse(content), getValue);
-});
-
-function getValue(auth) {
-	const sheets = google.sheets({version: 'v4', auth});
-	var rng = 'Dashboard!D3:E6'
-	sheets.spreadsheets.values.get({
-	  spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
-	  range: rng,
-	}, (err, res) => {
-	  if (err) return console.log('The API returned an error: ' + err);
-	  const rows = res.data.values;
-	  if (rows.length) {
-		// Print columns A and E, which correspond to indices 0 and 4.
-		let msg = '';
-		rows.map((row) => {
-			msg = msg.concat('\n',`${row[0]} ${row[1]}`);
-		});
-		let channel = client.channels.cache.get('864768873270345788')
-		//751893730117812225
-		channel.send(msg);
-	  } else {
-		console.log('No data found.');
-	  }
-	});
-  }
 
 
 /**
@@ -92,15 +67,49 @@ function getNewToken(oAuth2Client, callback) {
 }
 
 
-const dotenv = require('dotenv');
-dotenv.config();
+function getValue(rng, auth) {
+	const sheets = google.sheets({version: 'v4', auth});
+	sheets.spreadsheets.values.get({
+	  spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
+	  range: rng,
+	}, (err, res) => {
+	  if (err) return console.log('The API returned an error: ' + err);
+	  const rows = res.data.values;
+	  if (rows.length) {
+		// Print columns A and E, which correspond to indices 0 and 4.
+		var msg = '';
+		rows.map((row) => {
+			msg = msg.concat('\n',`${row[0]} ${row[1]}`);
+		});
+	  } else {
+		console.log('No data found.');
+	  }
+	});
+  }
 
-const Discord = require('discord.js');
-const client = new Discord.Client();
+function postMsg(rng) {
+	// Load client secrets from a local file.
+	fs.readFile('credentials.json', (err, content) => {
+		if (err) return console.log('Error loading client secret file:', err);
+		getValue(rng);
+		let channel = client.channels.cache.get('864768873270345788') //751893730117812225
+		// Authorize a client with credentials, then call the Google Sheets API.
+		authorize(JSON.parse(content), channel.send(msg));
+	});
+}
+
 
 client.once('ready', () => {
 	console.log('Ready!');
 });
+
+postMsg('Dashboard!D3:E6');
+
+// setInterval( postMsg('Dashboard!D3:E6'), 7200000);
+
+
+
+
 
 const dismoji = require('discord-emoji');
 var result = [];
