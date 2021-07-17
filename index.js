@@ -24,16 +24,18 @@ client.on('ready', () => {
 	const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
 	// console.log(getValue('Dashboard!D3:E6'));
 	
-	postMsg('Dashboard!D3:E6');
+	postMsg('Dashboard!D3:E6', function(msg){
+		console.log(msg);
+	});
 	// setInterval( postMsg('Dashboard!D3:E6'), 7200000);
 
-	function postMsg(rng) {
+	function postMsg(rng, callback) {
 		// Load client secrets from a local file.
 		fs.readFile('credentials.json', (err, content) => {
 			if (err) return console.log('Error loading client secret file:', err);
 			// Authorize a client with credentials, then call the Google Sheets API.
 			let msg = authorize(JSON.parse(content), rng, getValue);
-			console.log(msg);
+			callback(msg);
 			// channel.send(msg);
 		});
 	}
