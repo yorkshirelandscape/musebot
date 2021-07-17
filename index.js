@@ -67,10 +67,10 @@ function getNewToken(oAuth2Client, callback) {
 
 
 client.once('ready', () => {
-	const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
 	console.log('Ready!');
 });
 
+const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
 
 function getValue(rng, auth) {
 	const sheets = google.sheets({version: 'v4', auth});
