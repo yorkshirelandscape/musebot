@@ -78,15 +78,15 @@ client.on('ready', () => {
 		try {
 			let content = fs.readFileSync('credentials.json')
 			// var val = await authorize(JSON.parse(content), rng, getMsg);
-			authorize(JSON.parse(content), rng, getMsg).then((prm) => {
-				var val = prm
+			authorize(JSON.parse(content), rng, getMsg).then((val) => {
+				return val;
 			})
 		  } catch (err) {
 			return console.log('Error loading client secret file:', err);
 		  }
 
 		// console.log(val);
-		return val;
+		// return val;
 
 	}
 });
