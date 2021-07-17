@@ -149,7 +149,7 @@ function getNewToken(oAuth2Client, callback) {
 
 
 function getMsg(rng, auth) {
-	return new Promise(resolve => {
+	// return new Promise(resolve => {
 		const sheets = google.sheets({version: 'v4', auth});
 		var msg = '';
 		sheets.spreadsheets.values.get({
@@ -167,9 +167,10 @@ function getMsg(rng, auth) {
 			msg = '';
 			console.log('No data found.');
 		}
-		resolve(msg);
+		return msg;
+		// resolve(msg);
 		});
-	});
+	// });
 }
 
 
