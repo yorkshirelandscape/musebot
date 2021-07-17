@@ -40,41 +40,41 @@ client.on('ready', () => {
 	match = getValue("Dashboard!D3:E6");
 	console.log(match);
 	
-	function postMatch() {
-		if (now >= sixam && now <= tenpm && getValue(botStat) === 'GO' ) {
+	// function postMatch() {
+	// 	if (now >= sixam && now <= tenpm && getValue(botStat) === 'GO' ) {
 			
-			header = getValue("Dashboard!D1");
-			footer = getValue("Dashboard!D8");
-			match = getValue("Dashboard!D3:E6");
+	// 		header = getValue("Dashboard!D1");
+	// 		footer = getValue("Dashboard!D8");
+	// 		match = getValue("Dashboard!D3:E6");
 			
-			if (header != '') { 
-				console.log(header);
-				// channel.send(header); 
-			}
+	// 		if (header != '') { 
+	// 			console.log(header);
+	// 			// channel.send(header); 
+	// 		}
 		
-			// sng.setValue(sng.getValue() + 1);
-			console.log(match);
-			// channel.send(match);
+	// 		// sng.setValue(sng.getValue() + 1);
+	// 		console.log(match);
+	// 		// channel.send(match);
 	
-			if (footer != '') { 
-				console.log(footer);
-				//   channel.send(footer);
-				//   rnd.setValue('R' + rnd.getValue().slice(1) + 1);
-				//   sng.setValue(1);
-				//   botStat.setValue('STOP');
-			}
-		}
-	}
+	// 		if (footer != '') { 
+	// 			console.log(footer);
+	// 			//   channel.send(footer);
+	// 			//   rnd.setValue('R' + rnd.getValue().slice(1) + 1);
+	// 			//   sng.setValue(1);
+	// 			//   botStat.setValue('STOP');
+	// 		}
+	// 	}
+	// }
 
 	async function getValue(rng) {
 		// Load client secrets from a local file.
 
 		try {
 			let content = fs.readFileSync('credentials.json')
-			let msg = await authorize(JSON.parse(content), rng, getMsg);
+			let val = await authorize(JSON.parse(content), rng, getMsg);
 			// console.log(msg);
 			// channel.send(msg);
-			return msg;
+			return val;
 		  } catch (err) {
 			return console.log('Error loading client secret file:', err);
 		  }
