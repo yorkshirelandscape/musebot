@@ -28,7 +28,7 @@ client.on('ready', () => {
 	let botStat = "Dashboard!B3";
 	let header = '';
 	let footer = '';
-	// let match = '';
+	let match = '';
   
 	let now = new Date();
 	let sixam = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 6, 0, 0, 0);
@@ -42,31 +42,34 @@ client.on('ready', () => {
 	});
 	
 	
-	// function postMatch() {
-	// 	if (now >= sixam && now <= tenpm && getValue(botStat) === 'GO' ) {
+	function postMatch() {
+		if (now >= sixam && now <= tenpm && getValue(botStat) === 'GO' ) {
 			
-	// 		header = getValue("Dashboard!D1");
-	// 		footer = getValue("Dashboard!D8");
-	// 		match = getValue("Dashboard!D3:E6");
+			header = getValue("Dashboard!D1");
+			footer = getValue("Dashboard!D8");
+			match = getValue("Dashboard!D3:E6");
 			
-	// 		if (header != '') { 
-	// 			console.log(header);
-	// 			// channel.send(header); 
-	// 		}
+			if (header != '') { 
+				console.log(header);
+				// channel.send(header); 
+			}
 		
-	// 		// sng.setValue(sng.getValue() + 1);
-	// 		console.log(match);
-	// 		// channel.send(match);
+			// sng.setValue(sng.getValue() + 1);
+			getValue(match).then((val) => {
+				console.log(val);
+				// channel.send(val);
+			});
+			
 	
-	// 		if (footer != '') { 
-	// 			console.log(footer);
-	// 			//   channel.send(footer);
-	// 			//   rnd.setValue('R' + rnd.getValue().slice(1) + 1);
-	// 			//   sng.setValue(1);
-	// 			//   botStat.setValue('STOP');
-	// 		}
-	// 	}
-	// }
+			if (footer != '') { 
+				console.log(footer);
+				//   channel.send(footer);
+				//   rnd.setValue('R' + rnd.getValue().slice(1) + 1);
+				//   sng.setValue(1);
+				//   botStat.setValue('STOP');
+			}
+		}
+	}
 
 	function getValue(rng) {
 		return new Promise(resolve => {
