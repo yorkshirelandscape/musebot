@@ -29,12 +29,12 @@ client.on('ready', () => {
 	postMsg('Dashboard!D3:E6');
 	// setInterval( postMsg('Dashboard!D3:E6'), 7200000);
 
-	async function postMsg(rng) {
+	function postMsg(rng) {
 		// Load client secrets from a local file.
 		fs.readFile('credentials.json', (err, content) => {
 			if (err) return console.log('Error loading client secret file:', err);
 			// Authorize a client with credentials, then call the Google Sheets API.
-			let msg = await authorize(JSON.parse(content), rng, getValue);
+			let msg = authorize(JSON.parse(content), rng, getValue);
 			console.log(msg);
 			// channel.send(msg);
 		});
