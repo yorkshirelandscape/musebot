@@ -110,8 +110,7 @@ async function authorize(credentials, rng, callback) {
 			let token = fs.readFileSync(TOKEN_PATH)
 			oAuth2Client.setCredentials(JSON.parse(token));
 		} catch (err) {
-			resolve(getNewToken(oAuth2Client, callback));
-			// return getNewToken(oAuth2Client, callback);
+			return getNewToken(oAuth2Client, callback);
 		}
 
 		return await callback(rng, oAuth2Client);
