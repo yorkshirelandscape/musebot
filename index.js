@@ -66,12 +66,12 @@ client.on('ready', () => {
 	// 	}
 	// }
 
-	async function getValue(rng) {
+	function getValue(rng) {
 		// Load client secrets from a local file.
 
 		try {
 			let content = fs.readFileSync('credentials.json')
-			var val = await authorize(JSON.parse(content), rng, getMsg);
+			var val = authorize(JSON.parse(content), rng, getMsg);
 			// console.log(val);
 			// channel.send(msg);
 		  } catch (err) {
