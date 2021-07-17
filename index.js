@@ -89,7 +89,7 @@ client.on('ready', () => {
 
 
 
-function getValue(rng) {
+function getValue(rng, auth) {
 	const sheets = google.sheets({version: 'v4', auth});
 	let msg = '';
 	sheets.spreadsheets.values.get({
