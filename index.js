@@ -24,15 +24,15 @@ client.on('ready', () => {
 	const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
 	// console.log(getValue('Dashboard!D3:E6'));
 	
-	postMsg('Dashboard!D3:E6');
+	postMsg;
 	// setInterval( postMsg('Dashboard!D3:E6'), 7200000);
 
-	function postMsg(rng) {
+	function postMsg() {
 		// Load client secrets from a local file.
 		fs.readFile('credentials.json', (err, content) => {
 			if (err) return console.log('Error loading client secret file:', err);
 			// Authorize a client with credentials, then call the Google Sheets API.
-			var msg = authorize(JSON.parse(content), getValue(rng));
+			var msg = authorize(JSON.parse(content), getValue);
 			channel.send(msg);
 		});
 	}
@@ -92,12 +92,12 @@ function getNewToken(oAuth2Client, callback) {
 
 
 
-function getValue(rng, auth) {
+function getValue(auth) {
 	const sheets = google.sheets({version: 'v4', auth});
 	let msg = '';
 	sheets.spreadsheets.values.get({
 	  spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
-	  range: rng,
+	  range: 'Dashboard!D3:E6',
 	}, (err, res) => {
 	  if (err) return console.log('The API returned an error: ' + err);
 	  const rows = res.data.values;
