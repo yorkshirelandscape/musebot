@@ -9,14 +9,14 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // time.
 const TOKEN_PATH = 'token.json';
 
+var rng = 'Dashboard!D3:E6'
+
 // Load client secrets from a local file.
 fs.readFile('credentials.json', (err, content) => {
   if (err) return console.log('Error loading client secret file:', err);
   // Authorize a client with credentials, then call the Google Sheets API.
   authorize(JSON.parse(content), getvalue);
 });
-
-var rng = 'Dashboard!D3:E6'
 
 function getValue(auth) {
 	const sheets = google.sheets({version: 'v4', auth});
@@ -27,11 +27,13 @@ function getValue(auth) {
 	  if (err) return console.log('The API returned an error: ' + err);
 	  const rows = res.data.values;
 	  if (rows.length) {
-		console.log('Name, Major:');
 		// Print columns A and E, which correspond to indices 0 and 4.
-		rows.map((row) => {
-		  console.log(`${row[0]}, ${row[1]}`);
-		});
+		client.channels.cache.get('864768873270345788').then(channel => { //751893730117812225
+			channel.send(`${row[0]}, ${row[1]}`);
+		 });
+		// rows.map((row) => {
+		// 	console.log(`${row[0]}, ${row[1]}`);
+		// });
 	  } else {
 		console.log('No data found.');
 	  }
