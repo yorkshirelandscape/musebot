@@ -24,41 +24,18 @@ client.on('ready', () => {
 	const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
 	// console.log(getValue('Dashboard!D3:E6'));
 	
-	postMsg;
+	postMsg('Dashboard!D3:E6');
 	// setInterval( postMsg('Dashboard!D3:E6'), 7200000);
 
-	function postMsg() {
+	function postMsg(rng) {
 		// Load client secrets from a local file.
 		fs.readFile('credentials.json', (err, content) => {
 			if (err) return console.log('Error loading client secret file:', err);
 			// Authorize a client with credentials, then call the Google Sheets API.
-			authorize(JSON.parse(content), getValue);
+			let msg = authorize(JSON.parse(content), rng, getValue);
+			channel.send(msg);
 		});
 	}
-
-	function getValue(auth) {
-		const sheets = google.sheets({version: 'v4', auth});
-		var msg = '';
-		sheets.spreadsheets.values.get({
-		  spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
-		  range: 'Dashboard!D3:E6',
-		}, (err, res) => {
-		  if (err) return console.log('The API returned an error: ' + err);
-		  const rows = res.data.values;
-		  if (rows.length) {
-			// Print columns A and E, which correspond to indices 0 and 4.
-			rows.map((row) => {
-				msg = msg.concat('\n',`${row[0]} ${row[1]}`);
-			});
-		  } else {
-			msg = '';
-			console.log('No data found.');
-		  }
-		  console.log(msg);
-		//   channel.send(msg);
-		});
-	  }
-
 });
 
 
@@ -68,7 +45,7 @@ client.on('ready', () => {
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(credentials, callback) {
+function authorize(credentials, rng, callback) {
   const {client_secret, client_id, redirect_uris} = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(
       client_id, client_secret, redirect_uris[0]);
@@ -77,7 +54,7 @@ function authorize(credentials, callback) {
   fs.readFile(TOKEN_PATH, (err, token) => {
     if (err) return getNewToken(oAuth2Client, callback);
     oAuth2Client.setCredentials(JSON.parse(token));
-    callback(oAuth2Client);
+    callback(rng, oAuth2Client);
   });
 }
 
@@ -111,6 +88,29 @@ function getNewToken(oAuth2Client, callback) {
     });
   });
 }
+
+
+function getValue(rng, auth) {
+	const sheets = google.sheets({version: 'v4', auth});
+	var msg = '';
+	sheets.spreadsheets.values.get({
+	  spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
+	  range: rng,
+	}, (err, res) => {
+	  if (err) return console.log('The API returned an error: ' + err);
+	  const rows = res.data.values;
+	  if (rows.length) {
+		// Print columns A and E, which correspond to indices 0 and 4.
+		rows.map((row) => {
+			msg = msg.concat('\n',`${row[0]} ${row[1]}`);
+		});
+	  } else {
+		msg = '';
+		console.log('No data found.');
+	  }
+	  return msg;
+	});
+  }
 
 
 const dismoji = require('discord-emoji');
