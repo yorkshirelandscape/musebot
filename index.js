@@ -35,11 +35,11 @@ client.on('ready', () => {
 	let tenpm = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 22, 0, 0, 0);
 
 	// setInterval( postMatch(), 7200000 );
-	postMatch;
+	// postMatch;
 
-	// getValue('Dashboard!D3:E6');
-	// setInterval( postMsg('Dashboard!D3:E6'), 7200000);
-
+	match = getValues("Dashboard!D3:E6");
+	console.log(getValue(match));
+	
 	function postMatch() {
 		if (now >= sixam && now <= tenpm && getValue(botStat) === 'GO' ) {
 			
