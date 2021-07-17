@@ -28,7 +28,7 @@ client.on('ready', () => {
 	let botStat = "Dashboard!B3";
 	let header = '';
 	let footer = '';
-	let match = '';
+	// let match = '';
   
 	let now = new Date();
 	let sixam = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 6, 0, 0, 0);
@@ -37,8 +37,10 @@ client.on('ready', () => {
 	// setInterval( postMatch(), 7200000 );
 	// postMatch;
 
-	match = getValue("Dashboard!D3:E6");
-	console.log(match);
+	getValue("Dashboard!D3:E6").then((match) => {
+		console.log(match);
+	});
+	
 	
 	// function postMatch() {
 	// 	if (now >= sixam && now <= tenpm && getValue(botStat) === 'GO' ) {
@@ -67,28 +69,32 @@ client.on('ready', () => {
 	// }
 
 	function getValue(rng) {
-		// Load client secrets from a local file.
+		return new Promise(resolve => {
+			// Load client secrets from a local file.
 
-		// fs.readFile('credentials.json', (err, content) => {
-		// 	if (err) return console.log('Error loading client secret file:', err);
-		// 	// Authorize a client with credentials, then call the Google Sheets API.
-		// 	var val = authorize(JSON.parse(content), rng, getMsg);
-		// });
+			// fs.readFile('credentials.json', (err, content) => {
+			// 	if (err) return console.log('Error loading client secret file:', err);
+			// 	// Authorize a client with credentials, then call the Google Sheets API.
+			// 	var val = authorize(JSON.parse(content), rng, getMsg);
+			// });
 
-		try {
-			let content = fs.readFileSync('credentials.json')
-			// var val = await authorize(JSON.parse(content), rng, getMsg);
-			authorize(JSON.parse(content), rng, getMsg).then((val) => {
-				console.log(val);
-				return val;
-			})
-		  } catch (err) {
-			return console.log('Error loading client secret file:', err);
-		  }
+			try {
+				let content = fs.readFileSync('credentials.json')
+				// var val = await authorize(JSON.parse(content), rng, getMsg);
+				authorize(JSON.parse(content), rng, getMsg).then((val) => {
+					console.log(val);
+					resolve(val);
+					// return val;
+				})
+			} catch (err) {
+				resolve(console.log('Error loading client secret file:', err));
+				// return console.log('Error loading client secret file:', err);
+			}
 
-		// console.log(val);
-		// return val;
+			// console.log(val);
+			// return val;
 
+		});
 	}
 });
 
