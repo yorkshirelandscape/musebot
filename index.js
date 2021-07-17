@@ -69,11 +69,11 @@ function getNewToken(oAuth2Client, callback) {
 
 function getValue(rng, auth) {
 	const sheets = google.sheets({version: 'v4', auth});
+	let msg = '';
 	sheets.spreadsheets.values.get({
 	  spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
 	  range: rng,
 	}, (err, res) => {
-	  let msg = '';
 	  if (err) return console.log('The API returned an error: ' + err);
 	  const rows = res.data.values;
 	  if (rows.length) {
@@ -105,8 +105,8 @@ client.once('ready', () => {
 	console.log('Ready!');
 });
 
-let test = getValue('Dashboard!D3:E6');
-console.log(test);
+// let test = getValue('Dashboard!D3:E6');
+// console.log(test);
 
 postMsg('Dashboard!D3:E6');
 
