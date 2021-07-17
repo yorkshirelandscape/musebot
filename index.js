@@ -22,19 +22,58 @@ client.once('ready', () => {
 
 client.on('ready', () => {
 	const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
-	// console.log(getValue('Dashboard!D3:E6'));
 	
-	postMsg('Dashboard!D3:E6');
+	let rnd = "Dashboard!B2";
+	let sng = "Dashboard!B3";
+	let botStat = "Dashboard!B3";
+	let header = '';
+	let footer = '';
+	let match = '';
+  
+	let now = new Date();
+	let sixam = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 6, 0, 0, 0);
+	let tenpm = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 22, 0, 0, 0);
+
+	setInterval( postMatch(), 7200000 );
+
+	// getValue('Dashboard!D3:E6');
 	// setInterval( postMsg('Dashboard!D3:E6'), 7200000);
 
-	async function postMsg(rng) {
+	function postMatch() {
+		if (now >= sixam && now <= tenpm && getValue(botStat) === 'GO' ) {
+			
+			header = getValue("Dashboard!D1");
+			footer = getValue("Dashboard!D8");
+			match = getValues("Dashboard!D3:E6");
+			
+			if (header != '') { 
+				console.log(header);
+				// channel.send(header); 
+			}
+		
+			// sng.setValue(sng.getValue() + 1);
+			console.log(match);
+			// channel.send(match);
+	
+			if (footer != '') { 
+				console.log(footer);
+				//   channel.send(footer);
+				//   rnd.setValue('R' + rnd.getValue().slice(1) + 1);
+				//   sng.setValue(1);
+				//   botStat.setValue('STOP');
+			}
+		}
+	}
+
+	async function getValue(rng) {
 		// Load client secrets from a local file.
 
 		try {
 			let content = fs.readFileSync('credentials.json')
 			let msg = await authorize(JSON.parse(content), rng, getValue);
-			console.log(msg);
+			// console.log(msg);
 			// channel.send(msg);
+			return msg;
 		  } catch (err) {
 			return console.log('Error loading client secret file:', err);
 		  }
