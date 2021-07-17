@@ -38,7 +38,7 @@ client.on('ready', () => {
 	// postMatch;
 
 	match = getValue("Dashboard!D3:E6");
-	// console.log(match);
+	console.log(match);
 	
 	// function postMatch() {
 	// 	if (now >= sixam && now <= tenpm && getValue(botStat) === 'GO' ) {
@@ -77,12 +77,15 @@ client.on('ready', () => {
 
 		try {
 			let content = fs.readFileSync('credentials.json')
-			var val = await authorize(JSON.parse(content), rng, getMsg);
+			// var val = await authorize(JSON.parse(content), rng, getMsg);
+			authorize(JSON.parse(content), rng, getMsg).then((prm) => {
+				var val = prm
+			})
 		  } catch (err) {
 			return console.log('Error loading client secret file:', err);
 		  }
 
-		console.log(val);
+		// console.log(val);
 		return val;
 
 	}
