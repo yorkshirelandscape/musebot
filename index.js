@@ -45,7 +45,7 @@ client.on('ready', () => {
 			
 			header = getValue("Dashboard!D1");
 			footer = getValue("Dashboard!D8");
-			match = getValues("Dashboard!D3:E6");
+			match = getValue("Dashboard!D3:E6");
 			
 			if (header != '') { 
 				console.log(header);
