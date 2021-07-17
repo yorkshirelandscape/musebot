@@ -77,6 +77,7 @@ client.on('ready', () => {
 		  } catch (err) {
 			return console.log('Error loading client secret file:', err);
 		  }
+		console.log(val);
 		return val;
 		// fs.readFile('credentials.json', (err, content) => {
 		// 	if (err) return console.log('Error loading client secret file:', err);
