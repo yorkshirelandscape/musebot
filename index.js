@@ -55,7 +55,7 @@ function authorize(credentials, rng, callback) {
   fs.readFile(TOKEN_PATH, (err, token) => {
     if (err) return getNewToken(oAuth2Client, callback);
     oAuth2Client.setCredentials(JSON.parse(token));
-    callback(rng, oAuth2Client);
+    return callback(rng, oAuth2Client);
   });
 }
 
