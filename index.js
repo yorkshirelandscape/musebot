@@ -70,7 +70,7 @@ client.on('ready', () => {
 
 		try {
 			let content = fs.readFileSync('credentials.json')
-			let msg = await authorize(JSON.parse(content), rng, getValue);
+			let msg = await authorize(JSON.parse(content), rng, getMsg);
 			// console.log(msg);
 			// channel.send(msg);
 			return msg;
@@ -147,7 +147,7 @@ function getNewToken(oAuth2Client, callback) {
 }
 
 
-function getValue(rng, auth) {
+function getMsg(rng, auth) {
 	return new Promise(resolve => {
 		const sheets = google.sheets({version: 'v4', auth});
 		var msg = '';
