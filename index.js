@@ -9,8 +9,6 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // time.
 const TOKEN_PATH = 'token.json';
 
-var rng = 'Dashboard!D3:E6'
-
 // Load client secrets from a local file.
 fs.readFile('credentials.json', (err, content) => {
   if (err) return console.log('Error loading client secret file:', err);
@@ -20,6 +18,7 @@ fs.readFile('credentials.json', (err, content) => {
 
 function getValue(auth) {
 	const sheets = google.sheets({version: 'v4', auth});
+	var rng = 'Dashboard!D3:E6'
 	sheets.spreadsheets.values.get({
 	  spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
 	  range: rng,
