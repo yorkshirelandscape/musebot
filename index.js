@@ -55,11 +55,11 @@ async function authorize(credentials, rng, callback) {
       client_id, client_secret, redirect_uris[0]);
 
   // Check if we have previously stored a token.
-  readFile(TOKEN_PATH, (err, token) => {
+  await readFile(TOKEN_PATH, (err, token) => {
     if (err) return getNewToken(oAuth2Client, callback);
     oAuth2Client.setCredentials(JSON.parse(token));
   });
-  return await callback(rng, oAuth2Client);
+  return callback(rng, oAuth2Client);
 }
 
 /**
