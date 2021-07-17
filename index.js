@@ -93,7 +93,7 @@ function postMsg(rng) {
 	// Load client secrets from a local file.
 	fs.readFile('credentials.json', (err, content) => {
 		if (err) return console.log('Error loading client secret file:', err);
-		let msg = getValue('Dashboard!D3:E6');
+		let msg = getValue(rng);
 		let channel = client.channels.cache.get('864768873270345788'); //751893730117812225
 		// Authorize a client with credentials, then call the Google Sheets API.
 		authorize(JSON.parse(content), channel.send(msg));
@@ -104,6 +104,9 @@ function postMsg(rng) {
 client.once('ready', () => {
 	console.log('Ready!');
 });
+
+let test = getValue('Dashboard!D3:E6');
+console.log(test);
 
 postMsg('Dashboard!D3:E6');
 
