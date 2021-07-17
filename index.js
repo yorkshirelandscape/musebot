@@ -86,11 +86,13 @@ var emoji2
 function getvalue(auth) {
 	const sheets = google.sheets({version: 'v4', auth});
 	sheets.spreadsheets.values.get({
-	spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
-	range: 'Dashboard!D4',
+	spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
+	range: 'Class Data!A2:E',
+	// spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
+	// range: 'Dashboard!D4',
 	},(err, res) => {
 	if (err) return console.log('The API returned an error: ' + err);
-	emoji1 = res.data.values;
+	emoji1 = res.data.values[0];
 	// emoji2 = res.data.values[1];
 	});
 }
