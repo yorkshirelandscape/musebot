@@ -71,8 +71,8 @@ client.on('ready', () => {
 
 		try {
 			let content = fs.readFileSync('credentials.json')
-			let val = await authorize(JSON.parse(content), rng, getMsg);
-			console.log(val);
+			var val = await authorize(JSON.parse(content), rng, getMsg);
+			// console.log(val);
 			// channel.send(msg);
 		  } catch (err) {
 			return console.log('Error loading client secret file:', err);
