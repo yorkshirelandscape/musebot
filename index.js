@@ -15,7 +15,7 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // time.
 const TOKEN_PATH = 'token.json';
 
-const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
+const channel = client.channels.get('864768873270345788'); //751893730117812225
 
 console.log(channel);
 
