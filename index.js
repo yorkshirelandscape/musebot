@@ -73,7 +73,7 @@ function authorize(credentials, rng, callback) {
   } catch (err) {
 	return getNewToken(oAuth2Client, callback);
   }
-
+  console.log(rng);
   return callback(rng, oAuth2Client);
 }
 
@@ -110,6 +110,7 @@ function getNewToken(oAuth2Client, callback) {
 
 
 function getValue(rng, auth) {
+	console.log(rng);
 	const sheets = google.sheets({version: 'v4', auth});
 	var msg = '';
 	sheets.spreadsheets.values.get({
