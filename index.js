@@ -70,7 +70,13 @@ client.once('ready', () => {
 	console.log('Ready!');
 });
 
-const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
+client.on('ready', () => {
+	const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
+	postMsg('Dashboard!D3:E6');
+	// setInterval( postMsg('Dashboard!D3:E6'), 7200000);
+});
+
+
 
 function getValue(rng, auth) {
 	const sheets = google.sheets({version: 'v4', auth});
@@ -103,18 +109,6 @@ function postMsg(rng) {
 		authorize(JSON.parse(content), channel.send(msg));
 	});
 }
-
-
-// let test = getValue('Dashboard!D3:E6');
-// console.log(test);
-
-
-
-postMsg('Dashboard!D3:E6');
-
-// setInterval( postMsg('Dashboard!D3:E6'), 7200000);
-
-
 
 
 
