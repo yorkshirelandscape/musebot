@@ -34,7 +34,8 @@ client.on('ready', () => {
 	let sixam = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 6, 0, 0, 0);
 	let tenpm = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 22, 0, 0, 0);
 
-	setInterval( postMatch(), 7200000 );
+	// setInterval( postMatch(), 7200000 );
+	postMatch;
 
 	// getValue('Dashboard!D3:E6');
 	// setInterval( postMsg('Dashboard!D3:E6'), 7200000);
