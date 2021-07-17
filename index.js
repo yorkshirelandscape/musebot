@@ -24,18 +24,16 @@ client.on('ready', () => {
 	const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
 	// console.log(getValue('Dashboard!D3:E6'));
 	
-	postMsg('Dashboard!D3:E6', function(msg){
-		console.log(msg);
-	});
+	postMsg('Dashboard!D3:E6');
 	// setInterval( postMsg('Dashboard!D3:E6'), 7200000);
 
-	function postMsg(rng, callback) {
+	function postMsg(rng) {
 		// Load client secrets from a local file.
 		fs.readFile('credentials.json', (err, content) => {
 			if (err) return console.log('Error loading client secret file:', err);
 			// Authorize a client with credentials, then call the Google Sheets API.
 			let msg = authorize(JSON.parse(content), rng, getValue);
-			callback(msg);
+			console.log(msg);
 			// channel.send(msg);
 		});
 	}
@@ -48,7 +46,7 @@ client.on('ready', () => {
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(credentials, rng, callback) {
+async function authorize(credentials, rng, callback) {
   const {client_secret, client_id, redirect_uris} = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(
       client_id, client_secret, redirect_uris[0]);
@@ -57,7 +55,7 @@ function authorize(credentials, rng, callback) {
   fs.readFile(TOKEN_PATH, (err, token) => {
     if (err) return getNewToken(oAuth2Client, callback);
     oAuth2Client.setCredentials(JSON.parse(token));
-    return callback(rng, oAuth2Client);
+    return await callback(rng, oAuth2Client);
   });
 }
 
