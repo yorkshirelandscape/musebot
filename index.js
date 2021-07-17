@@ -30,22 +30,22 @@ client.on('ready', () => {
 	async function postMsg(rng) {
 		// Load client secrets from a local file.
 
-		// try {
-		// 	let content = fs.readFileSync('credentials.json')
-		// 	let msg = authorize(JSON.parse(content), rng, getValue);
-		// 	console.log(msg);
-		// 	// channel.send(msg);
-		//   } catch (err) {
-		// 	return console.log('Error loading client secret file:', err);
-		//   }
-
-		fs.readFile('credentials.json', (err, content) => {
-			if (err) return console.log('Error loading client secret file:', err);
-			// Authorize a client with credentials, then call the Google Sheets API.
+		try {
+			let content = fs.readFileSync('credentials.json')
 			let msg = await authorize(JSON.parse(content), rng, getValue);
 			console.log(msg);
-			channel.send(msg);
-		});
+			// channel.send(msg);
+		  } catch (err) {
+			return console.log('Error loading client secret file:', err);
+		  }
+
+		// fs.readFile('credentials.json', (err, content) => {
+		// 	if (err) return console.log('Error loading client secret file:', err);
+		// 	// Authorize a client with credentials, then call the Google Sheets API.
+		// 	let msg = authorize(JSON.parse(content), rng, getValue);
+		// 	console.log(msg);
+		// 	channel.send(msg);
+		// });
 	}
 });
 
@@ -62,17 +62,17 @@ async function authorize(credentials, rng, callback) {
       client_id, client_secret, redirect_uris[0]);
 
   // Check if we have previously stored a token.
-  fs.readFile(TOKEN_PATH, (err, token) => {
-    if (err) return getNewToken(oAuth2Client, callback);
-    oAuth2Client.setCredentials(JSON.parse(token));
-  });
+//   fs.readFile(TOKEN_PATH, (err, token) => {
+//     if (err) return getNewToken(oAuth2Client, callback);
+//     oAuth2Client.setCredentials(JSON.parse(token));
+//   });
 
-//   try {
-// 	let token = fs.readFileSync(TOKEN_PATH)
-// 	oAuth2Client.setCredentials(JSON.parse(token));
-//   } catch (err) {
-// 	return getNewToken(oAuth2Client, callback);
-//   }
+  try {
+	let token = fs.readFileSync(TOKEN_PATH)
+	oAuth2Client.setCredentials(JSON.parse(token));
+  } catch (err) {
+	return getNewToken(oAuth2Client, callback);
+  }
   console.log(rng);
   return await callback(rng, oAuth2Client);
 }
