@@ -73,11 +73,11 @@ function getValue(rng, auth) {
 	  spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
 	  range: rng,
 	}, (err, res) => {
+	  let msg = '';
 	  if (err) return console.log('The API returned an error: ' + err);
 	  const rows = res.data.values;
 	  if (rows.length) {
 		// Print columns A and E, which correspond to indices 0 and 4.
-		let msg = '';
 		rows.map((row) => {
 			msg = msg.concat('\n',`${row[0]} ${row[1]}`);
 		});
