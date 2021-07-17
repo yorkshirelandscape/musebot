@@ -54,7 +54,8 @@ client.on('ready', () => {
 			msg = '';
 			console.log('No data found.');
 		  }
-		  channel.send(msg);
+		  console.log(msg);
+		//   channel.send(msg);
 		});
 	  }
 
