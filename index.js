@@ -72,7 +72,7 @@ client.on('ready', () => {
 		try {
 			let content = fs.readFileSync('credentials.json')
 			let val = await authorize(JSON.parse(content), rng, getMsg);
-			// console.log(msg);
+			console.log(val);
 			// channel.send(msg);
 			return val;
 		  } catch (err) {
