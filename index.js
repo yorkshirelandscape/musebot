@@ -16,12 +16,13 @@ fs.readFile('credentials.json', (err, content) => {
   authorize(JSON.parse(content), getvalue);
 });
 
+var rng = 'Dashboard!D3:E6'
 
 function getValue(auth) {
 	const sheets = google.sheets({version: 'v4', auth});
 	sheets.spreadsheets.values.get({
-	  spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
-	  range: 'Class Data!A2:E',
+	  spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
+	  range: rng,
 	}, (err, res) => {
 	  if (err) return console.log('The API returned an error: ' + err);
 	  const rows = res.data.values;
@@ -29,7 +30,7 @@ function getValue(auth) {
 		console.log('Name, Major:');
 		// Print columns A and E, which correspond to indices 0 and 4.
 		rows.map((row) => {
-		  console.log(`${row[0]}, ${row[4]}`);
+		  console.log(`${row[0]}, ${row[1]}`);
 		});
 	  } else {
 		console.log('No data found.');
