@@ -28,9 +28,9 @@ function getValue(auth) {
 	  const rows = res.data.values;
 	  if (rows.length) {
 		// Print columns A and E, which correspond to indices 0 and 4.
-		client.channels.cache.fetch('864768873270345788').then(channel => { //751893730117812225
-			channel.send(`${row[0]}, ${row[1]}`);
-		 });
+		let channel = client.channels.cache.get('864768873270345788')
+		//751893730117812225
+		channel.send(`${row[0]}, ${row[1]}`);
 		// rows.map((row) => {
 		// 	console.log(`${row[0]}, ${row[1]}`);
 		// });
