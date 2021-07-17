@@ -15,10 +15,6 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // time.
 const TOKEN_PATH = 'token.json';
 
-const channel = client.channels.get('864768873270345788'); //751893730117812225
-
-console.log(channel);
-
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
  * given callback function.
@@ -104,11 +100,14 @@ function postMsg(rng) {
 
 
 client.once('ready', () => {
+	const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
 	console.log('Ready!');
 });
 
 // let test = getValue('Dashboard!D3:E6');
 // console.log(test);
+
+
 
 postMsg('Dashboard!D3:E6');
 
