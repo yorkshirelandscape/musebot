@@ -15,7 +15,7 @@ var rng = 'Dashboard!D3:E6'
 fs.readFile('credentials.json', (err, content) => {
   if (err) return console.log('Error loading client secret file:', err);
   // Authorize a client with credentials, then call the Google Sheets API.
-  authorize(JSON.parse(content), getvalue);
+  authorize(JSON.parse(content), getValue);
 });
 
 function getValue(auth) {
