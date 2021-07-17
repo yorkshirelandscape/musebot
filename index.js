@@ -83,40 +83,17 @@ var result = [];
 var emoji1
 var emoji2
 
-// function getvalue(auth) {
-// 	const sheets = google.sheets({version: 'v4', auth});
-// 	sheets.spreadsheets.values.get({
-// 	spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
-// 	range: 'Dashboard!D4',
-// 	},(err, res) => {
-// 	if (err) return console.log('The API returned an error: ' + err);
-// 	emoji1 = res.data.values;
-// 	// emoji2 = res.data.values[1];
-// 	});
-// }
-
-function main () {
-	const authClient = authorize();
-	const request = {
-	  // The ID of the spreadsheet to retrieve data from.
-	  spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',  // TODO: Update placeholder value.
-  
-	  // The A1 notation of the values to retrieve.
-	  range: 'Dashboard!D4',  // TODO: Update placeholder value.
-  
-	  // How values should be represented in the output.
-	  // The default render option is ValueRenderOption.FORMATTED_VALUE.
-	  valueRenderOption: 'ValueRenderOption.FORMATTED_VALUE',  // TODO: Update placeholder value.
-  
-	  // How dates, times, and durations should be represented in the output.
-	  // This is ignored if value_render_option is
-	  // FORMATTED_VALUE.
-	  // The default dateTime render option is [DateTimeRenderOption.SERIAL_NUMBER].
-	  dateTimeRenderOption: 'ValueRenderOption.FORMATTED_VALUE',  // TODO: Update placeholder value.
-  
-	  auth: authClient,
-	}
-};
+function getvalue(auth) {
+	const sheets = google.sheets({version: 'v4', auth});
+	sheets.spreadsheets.values.get({
+	spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
+	range: 'Dashboard!D4',
+	},(err, res) => {
+	if (err) return console.log('The API returned an error: ' + err);
+	emoji1 = res.data.values;
+	// emoji2 = res.data.values[1];
+	});
+}
 
 console.log(emoji1)
 
