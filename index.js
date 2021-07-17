@@ -8,9 +8,6 @@ const fs = require('fs');
 const readline = require('readline');
 const {google} = require('googleapis');
 
-// const util = require('util');
-// const readFile = util.promisify(fs.readFile);
-
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // The file token.json stores the user's access and refresh tokens, and is
@@ -30,12 +27,12 @@ client.on('ready', () => {
 	postMsg('Dashboard!D3:E6');
 	// setInterval( postMsg('Dashboard!D3:E6'), 7200000);
 
-	function postMsg(rng) {
+	async function postMsg(rng) {
 		// Load client secrets from a local file.
 		fs.readFile('credentials.json', (err, content) => {
 			if (err) return console.log('Error loading client secret file:', err);
 			// Authorize a client with credentials, then call the Google Sheets API.
-			let msg = authorize(JSON.parse(content), rng, getValue);
+			let msg = await authorize(JSON.parse(content), rng, getValue);
 			console.log(msg);
 			// channel.send(msg);
 		});
