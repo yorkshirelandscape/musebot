@@ -79,6 +79,7 @@ client.on('ready', () => {
 			let content = fs.readFileSync('credentials.json')
 			// var val = await authorize(JSON.parse(content), rng, getMsg);
 			authorize(JSON.parse(content), rng, getMsg).then((val) => {
+				console.log(val);
 				return val;
 			})
 		  } catch (err) {
