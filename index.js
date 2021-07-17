@@ -96,7 +96,6 @@ client.on('ready', () => {
  * @param {function} callback The callback to call with the authorized client.
  */
 function authorize(credentials, rng, callback) {
-	return new Promise(resolve => {
 		const {client_secret, client_id, redirect_uris} = credentials.installed;
 		const oAuth2Client = new google.auth.OAuth2(
 			client_id, client_secret, redirect_uris[0]);
@@ -114,9 +113,8 @@ function authorize(credentials, rng, callback) {
 			resolve(getNewToken(oAuth2Client, callback));
 			// return getNewToken(oAuth2Client, callback);
 		}
-		resolve( callback(rng, oAuth2Client));
-		// return await callback(rng, oAuth2Client);
-	});
+
+		return await callback(rng, oAuth2Client);
 }
 
 /**
