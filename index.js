@@ -27,6 +27,7 @@ function getValue(auth) {
 	  const rows = res.data.values;
 	  if (rows.length) {
 		// Print columns A and E, which correspond to indices 0 and 4.
+		let msg = '';
 		rows.map((row) => {
 			msg = concat(msg, `${row[0]} ${row[1]}\n`);
 		});
