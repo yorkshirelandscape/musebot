@@ -96,7 +96,7 @@ function postMsg(rng) {
 		let msg = getValue(rng);
 		let channel = client.channels.cache.get('864768873270345788'); //751893730117812225
 		// Authorize a client with credentials, then call the Google Sheets API.
-		authorize(JSON.parse(content), channel.send(msg));
+		authorize(JSON.parse(content), channel.send('Test'));
 	});
 }
 
