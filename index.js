@@ -29,7 +29,7 @@ function getValue(auth) {
 		// Print columns A and E, which correspond to indices 0 and 4.
 		let msg = '';
 		rows.map((row) => {
-			msg = concat(msg, `${row[0]} ${row[1]}\n`);
+			msg = msg.concat('\n',`${row[0]} ${row[1]}`);
 		});
 		let channel = client.channels.cache.get('864768873270345788')
 		//751893730117812225
