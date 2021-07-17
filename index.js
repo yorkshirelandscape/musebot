@@ -73,7 +73,6 @@ async function authorize(credentials, rng, callback) {
   } catch (err) {
 	return getNewToken(oAuth2Client, callback);
   }
-  console.log(rng);
   return await callback(rng, oAuth2Client);
 }
 
@@ -122,7 +121,7 @@ function getValue(rng, auth) {
 		if (rows.length) {
 			// Print columns A and E, which correspond to indices 0 and 4.
 			rows.map((row) => {
-				msg = msg.concat('\n',`${row[0]} ${row[1]}`);
+				msg = msg.concat('\n',`${row[0]} ${(row[1] || '')}`);
 			});
 		} else {
 			msg = '';
