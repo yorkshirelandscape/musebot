@@ -28,11 +28,11 @@ function getValue(auth) {
 	  if (rows.length) {
 		// Print columns A and E, which correspond to indices 0 and 4.
 		rows.map((row) => {
-			console.log(`${row[0]}, ${row[1]}`);
+			msg = concat(msg, `${row[0]} ${row[1]}\n`);
 		});
 		let channel = client.channels.cache.get('864768873270345788')
 		//751893730117812225
-		channel.send(`${row[0]}, ${row[1]}`);
+		channel.send(msg);
 	  } else {
 		console.log('No data found.');
 	  }
