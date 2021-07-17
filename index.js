@@ -33,7 +33,8 @@ client.on('ready', () => {
 			if (err) return console.log('Error loading client secret file:', err);
 			// Authorize a client with credentials, then call the Google Sheets API.
 			let msg = authorize(JSON.parse(content), rng, getValue);
-			channel.send(msg);
+			console.log(msg);
+			// channel.send(msg);
 		});
 	}
 });
