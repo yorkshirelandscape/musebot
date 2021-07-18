@@ -15,44 +15,64 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // time.
 const TOKEN_PATH = 'token.json';
 
-
-function postMatch(match) {
-  console.log(match);
-}
-
-
-function getValue(rng) {
-  // Load client secrets from a local file.
-  try {
-    var content = JSON.parse(fs.readFileSync('credentials.json'))
-  } catch (err) {
-    return console.log('Error loading client secret file:', err);
-  }
-  return authorize(content).then((auth) => getMsg(rng, auth));
-}
-
-
 client.once('ready', () => {
 	console.log('Ready!');
 });
 
-
 client.on('ready', () => {
-  const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
+	const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
 
-  let rnd = "Dashboard!B2";
-  let sng = "Dashboard!B3";
-  let botStat = "Dashboard!B3";
-  let header = '';
-  let footer = '';
-  let match = '';
+	let rnd = "Dashboard!B2";
+	let sng = "Dashboard!B3";
+	let botStat = "Dashboard!B4";
+	let header = 'Dashboard!D1';
+	let footer = 'Dashboard!D8';
+	let match = 'Dashboard!D3:E6';
+	
+	let now = new Date();
+	let sixam = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 6, 0, 0, 0);
+	let tenpm = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 22, 0, 0, 0);
 
-  let now = new Date();
-  let sixam = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 6, 0, 0, 0);
-  let tenpm = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 22, 0, 0, 0);
+	getValue(botStat).then(function(bStat) {
 
-  getValue("Dashboard!D3:E6").then(postMatch);
+		if (now >= sixam && now <= tenpm && bStat === 'GO' ) {
+		
+			getValue(header).then((val) => {
+					if (typeof val != 'undefined') { channel.send(val); }
+				});
+	
+			// sng.setValue(sng.getValue() + 1);
+			getValue(match).then((val) => {
+				console.log(val);
+				// channel.send(val);
+			});
+				
+			getValue(footer).then((val) => {
+				if (typeof val != 'undefined') { 
+					channel.send(val); 
+					// rnd.setValue('R' + rnd.getValue().slice(1) + 1);
+					// sng.setValue(1);
+					// botStat.setValue('STOP');
+				}
+			});
+		}
+	});
 });
+
+
+function getValue(rng) {
+	return new Promise(resolve => {
+		// Load client secrets from a local file.
+		try {
+			var content = JSON.parse(fs.readFileSync('credentials.json'))
+		} catch (err) {
+			resolve(console.log('Error loading client secret file:', err));
+			// return console.log('Error loading client secret file:', err);
+		}
+		resolve( authorize(content).then((auth) => getMsg(rng, auth)) );
+		// return authorize(content).then((auth) => getMsg(rng, auth));
+	});
+}
 
 
 async function authorize(credentials) {
@@ -97,7 +117,6 @@ async function getNewToken(oAuth2Client) {
 
 async function getMsg(rng, auth) {
   const sheets = google.sheets({version: 'v4', auth});
-  var msg = '';
   try {
     var response = await sheets.spreadsheets.values.get({
       spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
@@ -108,14 +127,20 @@ async function getMsg(rng, auth) {
     throw(err);
   }
 
+  var msg;
+  var msgArr = [];
+
   const rows = response.data.values;
-  if (rows.length) {
+  if (typeof rows != 'undefined') {
     // Print columns A and E, which correspond to indices 0 and 4.
     rows.map((row) => {
-      msg = msg.concat('\n', `${row[0]} ${(row[1] || '')}`);
+		msgArr.push(row[0] + ((typeof row[1] != 'undefined') ? ` ${row[1]}` : '') );
     });
+	msg = msgArr.join('\n');
   } else {
     console.log('No data found.');
   }
   return msg;
 }
+
+client.login(process.env.TOKEN);

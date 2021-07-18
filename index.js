@@ -15,127 +15,80 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // time.
 const TOKEN_PATH = 'token.json';
 
-
 client.once('ready', () => {
 	console.log('Ready!');
 });
 
 client.on('ready', () => {
 	const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
-	
+
 	let rnd = "Dashboard!B2";
 	let sng = "Dashboard!B3";
-	let botStat = "Dashboard!B3";
-	let header = '';
-	let footer = '';
-	let match = '';
-  
+	let botStat = "Dashboard!B4";
+	let header = 'Dashboard!D1';
+	let footer = 'Dashboard!D8';
+	let match = 'Dashboard!D3:E6';
+	
 	let now = new Date();
 	let sixam = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 6, 0, 0, 0);
 	let tenpm = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 22, 0, 0, 0);
 
-	// setInterval( postMatch(), 7200000 );
-	// postMatch;
+	getValue(botStat).then(function(bStat) {
 
-	getValue("Dashboard!D3:E6").then((match) => {
-		console.log(match);
-	});
-	
-	
-	function postMatch() {
-		if (now >= sixam && now <= tenpm && getValue(botStat) === 'GO' ) {
-			
-			header = getValue("Dashboard!D1");
-			footer = getValue("Dashboard!D8");
-			match = getValue("Dashboard!D3:E6");
-			
-			if (header != '') { 
-				console.log(header);
-				// channel.send(header); 
-			}
+		if (now >= sixam && now <= tenpm && bStat === 'GO' ) {
 		
+			getValue(header).then((val) => {
+					if (typeof val != 'undefined') { channel.send(val); }
+				});
+	
 			// sng.setValue(sng.getValue() + 1);
 			getValue(match).then((val) => {
 				console.log(val);
 				// channel.send(val);
 			});
-			
-	
-			if (footer != '') { 
-				console.log(footer);
-				//   channel.send(footer);
-				//   rnd.setValue('R' + rnd.getValue().slice(1) + 1);
-				//   sng.setValue(1);
-				//   botStat.setValue('STOP');
-			}
+				
+			getValue(footer).then((val) => {
+				if (typeof val != 'undefined') { 
+					channel.send(val); 
+					// rnd.setValue('R' + rnd.getValue().slice(1) + 1);
+					// sng.setValue(1);
+					// botStat.setValue('STOP');
+				}
+			});
 		}
-	}
-
-	function getValue(rng) {
-		return new Promise(resolve => {
-			// Load client secrets from a local file.
-
-			// fs.readFile('credentials.json', (err, content) => {
-			// 	if (err) return console.log('Error loading client secret file:', err);
-			// 	// Authorize a client with credentials, then call the Google Sheets API.
-			// 	var val = authorize(JSON.parse(content), rng, getMsg);
-			// });
-
-			try {
-				let content = fs.readFileSync('credentials.json')
-				// var val = await authorize(JSON.parse(content), rng, getMsg);
-				authorize(JSON.parse(content), rng, getMsg).then((val) => {
-					// console.log(val);
-					resolve(val);
-					// return val;
-				})
-			} catch (err) {
-				resolve(console.log('Error loading client secret file:', err));
-				// return console.log('Error loading client secret file:', err);
-			}
-
-			// console.log(val);
-			// return val;
-
-		});
-	}
+	});
 });
 
 
-/**
- * Create an OAuth2 client with the given credentials, and then execute the
- * given callback function.
- * @param {Object} credentials The authorization client credentials.
- * @param {function} callback The callback to call with the authorized client.
- */
-async function authorize(credentials, rng, callback) {
-		const {client_secret, client_id, redirect_uris} = credentials.installed;
-		const oAuth2Client = new google.auth.OAuth2(
-			client_id, client_secret, redirect_uris[0]);
-
-		// Check if we have previously stored a token.
-		//   fs.readFile(TOKEN_PATH, (err, token) => {
-		//     if (err) return getNewToken(oAuth2Client, callback);
-		//     oAuth2Client.setCredentials(JSON.parse(token));
-		//   });
-
+function getValue(rng) {
+	return new Promise(resolve => {
+		// Load client secrets from a local file.
 		try {
-			let token = fs.readFileSync(TOKEN_PATH)
-			oAuth2Client.setCredentials(JSON.parse(token));
+			var content = JSON.parse(fs.readFileSync('credentials.json'))
 		} catch (err) {
-			return getNewToken(oAuth2Client, callback);
+			resolve(console.log('Error loading client secret file:', err));
+			// return console.log('Error loading client secret file:', err);
 		}
-
-		return await callback(rng, oAuth2Client);
+		resolve( authorize(content).then((auth) => getMsg(rng, auth)) );
+		// return authorize(content).then((auth) => getMsg(rng, auth));
+	});
 }
 
-/**
- * Get and store new token after prompting for user authorization, and then
- * execute the given callback with the authorized OAuth2 client.
- * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
- * @param {getEventsCallback} callback The callback for the authorized client.
- */
-function getNewToken(oAuth2Client, callback) {
+
+async function authorize(credentials) {
+  const {client_secret, client_id, redirect_uris} = credentials.installed;
+  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+
+  try {
+    oAuth2Client.setCredentials(JSON.parse(fs.readFileSync(TOKEN_PATH)));
+  } catch (err) {
+    await getNewToken(oAuth2Client);
+  }
+  return oAuth2Client;
+}
+
+
+async function getNewToken(oAuth2Client) {
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES,
@@ -145,6 +98,7 @@ function getNewToken(oAuth2Client, callback) {
     input: process.stdin,
     output: process.stdout,
   });
+  // TODO util.promisify this https://nodejs.org/api/readline.html#readline_rl_question_query_options_callback
   rl.question('Enter the code from that page here: ', (code) => {
     rl.close();
     oAuth2Client.getToken(code, (err, token) => {
@@ -155,106 +109,38 @@ function getNewToken(oAuth2Client, callback) {
         if (err) return console.error(err);
         console.log('Token stored to', TOKEN_PATH);
       });
-      callback(oAuth2Client);
     });
   });
+  // This should await readline.question and there's probably a similar thing to do with oAuth2Client.getToken
 }
 
 
-function getMsg(rng, auth) {
-	return new Promise(resolve => {
-		const sheets = google.sheets({version: 'v4', auth});
-		var msg = '';
-		sheets.spreadsheets.values.get({
-		spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
-		range: rng,
-		}, (err, res) => {
-		if (err) return console.log('The API returned an error: ' + err);
-		const rows = res.data.values;
-		if (rows.length) {
-			// Print columns A and E, which correspond to indices 0 and 4.
-			rows.map((row) => {
-				msg = msg.concat('\n',`${row[0]} ${(row[1] || '')}`);
-			});
-		} else {
-			msg = '';
-			console.log('No data found.');
-		}
-		resolve(msg);
-		});
-	});
-}
-
-
-const dismoji = require('discord-emoji');
-var result = [];
-
-var emoji1
-var emoji2
-
-client.on('message', message => {
-
-	if (message.channel.name === 'music-votes') {
-
-	// console.log(message.content);
-
-	const enm = require("emoji-name-map");
-	const one = enm.get('one');
-	const two = enm.get('two');
-
-	let e1 = [];
-	let e2 = [];
-
-	e1 = message.content.match(/:.+?:/g);
-	// console.log(e1);
-	if (e1) { 
-		e1.forEach( e => {
-			e2.push( {name: e.match(/[a-zA-Z0-9_]+/g).toString(), id: null, unicode: null} );
-		})
-	}
-	// console.log(e2);
-	if (e2) {
-		e2.forEach( e => {
-			try {
-				e.id = client.emojis.cache.find(emoji => emoji.name === e.name);
-			} catch (err) {
-				console.log(err);
-			};
-			try {
-				// e.unicode = enm.get(e.name);
-				result = [];
-				getNames(dismoji, e.name);
-				e.unicode = result[0].toString();
-			} catch (err) {
-				console.log(err);
-			}
-		})
-	}
-	// console.log(e2);
-	if (e2) {
-		let i = 0;
-		e2.forEach( e => {
-			if (typeof e.id != 'undefined') {
-				message.react(e.id);
-			} else if (typeof e.unicode != 'undefined' ) {
-				message.react(e.unicode);
-			} else { message.react( i === 0 ? one : two ) };
-			i++;
-		})
-	}
-	}
-});
-
-function getNames(obj, name) {
-	for (var key in obj) {
-	  if (obj.hasOwnProperty(key)) {
-		if ("object" == typeof(obj[key])) {
-		  getNames(obj[key], name);
-		} else if (key == name) {
-		  result.push(obj[key]);
-		}
-	  }
-	}
+async function getMsg(rng, auth) {
+  const sheets = google.sheets({version: 'v4', auth});
+  try {
+    var response = await sheets.spreadsheets.values.get({
+      spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
+      range: rng,
+    })
+  } catch (err) {
+    console.log('The API returned an error: ' + err);
+    throw(err);
   }
+
+  var msg;
+  var msgArr = [];
+
+  const rows = response.data.values;
+  if (typeof rows != 'undefined') {
+    // Print columns A and E, which correspond to indices 0 and 4.
+    rows.map((row) => {
+		msgArr.push(row[0] + ((typeof row[1] != 'undefined') ? ` ${row[1]}` : '') );
+    });
+	msg = msgArr.join('\n');
+  } else {
+    console.log('No data found.');
+  }
+  return msg;
+}
 
 client.login(process.env.TOKEN);
