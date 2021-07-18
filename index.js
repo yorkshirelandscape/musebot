@@ -40,12 +40,22 @@ client.on('ready', () => {
 			getValue(header).then((val) => {
 					if (typeof val != 'undefined') { channel.send(val); }
 				});
-	
-			// sng.setValue(sng.getValue() + 1);
+			
+
 			getValue(match).then((val) => {
-				console.log(val);
-				// channel.send(val);
-			});
+					console.log(val);
+					// channel.send(val);
+				});
+			var sngVal;
+			getValue(sng).then((val) => {
+					if (typeof val != 'undefined') { 
+						sngVal = parseInt(val) + 1;
+						setValue(sng, sngVal).then((val) => {
+							console.log(val);
+						});
+					 }
+				});
+
 				
 			getValue(footer).then((val) => {
 				if (typeof val != 'undefined') { 
@@ -67,10 +77,21 @@ function getValue(rng) {
 			var content = JSON.parse(fs.readFileSync('credentials.json'))
 		} catch (err) {
 			resolve(console.log('Error loading client secret file:', err));
-			// return console.log('Error loading client secret file:', err);
 		}
 		resolve( authorize(content).then((auth) => getMsg(rng, auth)) );
-		// return authorize(content).then((auth) => getMsg(rng, auth));
+	});
+}
+
+
+function setValue(rng, val) {
+	return new Promise(resolve => {
+		// Load client secrets from a local file.
+		try {
+			var content = JSON.parse(fs.readFileSync('credentials.json'))
+		} catch (err) {
+			resolve(console.log('Error loading client secret file:', err));
+		}
+		resolve( authorize(content).then((auth) => setMsg(rng, val, auth)) );
 	});
 }
 
@@ -142,5 +163,25 @@ async function getMsg(rng, auth) {
   }
   return msg;
 }
+
+
+async function setMsg(rng, val, auth) {
+	const sheets = google.sheets({version: 'v4', auth});
+	try {
+	  var confirm = await sheets.spreadsheets.values.update( {
+		spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
+		range: rng,
+		valueInputOption: 'USER_ENTERED',
+		resource: {
+			majorDimension: 'ROWS',
+			values: [[val]]
+		}
+	  });
+	} catch (err) {
+	  console.log('The API returned an error: ' + err);
+	  throw(err);
+	}
+	return confirm.config.data.values[0];
+  }
 
 client.login(process.env.TOKEN);
