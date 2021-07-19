@@ -67,11 +67,14 @@ const findEmojis = async text => await Promise.allSettled(Array.from(text.matchA
 const replaceEmojis = (text, emojis) => emojis.filter(emoji => emoji.replacement).reduce((curText, emoji) => curText.replace(emoji.text, emoji.replacement), text);
 
 
-const getEmoji = async name => {
+const getEmoji = async match => {
   const guild = client.guilds.cache.get(GUILD_ID);
 
+  let text = match[0]
+  let name = match[1];
+
   let emoji = {
-    'text': `:${name}:`,
+    'text': text,
     'name': name,
     'replacement': false,
   };
@@ -79,7 +82,7 @@ const getEmoji = async name => {
   try {
     let guildEmoji = await guild.emojis.cache.find(matchFunc);
     emoji.id = guildEmoji.id;
-    emoji.replacement = `<${emoji.text}${guildEmoji.id}>`;
+    emoji.replacement = `<${text}${guildEmoji.id}>`;
     console.log(`Custom emoji found for "${name}"`, guildEmoji.id);
   } catch (err) {
     console.log(`No custom emoji found for "${name}"`, err);
