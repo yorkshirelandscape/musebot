@@ -110,11 +110,13 @@ const getEmoji = async match => {
 
 
 const react = async (message, emojis) => {
+  console.log(emojis)
   for (let emoji of emojis) {
+    console.log(emoji)
     if (typeof emoji.id != 'undefined') {
-      await sent.react(emoji.id);
+      await message.react(emoji.id);
     } else if (typeof emoji.unicode != 'undefined' ) {
-      await sent.react(emoji.unicode);
+      await message.react(emoji.unicode);
     } else {
       console.log(`Can't react with invalid emoji "${emoji.name}"`);
     }
@@ -151,10 +153,10 @@ client.on('ready', async () => {
 
   let matchText = getMatchText(valueRanges[4].values);
   let emojis = await findEmojis(matchText);
-  matchText = replaceEmojis(matchText);
+  matchText = replaceEmojis(matchText, emojis);
 
   if (matchText) {
-    let sent = await channel.send(mStr);
+    let sent = await channel.send(matchText);
     await react(sent, emojis);
   }
 
