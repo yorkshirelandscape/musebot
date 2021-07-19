@@ -66,6 +66,50 @@ const replaceEmojis = (text, emojis) => {
 }
 
 
+const findEmojis = async text => {
+  await Promise.allSettled(Array.from(text.matchAll(/:([a-zA-Z0-9_]+):/g), getEmoji));
+}
+
+
+const getEmoji = async name => {
+  const guild = client.guilds.cache.get(GUILD_ID);
+
+  let emoji = {
+    'text': `:${name}:`,
+    'name': name,
+    'replacement': false,
+  };
+  let matchFunc = ident => ident.name === name;
+  try {
+    let guildEmoji = await guild.emojis.cache.find(matchFunc);
+    emoji.id = guildEmoji.id;
+    emoji.replacement = `<${emoji.text}${guildEmoji.id}>`;
+    console.log(`Custom emoji found for "${name}"`, guildEmoji.id);
+  } catch (err) {
+    console.log(`No custom emoji found for "${name}"`, err);
+    try {
+      let clientEmoji = await client.emojis.cache.find(matchFunc);
+      emoji.id = clientEmoji.id;
+      console.log(`Client emoji found for "${name}"`, clientEmoji.id)
+    } catch (err) {
+      console.log(`No client emoji found for "${name}"`, err);
+    };
+    let sym = getDismojiByName(name);
+    if (sym) {
+      emoji.unicode = sym;
+      console.log(`Dismoji emoji found for "${name}"`, sym);
+    } else {
+      console.log(`No dismoji emoji found for "${name}"`);
+    }
+  }
+  if (!emoji.id && !emoji.unicode) {
+    console.log(`Emoji not found for "${name}"`);
+    return null;
+  }
+  return emoji;
+}
+
+
 const react = async (message, emojis) => {
   for (let emoji of emojis) {
     if (typeof emoji.id != 'undefined') {
@@ -85,50 +129,7 @@ client.once('ready', () => {
 
 
 client.on('ready', async () => {
-  const guild = client.guilds.cache.get(GUILD_ID);
   const channel = client.channels.cache.get(CHANNEL_ID);
-
-  
-  const findEmojis = async text => {
-    return await Promise.allSettled(Array.from(text.matchAll(/:([a-zA-Z0-9_]+):/g), getEmoji));
-  }
-  
-  
-  const getEmoji = async name => {
-    let emoji = {
-      'text': `:${name}:`,
-      'name': name,
-      'replacement': false,
-    };
-    let matchFunc = ident => ident.name === name;
-    try {
-      let guildEmoji = await guild.emojis.cache.find(matchFunc);
-      emoji.id = guildEmoji.id;
-      emoji.replacement = `<${emoji.text}${guildEmoji.id}>`;
-      console.log(`Custom emoji found for "${name}"`, guildEmoji.id);
-    } catch (err) {
-      console.log(`No custom emoji found for "${name}"`, err);
-      try {
-        let clientEmoji = await client.emojis.cache.find(matchFunc);
-        emoji.id = clientEmoji.id;
-        console.log(`Client emoji found for "${name}"`, clientEmoji.id)
-      } catch (err) {
-        console.log(`No client emoji found for "${name}"`, err);
-      };
-      let sym = getDismojiByName(name);
-      if (sym) {
-        emoji.unicode = sym;
-        console.log(`Dismoji emoji found for "${name}"`, sym);
-      } else {
-        console.log(`No dismoji emoji found for "${name}"`);
-      }
-    }
-    if (!emoji.id && !emoji.unicode) {
-      console.log(`Emoji not found for "${name}"`);
-      return null;
-    }
-    return emoji;
-  }
 
   let botState = await getValue(BOT_STATE_REF)
 
