@@ -52,7 +52,7 @@ const getMatchText = rows => rows.map(formatMatchRow).join('\n');
 
 
 const getDismojiByName = name => {
-  for (const cat of Object.values(dismoji)) {
+  for (let cat of Object.values(dismoji)) {
     if (typeof cat[name] != 'undefined') {
       return cat[name];
     }
@@ -61,14 +61,10 @@ const getDismojiByName = name => {
 }
 
 
-const replaceEmojis = (text, emojis) => {
-  return emojis.filter(emoji => emoji.replacement).reduce((curText, emoji) => curText.replace(emoji.text, emoji.replacement), text);
-}
+const findEmojis = async text => await Promise.allSettled(Array.from(text.matchAll(/:([a-zA-Z0-9_]+):/g), getEmoji));
 
 
-const findEmojis = async text => {
-  await Promise.allSettled(Array.from(text.matchAll(/:([a-zA-Z0-9_]+):/g), getEmoji));
-}
+const replaceEmojis = (text, emojis) => emojis.filter(emoji => emoji.replacement).reduce((curText, emoji) => curText.replace(emoji.text, emoji.replacement), text);
 
 
 const getEmoji = async name => {
