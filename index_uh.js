@@ -61,7 +61,7 @@ const getDismojiByName = name => {
 }
 
 
-const findEmojis = async text => await Promise.allSettled(Array.from(text.matchAll(/:([a-zA-Z0-9_]+):/g), getEmoji));
+const findEmojis = async text => await Promise.all(Array.from(text.matchAll(/:([a-zA-Z0-9_]+):/g), getEmoji));
 
 
 const replaceEmojis = (text, emojis) => emojis.filter(emoji => emoji.replacement).reduce((curText, emoji) => curText.replace(emoji.text, emoji.replacement), text);
