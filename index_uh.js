@@ -85,14 +85,14 @@ const getEmoji = async match => {
     emoji.replacement = `<${text}${guildEmoji.id}>`;
     console.log(`Custom emoji found for "${name}"`, guildEmoji.id);
   } catch (err) {
-    console.log(`No custom emoji found for "${name}"`, err);
+    console.log(`No custom emoji found for "${name}"`);
     try {
       let clientEmoji = await client.emojis.cache.find(matchFunc);
       emoji.id = clientEmoji.id;
       console.log(`Client emoji found for "${name}"`, clientEmoji.id)
     } catch (err) {
-      console.log(`No client emoji found for "${name}"`, err);
-    };
+      console.log(`No client emoji found for "${name}"`);
+    }
     let sym = getDismojiByName(name);
     if (sym) {
       emoji.unicode = sym;
