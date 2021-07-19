@@ -180,6 +180,7 @@ client.on('ready', async () => {
   let now = new Date();
   let countdown = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 18, 0, 0, 0) - now;
   setTimeout(function(){
+    nextMatch();
     setInterval(nextMatch, 2*60*60*1000);
   }, countdown);
 
