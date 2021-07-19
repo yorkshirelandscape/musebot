@@ -178,7 +178,7 @@ client.on('ready', async () => {
 
 
   let now = new Date();
-  let countdown = (60 - now.getSeconds()) + 60 * (60 - now.getMinutes()) + 60 * 60 * (now.getHours() % 2);
+  let countdown = ((60 - now.getSeconds()) + 60 * (60 - now.getMinutes()) + 60 * 60 * (1 - now.getHours() % 2))*1000;
   setTimeout(function(){
     nextMatch();
     setInterval(nextMatch, 2*60*60*1000);
