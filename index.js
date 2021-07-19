@@ -16,211 +16,205 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const TOKEN_PATH = 'token.json';
 
 const dismoji = require('discord-emoji');
-const enm = require("emoji-name-map");
-const one = enm.get('one');
-const two = enm.get('two');
+const enm = require('emoji-name-map');
+const EMOJI_ONE = enm.get('one');
+const EMOJI_TWO = enm.get('two');
+
+const SPREADSHEET_ID = '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs';
+
+const BOT_STATE_REF = 'Dashboard!B4';
+
+const REFS = {
+  'round': 'Dashboard!B2',
+  'song': 'Dashboard!B3',
+  'header': 'Dashboard!D1',
+  'footer': 'Dashboard!D8',
+  'match': 'Dashboard!D3:E6',
+}
+
+const GUILD_ID = '212660788786102272';  // 782213860337647636
+const CHANNEL_ID = '864768873270345788';  // 751893730117812225
+
+const START_TIME = 4
+const END_TIME = 22
+
+
+const isBotEnabled = botState => {
+  let now = new Date().getHours();
+  return botState === 'GO' && START_TIME < now && now < END_TIME;
+}
+
+
+const formatMatchRow = row => row[0] + ((typeof row[1] != 'undefined') ? ` ${row[1]}` : '');
+
+
+const getMatchText = rows => rows.map(formatMatchRow).join('\n');
+
+
+const getDismojiByName = name => {
+  for (let cat of Object.values(dismoji)) {
+    if (typeof cat[name] != 'undefined') {
+      return cat[name];
+    }
+  }
+  return null;
+}
+
+
+const findEmojis = async text => await Promise.all(Array.from(text.matchAll(/:([a-zA-Z0-9_]+):/g), getEmoji));
+
+
+const replaceEmojis = (text, emojis) => emojis.filter(emoji => emoji.replacement).reduce((curText, emoji) => curText.replace(emoji.text, emoji.replacement), text);
+
+
+const getEmoji = async match => {
+  const guild = client.guilds.cache.get(GUILD_ID);
+
+  let text = match[0]
+  let name = match[1];
+
+  let emoji = {
+    'text': text,
+    'name': name,
+    'replacement': false,
+  };
+  let matchFunc = ident => ident.name === name;
+  try {
+    let guildEmoji = await guild.emojis.cache.find(matchFunc);
+    emoji.id = guildEmoji.id;
+    emoji.replacement = `<${text}${guildEmoji.id}>`;
+    console.log(`Custom emoji found for "${name}"`, guildEmoji.id);
+  } catch (err) {
+    console.log(`No custom emoji found for "${name}"`);
+    try {
+      let clientEmoji = await client.emojis.cache.find(matchFunc);
+      emoji.id = clientEmoji.id;
+      console.log(`Client emoji found for "${name}"`, clientEmoji.id)
+    } catch (err) {
+      console.log(`No client emoji found for "${name}"`);
+    }
+    let sym = getDismojiByName(name);
+    if (sym) {
+      emoji.unicode = sym;
+      console.log(`Dismoji emoji found for "${name}"`, sym);
+    } else {
+      console.log(`No dismoji emoji found for "${name}"`);
+    }
+  }
+  if (!emoji.id && !emoji.unicode) {
+    console.log(`Emoji not found for "${name}"`);
+    return null;
+  }
+  return emoji;
+}
+
+
+const react = async (message, emojis) => {
+  for (let emoji of emojis) {
+    if (typeof emoji.id != 'undefined') {
+      await message.react(emoji.id);
+    } else if (typeof emoji.unicode != 'undefined' ) {
+      await message.react(emoji.unicode);
+    } else {
+      console.log(`Can't react with invalid emoji "${emoji.name}"`);
+    }
+  }
+}
+
 
 client.once('ready', () => {
-	console.log('Ready!');
-});
-
-client.on('ready', () => {
-	const guild = client.guilds.cache.get("212660788786102272"); //782213860337647636
-	const channel = client.channels.cache.get('864768873270345788'); //751893730117812225
-
-	let rnd = "Dashboard!B2";
-	let sng = "Dashboard!B3";
-	let botStat = "Dashboard!B4";
-	let header = 'Dashboard!D1';
-	let footer = 'Dashboard!D8';
-	let match = 'Dashboard!D3:E6';
-	
-	let now = new Date();
-	let sixam = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 4, 0, 0, 0);
-	let tenpm = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 22, 0, 0, 0);
-
-	getValue(botStat).then(function(bStat) {
-
-		if (now >= sixam && now <= tenpm && bStat === 'GO' ) {
-
-			let rngArr = [rnd, sng, header, footer, match];
-
-			getValues(rngArr).then((val) => {
-				let rndVal = val[0].values[0].toString();
-				let sngVal = parseInt(val[1].values[0].toString());
-				let headVal = ('values' in val[2] ) ? val[2].values[0].toString() : null;
-				let footVal = ('values' in val[3] ) ? val[3].values[0].toString() : null;
-				
-				if (headVal ? true : false) { channel.send(headVal); }
-
-				let matchArr = [];
-				val[4].values.forEach((row) => {
-					matchArr.push(row[0] + ((typeof row[1] != 'undefined') ? ` ${row[1]}` : '') );
-				});
-				matchStr = matchArr.join('\n');
-				let eMatch = matchStr.match(/:.+?:/g);
-				let eCustom = [];
-				if (eMatch) { 
-					eMatch.forEach( eM => {
-						eCustom.push( {text: eM, name: eM.match(/[a-zA-Z0-9_]+/g).toString()} );
-					});
-					if (eCustom) {
-						(function eCust() {
-							return new Promise(resolve => {
-								eCustom.forEach( eC => {
-									// console.log(eC);
-									customEmoji(eC.name).then((eRes) => {
-										// console.log(eRes);
-										try {
-											eC.id = eRes.id;
-										} catch (err) { 
-											console.log(err);
-										}
-									});
-								});
-							resolve(eCustom);
-							});	
-						})().then(function(eC1) {
-							return new Promise(resolve => {
-								let eC2 = eC1.filter( function(eCSet){
-									return eCSet.hasOwnProperty('id');
-								})
-								resolve(eC2);
-							});
-						}).then(function(eC3) {
-							return new Promise(resolve => {
-								console.log(eC3);
-								eC3.forEach( eC4 => {
-									matchStr.replace(eC4.text, `<${eC4.text}${eC4.id}>`);
-								});
-								resolve(matchStr);
-							});
-						}).then((mStr) => {
-							console.log(mStr);
-							if (mStr ? true : false ) {
-								channel.send(mStr).then((sent) => {
-									let emo = emote(mStr);
-									if (emo) {
-										let i = 0;
-										emo.forEach( e => {
-											if (typeof e.id != 'undefined') {
-												sent.react(e.id);
-											} else if (typeof e.unicode != 'undefined' ) {
-												sent.react(e.unicode);
-											} else { sent.react( i === 0 ? one : two ) };
-											i++;
-										})
-									}
-								});
-								console.log(sngVal);					
-								sngVal = sngVal + 1;
-								setValue(sng, sngVal).then((val) => {
-									console.log(val);
-								});
-							}
-						});
-					}
-				}
-
-				if (footVal ? true : false) { 
-					channel.send(footVal).then((sent) => {
-						let emo = emote(footVal);
-						if (emo) {
-							let i = 0;
-							emo.forEach( e => {
-								if (typeof e.id != 'undefined') {
-									sent.react(e.id);
-								} else if (typeof e.unicode != 'undefined' ) {
-									sent.react(e.unicode);
-								} else { sent.react( i === 0 ? one : two ) };
-								i++;
-							})
-						}
-					});
-					if (typeof rndVal != 'undefined') { 
-						rndVal = 'R' + (parseInt(rndVal.slice(1,2)) + 1);
-						setValue(rnd, rndVal).then((val) => {
-							console.log(val);
-						});
-					}
-					setValue(sng, 1).then((val) => {
-						console.log(val);
-					});
-					setValue(botStat, 'STOP').then((val) => {
-						console.log(val);
-					});
-				}
-			});
-		}
-	});
-	
-	function customEmoji(emoName) {
-		return new Promise(resolve => {
-			try {
-				// console.log(guild.emojis.cache.find(ident => ident.name === emoName));
-				resolve( guild.emojis.cache.find(ident => ident.name === emoName) );
-			} catch (err) {
-				console.log('Not a custom emoji.');
-				resolve(null);
-			};			
-		});
-	}
+  console.log('Ready!');
 });
 
 
-function getValue(rng) {
-	return new Promise(resolve => {
-		// Load client secrets from a local file.
-		try {
-			var content = JSON.parse(fs.readFileSync('credentials.json'))
-		} catch (err) {
-			resolve(console.log('Error loading client secret file:', err));
-		}
-		resolve( authorize(content).then((auth) => getMsg(rng, auth)) );
-	});
+client.on('ready', async () => {
+  const channel = client.channels.cache.get(CHANNEL_ID);
+
+  let botState = await getValue(BOT_STATE_REF)
+
+  if (!isBotEnabled(botState)) {
+    console.log('Bot disabled, exiting');
+    return;
+  }
+
+  // Even though REFS is an object, order is guaranteed for non-string keys
+  let valueRanges = await getValues(Object.values(REFS));
+
+  let round = valueRanges[0].values[0].toString();
+  let song = parseInt(valueRanges[1].values[0].toString());
+  let header = ('values' in valueRanges[2]) ? valueRanges[2].values[0].toString() : null;
+  let footer = ('values' in valueRanges[3]) ? valueRanges[3].values[0].toString() : null;
+
+  if (header) {
+    await channel.send(header);
+  }
+
+  let matchText = getMatchText(valueRanges[4].values);
+  let emojis = await findEmojis(matchText);
+  matchText = replaceEmojis(matchText, emojis);
+
+  if (matchText) {
+    let sent = await channel.send(matchText);
+    await react(sent, emojis);
+  }
+
+  await setValue(REFS.song, song + 1);
+
+  if (footer) {
+    let sent = await channel.send(footer);
+    let emojis = await findEmojis(footer);
+    await react(sent, emojis);
+
+    if (typeof round != 'undefined') {
+      await setValue(REFS.round, 'R' + (parseInt(round.slice(1, 2)) + 1));
+    }
+    await setValue(REFS.song, 1);
+    await setValue(BOT_STATE_REF, 'STOP');
+  }
+
+  client.destroy();
+});
+
+
+const loadCredentials = () => {
+  // Load client secrets from a local file.
+  try {
+    return content = JSON.parse(fs.readFileSync('credentials.json'))
+  } catch (err) {
+    console.log('Error loading client secret file:', err);
+    throw err;
+  }
 }
 
 
-function getValues(rng) {
-	return new Promise(resolve => {
-		// Load client secrets from a local file.
-		try {
-			var content = JSON.parse(fs.readFileSync('credentials.json'))
-		} catch (err) {
-			resolve(console.log('Error loading client secret file:', err));
-		}
-		resolve( authorize(content).then((auth) => getMsgs(rng, auth)) );
-	});
-}
+const getValue = async rng => getMsg(rng, await getAuthClient());
 
 
-function setValue(rng, val) {
-	return new Promise(resolve => {
-		// Load client secrets from a local file.
-		try {
-			var content = JSON.parse(fs.readFileSync('credentials.json'))
-		} catch (err) {
-			resolve(console.log('Error loading client secret file:', err));
-		}
-		resolve( authorize(content).then((auth) => setMsg(rng, val, auth)) );
-	});
-}
+const getValues = async rng => getMsgs(rng, await getAuthClient());
 
 
-async function authorize(credentials) {
+const setValue = async (rng, val) => setMsg(rng, val, await getAuthClient());
+
+
+const getAuthClient = async () => authorize(loadCredentials());
+
+
+const authorize = async credentials => {
   const {client_secret, client_id, redirect_uris} = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
   try {
     oAuth2Client.setCredentials(JSON.parse(fs.readFileSync(TOKEN_PATH)));
   } catch (err) {
+    console.log('Unable to load credentials from file, getting new token from user');
     await getNewToken(oAuth2Client);
   }
   return oAuth2Client;
 }
 
 
-async function getNewToken(oAuth2Client) {
+const getNewToken = async oAuth2Client => {
+  // TODO split this into a separate utility or separate flow?
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES,
@@ -247,123 +241,53 @@ async function getNewToken(oAuth2Client) {
 }
 
 
-async function getMsg(rng, auth) {
+const getMsg = async (rng, auth) => {
   const sheets = google.sheets({version: 'v4', auth});
   try {
     var response = await sheets.spreadsheets.values.get({
-      spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
+      spreadsheetId: SPREADSHEET_ID,
       range: rng,
-    })
-  } catch (err) {
-    console.log('The API returned an error: ' + err);
-    throw(err);
-  }
-
-  var msg;
-  var msgArr = [];
-
-  const rows = response.data.values;
-  if (typeof rows != 'undefined') {
-    // Print columns A and E, which correspond to indices 0 and 4.
-    rows.map((row) => {
-		msgArr.push(row[0] + ((typeof row[1] != 'undefined') ? ` ${row[1]}` : '') );
     });
-	msg = msgArr.join('\n');
-  } else {
-    console.log('No data found.');
+    return response.data.values[0][0];
+  } catch (err) {
+    console.log(`getMsg API returned an error for range "${rng}"`, err);
+    throw err;
   }
-  return msg;
 }
 
-async function getMsgs(rng, auth) {
-	const sheets = google.sheets({version: 'v4', auth});
-	try {
-	  var response = await sheets.spreadsheets.values.batchGet({
-		spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
-		ranges: rng,
-	  })
-	} catch (err) {
-	  console.log('The API returned an error: ' + err);
-	  throw(err);
-	}
-	return response.data.valueRanges;
+
+const getMsgs = async (rng, auth) => {
+  const sheets = google.sheets({version: 'v4', auth});
+  try {
+    var response = await sheets.spreadsheets.values.batchGet({
+      spreadsheetId: SPREADSHEET_ID,
+      ranges: rng,
+    });
+    return response.data.valueRanges;
+  } catch (err) {
+    console.log(`getMsgs API returned an error for range "${rng}"`, err);
+    throw err;
   }
-
-
-async function setMsg(rng, val, auth) {
-	const sheets = google.sheets({version: 'v4', auth});
-	try {
-	  var confirm = await sheets.spreadsheets.values.update( {
-		spreadsheetId: '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs',
-		range: rng,
-		valueInputOption: 'USER_ENTERED',
-		resource: {
-			majorDimension: 'ROWS',
-			values: [[val]]
-		}
-	  });
-	} catch (err) {
-	  console.log('The API returned an error: ' + err);
-	  throw(err);
-	}
-	return confirm.config.data.values[0];
 }
 
 
-
-var result = [];
-
-var emoji1
-var emoji2
-
-function emote(e) {
-	let e1 = [];
-	let e2 = [];
-
-	e1 = e.match(/:.+?:/g);
-	// console.log(e1);
-	if (e1) { 
-		e1.forEach( e => {
-			e2.push( {name: e.match(/[a-zA-Z0-9_]+/g).toString(), id: null, unicode: null} );
-		})
-	}
-
-	if (e2) {
-		e2.forEach( e => {
-			try {
-				e.id = client.emojis.cache.find(emoji => emoji.name === e.name);
-			} catch (err) {
-				console.log(err);
-			};
-			try {
-				result = [];
-				getNames(dismoji, e.name);
-				e.unicode = result[0].toString();
-			} catch (err) {
-				console.log('Custom or missing emoji');
-			}
-		})
-	}
-
-	let eArr = [];
-	if (e2) {
-		e2.forEach( e => {
-			eArr.push(e);
-		});
-	}
-	return eArr;
-}
-
-function getNames(obj, name) {
-	for (var key in obj) {
-	  if (obj.hasOwnProperty(key)) {
-		if ("object" == typeof(obj[key])) {
-		  getNames(obj[key], name);
-		} else if (key == name) {
-		  result.push(obj[key]);
-		}
-	  }
-	}
+const setMsg = async (rng, val, auth) => {
+  const sheets = google.sheets({version: 'v4', auth});
+  try {
+    var confirm = await sheets.spreadsheets.values.update({
+      spreadsheetId: SPREADSHEET_ID,
+      range: rng,
+      valueInputOption: 'USER_ENTERED',
+      resource: {
+        majorDimension: 'ROWS',
+        values: [[val]],
+      },
+    });
+    return confirm.config.data.values[0];
+  } catch (err) {
+    console.log(`setMsg API returned an error for range "${rng}" and value "${val}"`, err);
+    throw err;
+  }
 }
 
 
