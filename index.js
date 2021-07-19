@@ -89,6 +89,7 @@ const getEmoji = async match => {
     try {
       let clientEmoji = await client.emojis.cache.find(matchFunc);
       emoji.id = clientEmoji.id;
+      emoji.replacement = `<${text}${clientEmoji.id}>`;
       console.log(`Client emoji found for "${name}"`, clientEmoji.id)
     } catch (err) {
       console.log(`No client emoji found for "${name}"`);
