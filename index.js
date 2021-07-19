@@ -138,51 +138,56 @@ client.on('ready', async () => {
     return;
   }
 
-  // setInterval(nextMatch(), 60000);
-  setInterval(async function(){
-        // Even though REFS is an object, order is guaranteed for non-string keys
-    let valueRanges = await getValues(Object.values(REFS));
 
+  const nextMatch = async () => {
+    // Even though REFS is an object, order is guaranteed for non-string keys
+    let valueRanges = await getValues(Object.values(REFS));
+  
     let round = valueRanges[0].values[0].toString();
     let song = parseInt(valueRanges[1].values[0].toString());
     let header = ('values' in valueRanges[2]) ? valueRanges[2].values[0].toString() : null;
     let footer = ('values' in valueRanges[3]) ? valueRanges[3].values[0].toString() : null;
-
+  
     if (header) {
       await channel.send(header);
     }
-
+  
     let matchText = getMatchText(valueRanges[4].values);
     let emojis = await findEmojis(matchText);
     matchText = replaceEmojis(matchText, emojis);
-
+  
     if (matchText) {
       let sent = await channel.send(matchText);
       await react(sent, emojis);
     }
-
-    // await setValue(REFS.song, song + 1);
-
+  
+    await setValue(REFS.song, song + 1);
+  
     if (footer) {
       let sent = await channel.send(footer);
       let emojis = await findEmojis(footer);
       await react(sent, emojis);
-
+  
       if (typeof round != 'undefined') {
         await setValue(REFS.round, 'R' + (parseInt(round.slice(1, 2)) + 1));
       }
       await setValue(REFS.song, 1);
       await setValue(BOT_STATE_REF, 'STOP');
     }
-  }, 7200000);
+  }
+
+
+  let now = new Date();
+  let countdown = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 18, 0, 0, 0) - now;
+  setTimeout(function(){
+    setInterval(nextMatch, 2*60*60*1000);
+  }, countdown);
+
+
+  // setInterval(nextMatch, 2*60*60*1000);
 
   // client.destroy();
 });
-
-
-// const nextMatch = async () => {
-
-// }
 
 
 const loadCredentials = () => {
