@@ -185,22 +185,13 @@ const loadCredentials = () => {
 }
 
 
-const getValue = async rng => {
-  let auth = await getAuthClient();
-  return getMsg(rng, auth);
-}
+const getValue = async rng => getMsg(rng, await getAuthClient());
 
 
-const getValues = async rng => {
-  let auth = await getAuthClient();
-  return getMsgs(rng, auth);
-}
+const getValues = async rng => getMsgs(rng, await getAuthClient());
 
 
-const setValue = async (rng, val) => {
-  let auth = await getAuthClient();
-  return setMsg(rng, val, auth);
-}
+const setValue = async (rng, val) => setMsg(rng, val, await getAuthClient());
 
 
 const getAuthClient = async () => authorize(loadCredentials());
