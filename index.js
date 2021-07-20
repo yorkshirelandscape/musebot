@@ -4,6 +4,7 @@ dotenv.config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
+const _ = require('underscore');
 const fs = require('fs');
 const readline = require('readline');
 const {google} = require('googleapis');
@@ -30,10 +31,15 @@ const REFS = {
   'header': 'Dashboard!D1',
   'footer': 'Dashboard!D8',
   'match': 'Dashboard!D3:E6',
+  'size': 'Dashboard!B5'
 }
+// #music-votes
+// const GUILD_ID = '782213860337647636';  
+// const CHANNEL_ID = '751893730117812225';  
 
-const GUILD_ID = '782213860337647636';  // 212660788786102272
-const CHANNEL_ID = '751893730117812225';  // 864768873270345788
+// testing
+const GUILD_ID = '212660788786102272';  
+const CHANNEL_ID = '864768873270345788'; 
 
 const START_TIME = 5
 const END_TIME = 21
@@ -131,9 +137,6 @@ client.once('ready', () => {
 client.on('ready', async () => {
   const channel = client.channels.cache.get(CHANNEL_ID);
 
-
-
-
   const nextMatch = async () => {
 
     let botState = await getValue(BOT_STATE_REF)
@@ -142,7 +145,7 @@ client.on('ready', async () => {
       console.log('Bot disabled, exiting');
       return;
     }
-    
+
     // Even though REFS is an object, order is guaranteed for non-string keys
     let valueRanges = await getValues(Object.values(REFS));
   
@@ -150,46 +153,53 @@ client.on('ready', async () => {
     let song = parseInt(valueRanges[1].values[0].toString());
     let header = ('values' in valueRanges[2]) ? valueRanges[2].values[0].toString() : null;
     let footer = ('values' in valueRanges[3]) ? valueRanges[3].values[0].toString() : null;
-  
-    if (header) {
-      await channel.send(header);
-    }
-  
-    let matchText = getMatchText(valueRanges[4].values);
-    let emojis = await findEmojis(matchText);
-    matchText = replaceEmojis(matchText, emojis);
-  
-    if (matchText) {
-      let sent = await channel.send(matchText);
-      await react(sent, emojis);
-    }
-  
-    await setValue(REFS.song, song + 1);
-  
-    if (footer) {
-      let sent = await channel.send(footer);
-      let emojis = await findEmojis(footer);
-      await react(sent, emojis);
-  
-      if (typeof round != 'undefined') {
-        await setValue(REFS.round, 'R' + (parseInt(round.slice(1, 2)) + 1));
+    let size = parseInt(valueRanges[5].values[0].toString());
+    let rndVal = parseInt(round.slice(1, 2));
+    let rpt = Math.min(8, Math.pow(2,rndVal - (size > 64 ? 0 : (size > 32 ? 1 : 2))));
+    
+    const postMatch = async () => {
+
+      if (header) {
+        await channel.send(header);
       }
-      await setValue(REFS.song, 1);
-      await setValue(BOT_STATE_REF, 'STOP');
+    
+      let matchText = getMatchText(valueRanges[4].values);
+      let emojis = await findEmojis(matchText);
+      matchText = replaceEmojis(matchText, emojis);
+    
+      if (matchText) {
+        let sent = await channel.send(matchText);
+        await react(sent, emojis);
+      }
+    
+      await setValue(REFS.song, song + 1);
+    
+      if (footer) {
+        let sent = await channel.send(footer);
+        let emojis = await findEmojis(footer);
+        await react(sent, emojis);
+    
+        if (typeof round != 'undefined') {
+          await setValue(REFS.round, 'R' + rndVal + 1);
+        }
+        await setValue(REFS.song, 1);
+        await setValue(BOT_STATE_REF, 'STOP');
+      }
     }
+
+    _.times(rpt, postMatch);
   }
 
 
   let now = new Date();
   let countdown = ((60 - now.getSeconds()) + 60 * (60 - now.getMinutes()) + 60 * 60 * (1 - now.getHours() % 2))*1000;
-  console.log(now + countdown);
+  console.log(now);
+  console.log(countdown/60/60/1000);
   setTimeout(function(){
     nextMatch();
     setInterval(nextMatch, 2*60*60*1000);
   }, countdown);
 
-
-  // setInterval(nextMatch, 2*60*60*1000);
 
   // client.destroy();
 });
