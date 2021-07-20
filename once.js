@@ -185,7 +185,7 @@ const nextMatch = async matches => {
     await setValue(BOT_STATE_REF, 'STOP');
   }
 
-  if (matches) {
+  if (matches > 1) {
     await nextMatch(--matches);
   }
 }
@@ -198,7 +198,7 @@ client.once('ready', () => {
 
 
 client.on('ready', async () => {
-  nextMatch();
+  await nextMatch();
   client.destroy();
 });
 
