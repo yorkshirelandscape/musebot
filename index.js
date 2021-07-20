@@ -201,7 +201,7 @@ client.on('ready', async () => {
   let now = new Date();
   // Number of seconds until the next even hour
   let countdown = ((60 - now.getSeconds()) + 60 * (60 - now.getMinutes()) + 60 * 60 * (1 - now.getHours() % 2));
-  console.log(`Triggering in ${countdown / 60)} minutes`);
+  console.log(`Triggering in ${countdown / 60} minutes`);
   setTimeout(() => {
     nextMatch();
     setInterval(nextMatch, 2 * 60 * 60 * 1000);
