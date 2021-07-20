@@ -129,77 +129,83 @@ const react = async (message, emojis) => {
 }
 
 
+const getMatchesCount = (round, size) => Math.min(8, Math.pow(2, round - (size > 64 ? 0 : (size > 32 ? 1 : 2))));
+
+
+const nextMatch = async matches => {
+  const channel = client.channels.cache.get(CHANNEL_ID);
+
+  let botState = await getValue(BOT_STATE_REF)
+
+  if (!isBotEnabled(botState)) {
+    console.log('Bot disabled, exiting');
+    return;
+  }
+
+  // Even though REFS is an object, order is guaranteed for non-string keys
+  let valueRanges = await getValues(Object.values(REFS));
+
+  let round = valueRanges[0].values[0].toString();
+  let song = parseInt(valueRanges[1].values[0].toString());
+  let header = ('values' in valueRanges[2]) ? valueRanges[2].values[0].toString() : null;
+  let footer = ('values' in valueRanges[3]) ? valueRanges[3].values[0].toString() : null;
+  let size = parseInt(valueRanges[5].values[0].toString());
+  let rndVal = parseInt(round.slice(1, 2));
+
+  if (typeof matches == 'undefined') {
+    matches = getMatchesCount(rndVal, size);
+    console.log(`Posting ${matches} matches this iteration`)
+  }
+  console.log(`${matches} matches left to post`);
+
+  if (header) {
+    await channel.send(header);
+  }
+
+  let matchText = getMatchText(valueRanges[4].values);
+  let emojis = await findEmojis(matchText);
+  matchText = replaceEmojis(matchText, emojis);
+
+  if (matchText) {
+    let sent = await channel.send(matchText);
+    await react(sent, emojis);
+  }
+
+  await setValue(REFS.song, song + 1);
+
+  if (footer) {
+    let sent = await channel.send(footer);
+    let emojis = await findEmojis(footer);
+    await react(sent, emojis);
+
+    if (typeof round != 'undefined') {
+      await setValue(REFS.round, 'R' + rndVal + 1);
+    }
+    await setValue(REFS.song, 1);
+    await setValue(BOT_STATE_REF, 'STOP');
+  }
+
+  if (matches) {
+    await nextMatch(--matches);
+  }
+}
+
+
+
 client.once('ready', () => {
   console.log('Ready!');
 });
 
 
 client.on('ready', async () => {
-  const channel = client.channels.cache.get(CHANNEL_ID);
-
-  const nextMatch = async () => {
-
-    let botState = await getValue(BOT_STATE_REF)
-
-    if (!isBotEnabled(botState)) {
-      console.log('Bot disabled, exiting');
-      return;
-    }
-
-    // Even though REFS is an object, order is guaranteed for non-string keys
-    let valueRanges = await getValues(Object.values(REFS));
-  
-    let round = valueRanges[0].values[0].toString();
-    let song = parseInt(valueRanges[1].values[0].toString());
-    let header = ('values' in valueRanges[2]) ? valueRanges[2].values[0].toString() : null;
-    let footer = ('values' in valueRanges[3]) ? valueRanges[3].values[0].toString() : null;
-    let size = parseInt(valueRanges[5].values[0].toString());
-    let rndVal = parseInt(round.slice(1, 2));
-    let rpt = Math.min(8, Math.pow(2,rndVal - (size > 64 ? 0 : (size > 32 ? 1 : 2))));
-    
-    const postMatch = async () => {
-
-      if (header) {
-        await channel.send(header);
-      }
-    
-      let matchText = getMatchText(valueRanges[4].values);
-      let emojis = await findEmojis(matchText);
-      matchText = replaceEmojis(matchText, emojis);
-    
-      if (matchText) {
-        let sent = await channel.send(matchText);
-        await react(sent, emojis);
-      }
-    
-      await setValue(REFS.song, song + 1);
-    
-      if (footer) {
-        let sent = await channel.send(footer);
-        let emojis = await findEmojis(footer);
-        await react(sent, emojis);
-    
-        if (typeof round != 'undefined') {
-          await setValue(REFS.round, 'R' + rndVal + 1);
-        }
-        await setValue(REFS.song, 1);
-        await setValue(BOT_STATE_REF, 'STOP');
-      }
-    }
-
-    _.times(rpt, postMatch);
-  }
-
-
   let now = new Date();
-  let countdown = ((60 - now.getSeconds()) + 60 * (60 - now.getMinutes()) + 60 * 60 * (1 - now.getHours() % 2))*1000;
-  console.log(now);
-  console.log(countdown/60/60/1000);
-  setTimeout(function(){
+  // Number of seconds until the next even hour
+  let countdown = ((60 - now.getSeconds()) + 60 * (60 - now.getMinutes()) + 60 * 60 * (1 - now.getHours() % 2));
+  console.log(`Triggering in ${countdown / 60)} minutes`);
+  setTimeout(() => {
     nextMatch();
-    setInterval(nextMatch, 2*60*60*1000);
-  }, countdown);
-
+    setInterval(nextMatch, 2 * 60 * 60 * 1000);
+  }, countdown * 1000);
 
   // client.destroy();
 });
