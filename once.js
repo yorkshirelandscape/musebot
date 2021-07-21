@@ -34,16 +34,17 @@ const REFS = {
   'size': 'Dashboard!B5'
 }
 // #music-votes
-// const GUILD_ID = '782213860337647636';  
-// const CHANNEL_ID = '751893730117812225';  
+const GUILD_ID = '782213860337647636';  
+const CHANNEL_ID = '751893730117812225';  
 
 // testing
-const GUILD_ID = '212660788786102272';  
-const CHANNEL_ID = '864768873270345788'; 
+// const GUILD_ID = '212660788786102272';  
+// const CHANNEL_ID = '864768873270345788'; 
 
 const START_TIME = 5
 const END_TIME = 21
 
+const now = new Date();
 
 const isBotEnabled = botState => {
   let now = new Date().getHours();
@@ -138,7 +139,7 @@ const nextMatch = async matches => {
   let botState = await getValue(BOT_STATE_REF)
 
   if (!isBotEnabled(botState)) {
-    console.log('Bot disabled, exiting');
+    console.log(`${now}: Bot disabled, exiting`);
     return;
   }
 
@@ -154,7 +155,7 @@ const nextMatch = async matches => {
 
   if (typeof matches == 'undefined') {
     matches = getMatchesCount(rndVal, size);
-    console.log(`Posting ${matches} matches this iteration`)
+    console.log(`${now}: Posting ${matches} matches this iteration`)
   }
   console.log(`${matches} matches left to post`);
 
