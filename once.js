@@ -47,8 +47,8 @@ const END_TIME = 21
 const now = new Date();
 
 const isBotEnabled = botState => {
-  let now = new Date().getHours();
-  return botState === 'GO' && START_TIME < now && now < END_TIME;
+  let nowHour = new Date().getHours();
+  return botState === 'GO' && START_TIME < nowHour && nowHour < END_TIME;
 }
 
 
@@ -130,7 +130,7 @@ const react = async (message, emojis) => {
 }
 
 
-const getMatchesCount = (round, size) => Math.min(8, Math.pow(2, round - (size > 64 ? 0 : (size > 32 ? 1 : 2))));
+const getMatchesCount = (round, size) => Math.min(round === 4 ? 4 : (round === 5 ? 2 : (round === 6 ? 1 : 8)), Math.pow(2, round - (size > 64 ? 0 : (size > 32 ? 1 : 2))));
 
 
 const nextMatch = async matches => {
