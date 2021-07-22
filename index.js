@@ -33,16 +33,21 @@ const REFS = {
   'match': 'Dashboard!D3:E6',
   'size': 'Dashboard!B5'
 }
-// #music-votes
-const GUILD_ID = '782213860337647636';  
-const CHANNEL_ID = '751893730117812225';  
 
-// testing
-// const GUILD_ID = '212660788786102272';  
-// const CHANNEL_ID = '864768873270345788'; 
+let skipstat = false;
+let testing = false;
 
-const START_TIME = 5
-const END_TIME = 21
+process.argv.forEach(function (val, index, array) {
+    if( val === '-s' ) { skipstat = true;}
+    if( val === '-t' ) { testing = true;}
+  });
+
+const GUILD_ID = (testing === true ? '212660788786102272' : '782213860337647636');  
+const CHANNEL_ID =  (testing === true ? '864768873270345788' : '751893730117812225');  
+
+
+const START_TIME = (skipstat === true ? 0 : 5)
+const END_TIME = (skipstat === true ? 24 : 21)
 
 const now = new Date();
 
