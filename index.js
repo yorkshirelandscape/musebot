@@ -36,10 +36,12 @@ const REFS = {
 
 let skipstat = false;
 let testing = false;
+let once = false;
 
 process.argv.forEach(function (val, index, array) {
     if( val === '-s' ) { skipstat = true;}
     if( val === '-t' ) { testing = true;}
+    if( val === '-o' ) {once = true;}
   });
 
 const GUILD_ID = (testing === true ? '212660788786102272' : '782213860337647636');  
@@ -204,15 +206,19 @@ client.once('ready', () => {
 
 
 client.on('ready', async () => {
-  // Number of seconds until the next even hour
-  let countdown = ((60 - now.getSeconds()) + 60 * (60 - now.getMinutes()) + 60 * 60 * (1 - now.getHours() % 2));
-  console.log(`${now}: Triggering in ${countdown / 60} minutes`);
-  setTimeout(() => {
-    nextMatch();
-    setInterval(nextMatch, 2 * 60 * 60 * 1000);
-  }, countdown * 1000);
 
-  // client.destroy();
+  if (once = true) {
+    await nextMatch();
+    client.destroy();
+  } else {
+    // Number of seconds until the next even hour
+    let countdown = ((60 - now.getSeconds()) + 60 * (60 - now.getMinutes()) + 60 * 60 * (1 - now.getHours() % 2));
+    console.log(`${now}: Triggering in ${countdown / 60} minutes`);
+    setTimeout(() => {
+      nextMatch();
+      setInterval(nextMatch, 2 * 60 * 60 * 1000);
+    }, countdown * 1000);
+  }
 });
 
 

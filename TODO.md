@@ -1,6 +1,6 @@
 # To Do List
-- modularize and merge once.js
-- add parameter or version to skip botStat
+- ~~modularize and merge once.js~~ (made flag instead)
+- ~~add parameter or version to skip botStat~~ (also testing)
 - track check-ins and check-outs to determine round resumption time
 - record match results
 - resolve ties
