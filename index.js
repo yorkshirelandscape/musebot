@@ -4,7 +4,6 @@ dotenv.config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-const _ = require('underscore');
 const fs = require('fs');
 const readline = require('readline');
 const {google} = require('googleapis');
@@ -158,7 +157,7 @@ const nextMatch = async matches => {
   let header = ('values' in valueRanges[2]) ? valueRanges[2].values[0].toString() : null;
   let footer = ('values' in valueRanges[3]) ? valueRanges[3].values[0].toString() : null;
   let size = parseInt(valueRanges[5].values[0].toString());
-  let rndVal = parseInt(round.slice(1, 2));
+  let rndVal = parseInt(round.slice(1));
 
   if (typeof matches == 'undefined') {
     matches = getMatchesCount(rndVal, size);
@@ -187,7 +186,7 @@ const nextMatch = async matches => {
     await react(sent, emojis);
 
     if (typeof round != 'undefined') {
-      await setValue(REFS.round, 'R' + rndVal + 1);
+      await setValue(REFS.round, 'R' + (rndVal + 1));
     }
     await setValue(REFS.song, 1);
     await setValue(BOT_STATE_REF, 'STOP');
