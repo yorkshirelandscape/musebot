@@ -10,3 +10,4 @@
 - handle 3P properly
 - add !command for DXV and Bluey to trigger nextMatch
 - consolidate getValues and getValue
+- pin Q messages

@@ -58,15 +58,17 @@ client.on('ready', () => {
             msg.deleted === false && msg.content.includes('Match')
         );
         console.log(rndMatches);
-        let rndMatchesReactions = rndMatches.map( (msg) => {
+        let rndMatchesReactions = new Map();
+        for (const msg of rndMatches.values()) {
             let matchReacts = msg.reactions.cache;
-            let mR = {match: parseInt(msg.content.slice(8,msg.content.indexOf(':'))), reactions: {emoji: matchReacts.key, count: matchReacts.count}};
-            return mR;
-        });
+            let matchNo = parseInt(msg.content.slice(8,msg.content.indexOf(':')));
+            // let mR = new Map();
+            for (const [key, value] of matchReacts) {
+                rndMatchesReactions.set(matchNo, {emoji: key, count: value.count});
+            }
+        }
         console.log(rndMatchesReactions);
     })
-
-
 });
 
 
