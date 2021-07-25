@@ -4,48 +4,68 @@ dotenv.config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-const fs = require('fs');
-const readline = require('readline');
-const {google} = require('googleapis');
-
-// If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
-const TOKEN_PATH = 'token.json';
-
 const dismoji = require('discord-emoji');
 const enm = require('emoji-name-map');
 const EMOJI_ONE = enm.get('one');
 const EMOJI_TWO = enm.get('two');
 
-const SPREADSHEET_ID = '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs';
+const skipstat = false;
+const testing = false;
+const once = false;
 
-const BOT_STATE_REF = 'Dashboard!B4';
-
-const REFS = {
-  'round': 'Dashboard!B2',
-  'song': 'Dashboard!B3',
-  'header': 'Dashboard!D1',
-  'footer': 'Dashboard!D8',
-  'match': 'Dashboard!D3:E6',
-  'size': 'Dashboard!B5'
-}
-
-let skipstat = false;
-let testing = false;
-let once = false;
-
+process.argv.forEach(function (val, index, array) {
+    if( val === '-s' ) { skipstat = true;}
+    if( val === '-t' ) { testing = true;}
+    if( val === '-o' ) {once = true;}
+  });
 
 const GUILD_ID = (testing === true ? '212660788786102272' : '782213860337647636');  
 const CHANNEL_ID =  (testing === true ? '864768873270345788' : '751893730117812225');  
+
+
+async function fetch_many(channel, limit = 150) {
+    let sum_messages = await channel.messages.fetch({limit: 100});
+    let last_id = sum_messages.last().id;
+    let lim = Math.max(0, limit - 100);
+    while (true) {
+        let options = { limit: lim };
+        if (last_id) {
+            options.before = last_id;
+        }
+
+        const msgs = await channel.messages.fetch(options);
+        lim = Math.max(0, lim - lim);
+        sum_messages = sum_messages.concat(msgs);
+        last_id = msgs.last().id;
+        
+        if (lim === 0 || msgs.size != 100 || sum_messages.length >= limit) {
+            break;
+        }
+    }
+
+    return sum_messages;
+}
 
 
 client.on('ready', () => {
     console.log('Ready!');
 
     const channel = client.channels.cache.get(CHANNEL_ID);
+
+
+    fetch_many(channel,150).then( messages => {
+        const checkInMsg = channel.messages.cache.find(m => m.content.includes('if you plan on voting'));
+        let checkIns = checkInMsg.reactions.cache.each(async (reaction) => await reaction.users.fetch());
+        let checkInUsers = checkIns.first().users.cache;//.map( (user) => user.username);
+
+        const checkOutMsg = channel.messages.cache.find(m => m.content.includes('you have checked in and are done voting'))
+        let checkOuts = checkOutMsg.reactions.cache.each(async (reaction) => await reaction.users.fetch())
+        let checkOutUsers = checkOuts.first().users.cache;//.map( (user) => user.username);
+
+        console.log(checkInUsers);
+        console.log(checkOutUsers);
+    });
+    
 
     channel.messages.fetch({limit: 100}).then( messages => {
         let msgDelims = messages.filter(msg => 
@@ -62,7 +82,6 @@ client.on('ready', () => {
         for (const msg of rndMatches.values()) {
             let matchReacts = msg.reactions.cache;
             let matchNo = parseInt(msg.content.slice(8,msg.content.indexOf(':')));
-            // let mR = new Map();
             for (const [key, value] of matchReacts) {
                 rndMatchesReactions.set(matchNo, {emoji: key, count: value.count});
             }
@@ -71,120 +90,6 @@ client.on('ready', () => {
     })
 });
 
-
-// const loadCredentials = () => {
-// // Load client secrets from a local file.
-// try {
-//     return content = JSON.parse(fs.readFileSync('credentials.json'))
-// } catch (err) {
-//     console.log('Error loading client secret file:', err);
-//     throw err;
-// }
-// }
-
-
-// const getValue = async rng => getMsg(rng, await getAuthClient());
-
-
-// const getValues = async rng => getMsgs(rng, await getAuthClient());
-
-
-// const setValue = async (rng, val) => setMsg(rng, val, await getAuthClient());
-
-
-// const getAuthClient = async () => authorize(loadCredentials());
-
-
-// const authorize = async credentials => {
-// const {client_secret, client_id, redirect_uris} = credentials.installed;
-// const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-
-// try {
-//     oAuth2Client.setCredentials(JSON.parse(fs.readFileSync(TOKEN_PATH)));
-// } catch (err) {
-//     console.log('Unable to load credentials from file, getting new token from user');
-//     await getNewToken(oAuth2Client);
-// }
-// return oAuth2Client;
-// }
-
-
-// const getNewToken = async oAuth2Client => {
-// // TODO split this into a separate utility or separate flow?
-// const authUrl = oAuth2Client.generateAuthUrl({
-//     access_type: 'offline',
-//     scope: SCOPES,
-// });
-// console.log('Authorize this app by visiting this url:', authUrl);
-// const rl = readline.createInterface({
-//     input: process.stdin,
-//     output: process.stdout,
-// });
-// // TODO util.promisify this https://nodejs.org/api/readline.html#readline_rl_question_query_options_callback
-// rl.question('Enter the code from that page here: ', (code) => {
-//     rl.close();
-//     oAuth2Client.getToken(code, (err, token) => {
-//     if (err) return console.error('Error while trying to retrieve access token', err);
-//     oAuth2Client.setCredentials(token);
-//     // Store the token to disk for later program executions
-//     fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-//         if (err) return console.error(err);
-//         console.log('Token stored to', TOKEN_PATH);
-//     });
-//     });
-// });
-// // This should await readline.question and there's probably a similar thing to do with oAuth2Client.getToken
-// }
-
-
-// const getMsg = async (rng, auth) => {
-// const sheets = google.sheets({version: 'v4', auth});
-// try {
-//     var response = await sheets.spreadsheets.values.get({
-//     spreadsheetId: SPREADSHEET_ID,
-//     range: rng,
-//     });
-//     return response.data.values[0][0];
-// } catch (err) {
-//     console.log(`getMsg API returned an error for range "${rng}"`, err);
-//     throw err;
-// }
-// }
-
-
-// const getMsgs = async (rng, auth) => {
-// const sheets = google.sheets({version: 'v4', auth});
-// try {
-//     var response = await sheets.spreadsheets.values.batchGet({
-//     spreadsheetId: SPREADSHEET_ID,
-//     ranges: rng,
-//     });
-//     return response.data.valueRanges;
-// } catch (err) {
-//     console.log(`getMsgs API returned an error for range "${rng}"`, err);
-//     throw err;
-// }
-// }
-
-
-// const setMsg = async (rng, val, auth) => {
-// const sheets = google.sheets({version: 'v4', auth});
-// try {
-//     var confirm = await sheets.spreadsheets.values.update({
-//     spreadsheetId: SPREADSHEET_ID,
-//     range: rng,
-//     valueInputOption: 'USER_ENTERED',
-//     resource: {
-//         majorDimension: 'ROWS',
-//         values: [[val]],
-//     },
-//     });
-//     return confirm.config.data.values[0];
-// } catch (err) {
-//     console.log(`setMsg API returned an error for range "${rng}" and value "${val}"`, err);
-//     throw err;
-// }
-// }
 
 client.login(process.env.TOKEN);
   

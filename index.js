@@ -33,9 +33,9 @@ const REFS = {
   'size': 'Dashboard!B5'
 }
 
-let skipstat = false;
-let testing = false;
-let once = false;
+const skipstat = false;
+const testing = false;
+const once = false;
 
 process.argv.forEach(function (val, index, array) {
     if( val === '-s' ) { skipstat = true;}
@@ -186,7 +186,7 @@ const nextMatch = async matches => {
     await react(sent, emojis);
 
     if (typeof round != 'undefined') {
-      await setValue(REFS.round, 'R' + (rndVal + 1));
+      await setValue(REFS.round, 'R' + (parseInt(rndVal) + 1));
     }
     await setValue(REFS.song, 1);
     await setValue(BOT_STATE_REF, 'STOP');
