@@ -186,7 +186,7 @@ const nextMatch = async matches => {
     await react(sent, emojis);
 
     if (typeof round != 'undefined') {
-      await setValue(REFS.round, 'R' + (parseInt(rndVal) + 1));
+      await setValue(REFS.round, 'R' + (rndVal + 1));
     }
     await setValue(REFS.song, 1);
     await setValue(BOT_STATE_REF, 'STOP');
@@ -206,7 +206,7 @@ client.once('ready', () => {
 
 client.on('ready', async () => {
 
-  if (once = true) {
+  if (once === true) {
     await nextMatch();
     client.destroy();
   } else {
