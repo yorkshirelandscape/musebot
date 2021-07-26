@@ -51,7 +51,7 @@ const getChecks = (channel, search) => {
     return new Promise(resolve => {
         const checkMsg = channel.messages.cache.find(m => m.content.includes(search));
         checkMsg.reactions.cache.first().users.fetch().then( p => {
-            const checks = p.filter(u => !u.bot).map( (user) => user.username);
+            const checks = p.filter(u => !u.bot).map( (user) => ({user: user.username, id: user.id})); //user.username);
             resolve(checks);
         });
     });
@@ -69,8 +69,8 @@ client.on('ready', () => {
         const checkIns = await getChecks(channel, 'if you plan on voting');
         const checkOuts = await getChecks(channel, 'you have checked in and are done voting');
 
-        const missing = checkIns.filter( x => !checkOuts.includes(x));
-        const extra = checkOuts.filter( x => !checkIns.includes(x));
+        const missing = checkIns.filter( x => !checkOuts.map(u => u.user).includes(x.user));
+        const extra = checkOuts.filter( x => !checkIns.map(u => u.user).includes(x.user));
         
         const pctCheckedIn = (checkOuts.length - extra.length) / checkIns.length
 
