@@ -47,23 +47,37 @@ async function fetch_many(channel, limit = 150) {
 }
 
 
+const getChecks = (channel, search) => {
+    return new Promise(resolve => {
+        const checkMsg = channel.messages.cache.find(m => m.content.includes(search));
+        checkMsg.reactions.cache.first().users.fetch().then( p => {
+            const checks = p.filter(u => !u.bot).map( (user) => user.username);
+            resolve(checks);
+        });
+    });
+}
+
+
 client.on('ready', () => {
     console.log('Ready!');
 
     const channel = client.channels.cache.get(CHANNEL_ID);
 
+    
+    fetch_many(channel,150).then( async messages => {
+        
+        const checkIns = await getChecks(channel, 'if you plan on voting');
+        const checkOuts = await getChecks(channel, 'you have checked in and are done voting');
 
-    fetch_many(channel,150).then( messages => {
-        const checkInMsg = channel.messages.cache.find(m => m.content.includes('if you plan on voting'));
-        let checkIns = checkInMsg.reactions.cache.each(async (reaction) => await reaction.users.fetch());
-        let checkInUsers = checkIns.first().users.cache;//.map( (user) => user.username);
+        const missing = checkIns.filter( x => !checkOuts.includes(x));
+        const extra = checkOuts.filter( x => !checkIns.includes(x));
+        
+        const pctCheckedIn = (checkOuts.length - extra.length) / checkIns.length
 
-        const checkOutMsg = channel.messages.cache.find(m => m.content.includes('you have checked in and are done voting'))
-        let checkOuts = checkOutMsg.reactions.cache.each(async (reaction) => await reaction.users.fetch())
-        let checkOutUsers = checkOuts.first().users.cache;//.map( (user) => user.username);
+        console.log(missing);
+        console.log(extra);
+        console.log(pctCheckedIn);
 
-        console.log(checkInUsers);
-        console.log(checkOutUsers);
     });
     
 
