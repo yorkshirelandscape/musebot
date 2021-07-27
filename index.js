@@ -136,7 +136,7 @@ const react = async (message, emojis) => {
 }
 
 
-const getMatchesCount = (round, size) => Math.min(round === 4 ? 4 : (round === 5 ? 2 : (round === 6 ? 1 : 8)), Math.pow(2, round - (size > 64 ? 0 : (size > 32 ? 1 : 2))));
+const getMatchesCount = (round, size) => Math.min(round === 4 ? 4 : (round === 5 ? 2 : (round === 6 ? 2 : 8)), Math.pow(2, round - (size > 64 ? 0 : (size > 32 ? 1 : 2))));
 
 
 const nextMatch = async matches => {
@@ -190,6 +190,11 @@ const nextMatch = async matches => {
     }
     await setValue(REFS.song, 1);
     await setValue(BOT_STATE_REF, 'STOP');
+  }
+
+  if (round === 'R6') {
+    await setValue(REFS.round, '3P');
+    await setValue(REFS.song, 1);
   }
 
   if (matches > 1) {
