@@ -6,6 +6,7 @@ const client = new Discord.Client();
 
 const dismoji = require('discord-emoji');
 const enm = require('emoji-name-map');
+const { values } = require('underscore');
 const EMOJI_ONE = enm.get('one');
 const EMOJI_TWO = enm.get('two');
 
@@ -16,7 +17,7 @@ const once = false;
 process.argv.forEach(function (val, index, array) {
     if( val === '-s' ) { skipstat = true;}
     if( val === '-t' ) { testing = true;}
-    if( val === '-o' ) {once = true;}
+    if( val === '-o' ) { once = true;}
   });
 
 const GUILD_ID = (testing === true ? '212660788786102272' : '782213860337647636');  
@@ -51,7 +52,7 @@ const getChecks = (channel, search) => {
     return new Promise(resolve => {
         const checkMsg = channel.messages.cache.find(m => m.content.includes(search));
         checkMsg.reactions.cache.first().users.fetch().then( p => {
-            const checks = p.filter(u => !u.bot).map( (user) => ({user: user.username, id: user.id})); //user.username);
+            const checks = p.filter(u => !u.bot).map( (user) => ({user: user.username, id: user.id}));
             resolve(checks);
         });
     });
@@ -92,15 +93,17 @@ client.on('ready', () => {
             msg.deleted === false && msg.content.includes('Match')
         );
         console.log(rndMatches);
-        let rndMatchesReactions = new Map();
-        for (const msg of rndMatches.values()) {
-            let matchReacts = msg.reactions.cache;
-            let matchNo = parseInt(msg.content.slice(8,msg.content.indexOf(':')));
-            for (const [key, value] of matchReacts) {
-                rndMatchesReactions.set(matchNo, {emoji: key, count: value.count});
+        let rndMatchesResults = [];
+        rndMatches.map( rm => {
+            let matchNo = parseInt(rm.content.slice(8,rm.content.indexOf(':')));
+
+            let matchReacts = new Set();
+            for (const [key, value] of rm.reactions.cache) {
+                matchReacts.add({emoji: key, count: value.count});
             }
-        }
-        console.log(rndMatchesReactions);
+            rndMatchesResults.push({[matchNo]: matchReacts})
+        });
+        console.log(rndMatchesResults);
     })
 });
 
