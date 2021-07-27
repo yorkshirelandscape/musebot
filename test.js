@@ -11,7 +11,7 @@ const EMOJI_ONE = enm.get('one');
 const EMOJI_TWO = enm.get('two');
 
 const skipstat = false;
-const testing = false;
+const testing = true;
 const once = false;
 
 process.argv.forEach(function (val, index, array) {
@@ -23,6 +23,7 @@ process.argv.forEach(function (val, index, array) {
 const GUILD_ID = (testing === true ? '212660788786102272' : '782213860337647636');  
 const CHANNEL_ID =  (testing === true ? '864768873270345788' : '751893730117812225');  
 
+const now = new Date();
 
 async function fetch_many(channel, limit = 150) {
     let sum_messages = await channel.messages.fetch({limit: 100});
@@ -58,53 +59,76 @@ const getChecks = (channel, search) => {
     });
 }
 
+const checkRound = () => {
+    
+    const channel = client.channels.cache.get(CHANNEL_ID);
+
+    fetch_many(channel,150).then( async messages => {
+            
+        const roundStart = await messages.find( msg => msg.content.includes('Begins————'));
+        const roundEnd = await messages.find( msg => msg.content.includes('you have checked in and are done voting'));
+
+        if ( roundStart.createdTimestamp < roundEnd.createdTimestamp ) {
+            const checkIns = await getChecks(channel, 'if you plan on voting');
+            const checkOuts = await getChecks(channel, 'you have checked in and are done voting');
+
+            const missing = checkIns.filter( x => !checkOuts.map(u => u.user).includes(x.user));
+            const extra = checkOuts.filter( x => !checkIns.map(u => u.user).includes(x.user));
+            
+            const pctCheckedIn = (checkOuts.length - extra.length) / checkIns.length
+
+            // console.log(missing);
+            // console.log(extra);
+            // console.log(pctCheckedIn);
+
+            if (pctCheckedIn >= 0.8) {
+
+                channel.send(
+                    `${pctCheckedIn*100}% checked in.\nMissing: ${missing.toString()}\nExtra: ${extra.toString()}`
+                )
+
+                await new Promise(r => setTimeout(r, 60*60*1000));
+
+                channel.send('Round concluded. Tabulating votes.')
+
+                channel.messages.fetch({limit: 100}).then( messages => {
+                    let msgDelims = messages.filter(msg => 
+                        msg.content.includes('you have checked in and are done voting') && msg.deleted === false
+                        );
+                    msgDelims.array();
+                    let rndMatches = messages.filter(msg =>
+                        msg.createdTimestamp < msgDelims._array[0].createdTimestamp && 
+                        msg.createdTimestamp > msgDelims._array[1].createdTimestamp &&
+                        msg.deleted === false && msg.content.includes('Match')
+                    );
+                    let rndMatchesResults = [];
+                    rndMatches.map( rm => {
+                        let matchNo = parseInt(rm.content.slice(8,rm.content.indexOf(':')));
+            
+                        let matchReacts = new Set();
+                        for (const [key, value] of rm.reactions.cache) {
+                            matchReacts.add({emoji: key, count: value.count});
+                        }
+                        rndMatchesResults.push({[matchNo]: matchReacts})
+                    });
+                    console.log(rndMatchesResults);
+                })
+
+            } else { console.log('Awaiting 80%.')}
+        } else { console.log('Round in progress.')}
+    });
+}
 
 client.on('ready', () => {
     console.log('Ready!');
 
-    const channel = client.channels.cache.get(CHANNEL_ID);
-
+    let countdown = 1;//((60 - now.getSeconds()) + 60 * ( 30 - now.getMinutes() % 30));
+    console.log(`${now}: Triggering in ${countdown / 60} minutes`);
+    setTimeout(() => {
+        checkRound();
+        setInterval(checkRound, 60 * 30 * 1000);
+    }, countdown * 1000);
     
-    fetch_many(channel,150).then( async messages => {
-        
-        const checkIns = await getChecks(channel, 'if you plan on voting');
-        const checkOuts = await getChecks(channel, 'you have checked in and are done voting');
-
-        const missing = checkIns.filter( x => !checkOuts.map(u => u.user).includes(x.user));
-        const extra = checkOuts.filter( x => !checkIns.map(u => u.user).includes(x.user));
-        
-        const pctCheckedIn = (checkOuts.length - extra.length) / checkIns.length
-
-        console.log(missing);
-        console.log(extra);
-        console.log(pctCheckedIn);
-
-    });
-    
-
-    channel.messages.fetch({limit: 100}).then( messages => {
-        let msgDelims = messages.filter(msg => 
-            msg.content.includes('you have checked in and are done voting') && msg.deleted === false
-            );
-        msgDelims.array();
-        let rndMatches = messages.filter(msg =>
-            msg.createdTimestamp < msgDelims._array[0].createdTimestamp && 
-            msg.createdTimestamp > msgDelims._array[1].createdTimestamp &&
-            msg.deleted === false && msg.content.includes('Match')
-        );
-        console.log(rndMatches);
-        let rndMatchesResults = [];
-        rndMatches.map( rm => {
-            let matchNo = parseInt(rm.content.slice(8,rm.content.indexOf(':')));
-
-            let matchReacts = new Set();
-            for (const [key, value] of rm.reactions.cache) {
-                matchReacts.add({emoji: key, count: value.count});
-            }
-            rndMatchesResults.push({[matchNo]: matchReacts})
-        });
-        console.log(rndMatchesResults);
-    })
 });
 
 
