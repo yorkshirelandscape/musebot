@@ -33,9 +33,9 @@ const REFS = {
   'size': 'Dashboard!B5'
 }
 
-const skipstat = false;
-const testing = false;
-const once = false;
+let skipstat = false;
+let testing = false;
+let once = false;
 
 process.argv.forEach(function (val, index, array) {
     if( val === '-s' ) { skipstat = true;}
