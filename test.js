@@ -135,7 +135,7 @@ client.on('ready', () => {
     console.log('Ready!');
     
     //run every half hour at quarter after and quarter to
-    let countdown = 1;//((60 - now.getSeconds()) + 60 * ( (now.getMinutes() > 15 ? 45 : 15) - now.getMinutes() % 30));
+    let countdown = 1;//((60 - now.getSeconds()) + 60 * ( 30 - (getMinutes() + 15) % 30);
     console.log(`${now}: Triggering in ${countdown / 60} minutes`);
     setTimeout(() => {
         checkRound();
