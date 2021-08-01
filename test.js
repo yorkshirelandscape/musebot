@@ -97,9 +97,6 @@ const checkRound = () => {
         //of those, find the most recent messages that begin and end a round
         const roundStart = await messages.find( msg => msg.content.includes('Begins————'));
         const roundEnd = await messages.find( msg => msg.content.includes('you have checked in and are done voting'));
-
-		console.log(roundStart.createdTimestamp);
-		console.log(roundEnd.createdTimestamp);
 		
         //if the most recent round is complete, fetch the reactions from the check-in and check-out messages
         if ( roundStart.createdTimestamp < roundEnd.createdTimestamp ) {
@@ -110,10 +107,6 @@ const checkRound = () => {
             const missing = checkIns.filter( x => !checkOuts.map(u => u.user).includes(x.user));
             const extra = checkOuts.filter( x => !checkIns.map(u => u.user).includes(x.user));
             const pctCheckedIn = (checkOuts.length - extra.length) / checkIns.length
-
-            console.log(missing);
-            console.log(extra);
-            console.log(pctCheckedIn);
 
             // const roundEndTime = new Date(roundEnd.createdTimestamp * 1000)
 			const roundEndTime = roundEnd.createdTimestamp
@@ -158,23 +151,43 @@ const checkRound = () => {
 					rndMatchesResults.push({[matchNo]: matchReacts})
 				});
 
-				let round = await getValue(REFS.round);
-				let rndVal = parseInt(round.slice(1)) - 1;
-
-				let resultsRange = 'R' + rndVal + '!K2:M' + ((Math.pow(2,(7-rndVal))/2)+1)
-
+				//format the results array properly
 				let resultsArray = []
-				
 				rndMatchesResults.map( r => {
 					Object.values(r).map( e => {
-							resultsArray.push([parseInt(Object.values(e[0]).toString()), parseInt(Object.values(e[1]).toString()), Object.values(e[0]) = Object.values(e[1]) ? 1 : 0 ]);
+						resultsArray.push([parseInt(Object.values(e[0]).toString()), parseInt(Object.values(e[1]).toString()), Object.values(e[0]).toString() === Object.values(e[1]).toString() ? 1 : 0, Object.keys(r)[0] ]);
 					});
 				});
-
 				resultsArray.reverse();
-				console.log(resultsArray);
+				
+				//settle ties
+				tiesArray = [];
+				resultsArray.map( r => {
+					if ( r[2] === 1 ) {
+						tiesArray.push({match: r[3]});
+					}
+				});
 
-				setValues(resultsRange, resultsArray);
+				console.log(tiesArray);
+
+				if (tiesArray) {
+					for (const t of tiesArray) {
+						t.msg = await rndMatches.filter( msg =>
+							parseInt(msg.content.slice(8,msg.content.indexOf(':'))) === t.match
+						);
+						console.log(tiesArray);
+						channel.send(t.msg.content.replace('**Match**','**Tie**'));
+						sleep(3*1000);
+						t.result = Math.round(Math.random());
+					}
+				}
+				
+				//set the range to push the results to and push them
+				let round = await getValue(REFS.round);
+				let rndVal = parseInt(round.slice(1)) - 1;
+				let resultsRange = 'R' + rndVal + '!K2:M' + ((Math.pow(2,(7-rndVal))/2)+1)
+
+				// setValues(resultsRange, resultsArray);
 
             } else { 
 				console.log('Awaiting 80%.');
