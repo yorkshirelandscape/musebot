@@ -34,7 +34,7 @@ const REFS = {
 }
 
 let skipstat = false;
-let testing = false;
+let testing = true;
 let once = false;
 
 process.argv.forEach(function (val, index, array) {
@@ -98,6 +98,9 @@ const checkRound = () => {
         const roundStart = await messages.find( msg => msg.content.includes('Begins————'));
         const roundEnd = await messages.find( msg => msg.content.includes('you have checked in and are done voting'));
 
+		console.log(roundStart.createdTimestamp);
+		console.log(roundEnd.createdTimestamp);
+		
         //if the most recent round is complete, fetch the reactions from the check-in and check-out messages
         if ( roundStart.createdTimestamp < roundEnd.createdTimestamp ) {
             const checkIns = await getChecks(channel, 'if you plan on voting');
@@ -116,7 +119,7 @@ const checkRound = () => {
 			const roundEndTime = roundEnd.createdTimestamp
 
             //if 80% are checked in and the round is half over OR the round has one hour left to go, issue the 1-hour warning
-            if ( ( pctCheckedIn >= 0.8 && now > ( roundEndTime + 12*60*60*1000 ) ) || now > ( roundEndTime + 12*60*60*1000 ) ) {
+            if ( ( pctCheckedIn >= 0.8)) {// && now > ( roundEndTime + 12*60*60*1000 ) ) || now > ( roundEndTime + 12*60*60*1000 ) ) {
 
 				if ( pctCheckedIn < 1) {
 					channel.send(
@@ -130,48 +133,49 @@ const checkRound = () => {
 				channel.send('Round concluded. Tabulating votes.')
 
                 //fetch 100 most recent messages (not necessary, but I wrote this out of order)
-                channel.messages.fetch({limit: 100}).then( async messages => {
-                    //isolate the check-out messages and convert to an array
-                    let msgDelims = messages.filter(msg => 
-                        msg.content.includes('you have checked in and are done voting') && msg.deleted === false
-                        );
-                    msgDelims.array();
-                    //filter all the messages for those between the two most recent delimiters
-                    let rndMatches = messages.filter(msg =>
-                        msg.createdTimestamp < msgDelims._array[0].createdTimestamp && 
-                        msg.createdTimestamp > msgDelims._array[1].createdTimestamp &&
-                        msg.deleted === false && msg.content.includes('Match')
-                    );
-                    //create an array of the reaction counts for each message
-                    let rndMatchesResults = [];
-                    rndMatches.map( rm => {
-                        let matchNo = parseInt(rm.content.slice(8,rm.content.indexOf(':')));
-            
-                        let matchReacts = new Set();
-                        for (const [key, value] of rm.reactions.cache) {
-                            matchReacts.add({emoji: key, count: value.count});
-                        }
-                        rndMatchesResults.push({[matchNo]: matchReacts})
-                    });
+                const roundMessages = await channel.messages.fetch({limit: 100})
+				
+				//isolate the check-out messages and convert to an array
+				let msgDelims = roundMessages.filter(msg => 
+					msg.content.includes('you have checked in and are done voting') && msg.deleted === false
+					);
+				msgDelims.array();
+				//filter all the messages for those between the two most recent delimiters
+				let rndMatches = roundMessages.filter(msg =>
+					msg.createdTimestamp < msgDelims._array[0].createdTimestamp && 
+					msg.createdTimestamp > msgDelims._array[1].createdTimestamp &&
+					msg.deleted === false && msg.content.includes('Match')
+				);
+				//create an array of the reaction counts for each message
+				let rndMatchesResults = [];
+				rndMatches.map( rm => {
+					let matchNo = parseInt(rm.content.slice(8,rm.content.indexOf(':')));
+		
+					let matchReacts = [];
+					for (const [key, value] of rm.reactions.cache) {
+						matchReacts.push({[key]: value.count});
+					}
+					rndMatchesResults.push({[matchNo]: matchReacts})
+				});
 
-                    let round = await getValue(Object.values(REFS.round)).toString();
-					console.log(round);
-                    let rndVal = parseInt(round.slice(1));
+				let round = await getValue(REFS.round);
+				let rndVal = parseInt(round.slice(1));
 
-                    let resultsRange = round + '!K2:L' + Math.pow(2,(7-rndVal))/2
-					console.log(resultsRange);
+				let resultsRange = round + '!K2:L' + Math.pow(2,(7-rndVal))/2
+				console.log(resultsRange);
 
-                    let resultsArray = []
-					
-					rndMatchesResults.reverse().map( r => {
-						r.map( v => {
-							resultsArray.push(v.count);
-						});
-                    });
+				let resultsArray = []
+				
+				console.log(rndMatchesResults);
 
-                    console.log(rndMatchesResults);
-					console.log(resultsArray);
-                })
+				rndMatchesResults.map( r => {
+					Object.values(r).map( e => {
+							resultsArray.push([parseInt(Object.values(e[0]).toString()),parseInt(Object.values(e[1]).toString())]);
+					});
+				});
+
+				console.log(resultsArray);
+
             } else { 
 				console.log('Awaiting 80%.');
 				console.log(pctCheckedIn);
