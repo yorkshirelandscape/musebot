@@ -83,6 +83,9 @@ const getChecks = (channel, search) => {
     });
 }
 
+const sleep = async (interval) => {await new Promise(r => setTimeout(r, interval))};
+
+
 //function that pulls it all together
 const checkRound = () => {
 
@@ -109,19 +112,22 @@ const checkRound = () => {
             console.log(extra);
             console.log(pctCheckedIn);
 
-            const roundEndTime = new Date(roundEnd.createdTimestamp * 1000)
+            // const roundEndTime = new Date(roundEnd.createdTimestamp * 1000)
+			const roundEndTime = roundEnd.createdTimestamp
 
             //if 80% are checked in and the round is half over OR the round has one hour left to go, issue the 1-hour warning
             if ( ( pctCheckedIn >= 0.8 && now > ( roundEndTime + 12*60*60*1000 ) ) || now > ( roundEndTime + 12*60*60*1000 ) ) {
 
-                channel.send(
-                    `${pctCheckedIn*100}% checked in.\nMissing: ${missing.toString()}\nExtra: ${extra.toString()}`
-                )
+				if ( pctCheckedIn < 1) {
+					channel.send(
+						`${pctCheckedIn*100}% checked in.\nMissing: ${missing.toString()}\nExtra: ${extra.toString()}`
+					)
 
-                //wait an hour for the round to end, then tabulate the results
-                await new Promise(r => setTimeout(r, 60*60*1000));
-
-                channel.send('Round concluded. Tabulating votes.')
+					//wait an hour for the round to end, then tabulate the results
+					sleep(60*60*1000);
+				}
+                
+				channel.send('Round concluded. Tabulating votes.')
 
                 //fetch 100 most recent messages (not necessary, but I wrote this out of order)
                 channel.messages.fetch({limit: 100}).then( async messages => {
@@ -149,6 +155,7 @@ const checkRound = () => {
                     });
 
                     let round = await getValue(Object.values(REFS.round)).toString();
+					console.log(round);
                     let rndVal = parseInt(round.slice(1));
 
                     let resultsRange = round + '!K2:L' + Math.pow(2,(7-rndVal))/2
@@ -165,7 +172,11 @@ const checkRound = () => {
                     console.log(rndMatchesResults);
 					console.log(resultsArray);
                 })
-            } else { console.log('Awaiting 80%.')}
+            } else { 
+				console.log('Awaiting 80%.');
+				console.log(pctCheckedIn);
+				console.log(roundEndTime);
+			}
         } else { console.log('Round in progress.')}
     });
 }
@@ -182,6 +193,18 @@ client.on('ready', () => {
     }, countdown * 1000);
     
 });
+
+
+const loadCredentials = () => {
+	// Load client secrets from a local file.
+	try {
+	  return content = JSON.parse(fs.readFileSync('credentials.json'))
+	} catch (err) {
+	  console.log('Error loading client secret file:', err);
+	  throw err;
+	}
+  }
+  
 
 const getValue = async rng => getMsg(rng, await getAuthClient());
 
