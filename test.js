@@ -20,8 +20,6 @@ const enm = require('emoji-name-map');
 const EMOJI_ONE = enm.get('one');
 const EMOJI_TWO = enm.get('two');
 
-const SPREADSHEET_ID = '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs';
-
 const BOT_STATE_REF = 'Dashboard!B4';
 
 const REFS = {
@@ -45,6 +43,8 @@ process.argv.forEach(function (val, index, array) {
 
 const GUILD_ID = (testing === true ? '212660788786102272' : '782213860337647636');  
 const CHANNEL_ID =  (testing === true ? '864768873270345788' : '751893730117812225');  
+const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs');
+
 
 const now = new Date();
 
@@ -159,22 +159,22 @@ const checkRound = () => {
 				});
 
 				let round = await getValue(REFS.round);
-				let rndVal = parseInt(round.slice(1));
+				let rndVal = parseInt(round.slice(1)) - 1;
 
-				let resultsRange = round + '!K2:L' + Math.pow(2,(7-rndVal))/2
-				console.log(resultsRange);
+				let resultsRange = 'R' + rndVal + '!K2:M' + ((Math.pow(2,(7-rndVal))/2)+1)
 
 				let resultsArray = []
 				
-				console.log(rndMatchesResults);
-
 				rndMatchesResults.map( r => {
 					Object.values(r).map( e => {
-							resultsArray.push([parseInt(Object.values(e[0]).toString()),parseInt(Object.values(e[1]).toString())]);
+							resultsArray.push([parseInt(Object.values(e[0]).toString()), parseInt(Object.values(e[1]).toString()), Object.values(e[0]) = Object.values(e[1]) ? 1 : 0 ]);
 					});
 				});
 
+				resultsArray.reverse();
 				console.log(resultsArray);
+
+				setValues(resultsRange, resultsArray);
 
             } else { 
 				console.log('Awaiting 80%.');
@@ -217,6 +217,9 @@ const getValues = async rng => getMsgs(rng, await getAuthClient());
 
 
 const setValue = async (rng, val) => setMsg(rng, val, await getAuthClient());
+
+
+const setValues = async (rng, val) => setMsgs(rng, val, await getAuthClient());
 
 
 const getAuthClient = async () => authorize(loadCredentials());
@@ -312,5 +315,26 @@ const setMsg = async (rng, val, auth) => {
     throw err;
   }
 }
+
+
+const setMsgs = async (rng, val, auth) => {
+	const sheets = google.sheets({version: 'v4', auth});
+	try {
+	  var confirm = await sheets.spreadsheets.values.update({
+		spreadsheetId: SPREADSHEET_ID,
+		range: rng,
+		valueInputOption: 'USER_ENTERED',
+		resource: {
+		  majorDimension: 'ROWS',
+		  values: val,
+		},
+	  });
+	  return confirm.config.data.values[0];
+	} catch (err) {
+	  console.log(`setMsg API returned an error for range "${rng}" and value "${val}"`, err);
+	  throw err;
+	}
+  }
+
 
 client.login(process.env.TOKEN);

@@ -20,8 +20,6 @@ const enm = require('emoji-name-map');
 const EMOJI_ONE = enm.get('one');
 const EMOJI_TWO = enm.get('two');
 
-const SPREADSHEET_ID = '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs';
-
 const BOT_STATE_REF = 'Dashboard!B4';
 
 const REFS = {
@@ -45,6 +43,7 @@ process.argv.forEach(function (val, index, array) {
 
 const GUILD_ID = (testing === true ? '212660788786102272' : '782213860337647636');  
 const CHANNEL_ID =  (testing === true ? '864768873270345788' : '751893730117812225');  
+const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs');
 
 
 const START_TIME = (skipstat === true ? 0 : 5)
