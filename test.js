@@ -193,6 +193,8 @@ const checkRound = () => {
 
 				setValues(resultsRange, pushArray);
 
+				await setValue(BOT_STATE_REF, 'GO');
+
             } else { 
 				console.log('Awaiting 80%.');
 				console.log(pctCheckedIn);
