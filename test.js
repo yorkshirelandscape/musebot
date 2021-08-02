@@ -91,6 +91,17 @@ const checkRound = () => {
 
     const channel = client.channels.cache.get(CHANNEL_ID);
 
+		// Even though REFS is an object, order is guaranteed for non-string keys
+		let valueRanges = await getValues(Object.values(REFS));
+
+		let round = valueRanges[0].values[0].toString();
+		let song = parseInt(valueRanges[1].values[0].toString());
+		let header = ('values' in valueRanges[2]) ? valueRanges[2].values[0].toString() : null;
+		let footer = ('values' in valueRanges[3]) ? valueRanges[3].values[0].toString() : null;
+		let size = parseInt(valueRanges[5].values[0].toString());
+		let year = parseInt(valueRanges[6].values[0].toString());
+		let rndVal = parseInt(round.slice(1));
+
     //fetch the last 150 messages (this should cover even the longest rounds)
     fetch_many(channel,150).then( async messages => {
             
@@ -112,7 +123,19 @@ const checkRound = () => {
 			const roundEndTime = roundEnd.createdTimestamp
 
             //if 80% are checked in and the round is half over OR the round has one hour left to go, issue the 1-hour warning
-            if ( ( pctCheckedIn >= 0.8)) {// && now > ( roundEndTime + 12*60*60*1000 ) ) || now > ( roundEndTime + 12*60*60*1000 ) ) {
+			let roundMin = 11;
+			let roundMax = 23;
+            if (rndVal === 0 || 
+					(rndVal === 1 && size === 96 ) || 
+					(rndVal === 2 && ( size === 64 || size == 48 ) ) || 
+					(rndVal === 3 && size < 64 ) ) {
+				roundMin = 23;
+				roundMax = 35;
+			} else if ( round = '3P' ) {
+				roundMin = 23;
+				roundMax = 23;
+			}
+            if ( ( pctCheckedIn >= 0.8 && now > ( roundEndTime + roundMin*60*60*1000 ) ) || now > ( roundEndTime + roundMax*60*60*1000 ) ) {
 
 				if ( pctCheckedIn < 1) {
 					channel.send(
@@ -176,8 +199,9 @@ const checkRound = () => {
 							parseInt(msg.content.slice(8,msg.content.indexOf(':'))) === parseInt(t.match)
 						);
 						channel.send(t.msg.content.replace('**Match','**Tie'));
-						await sleep(3*1000);
+						await sleep(5*1000);
 						channel.send('Winner: ' + t.emoji);
+            			await sleep(3*1000);
 					}
 				}
 				

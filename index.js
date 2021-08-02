@@ -175,10 +175,12 @@ const nextMatch = async matches => {
     ) {
       let sent = await channel.send( `React with 🎵 if you plan on voting in the ${year} bracket.` );
       await sent.react('🎵');
+      // await sent.pin();
     }
 
   if (header) {
-    await channel.send(header);
+    let sent = await channel.send(header);
+    // await sent.pin();
   }
 
   let matchText = getMatchText(valueRanges[4].values);
@@ -198,7 +200,7 @@ const nextMatch = async matches => {
     await react(sent, emojis);
 
     if (typeof round != 'undefined') {
-      await setValue(REFS.round, 'R' + (rndVal + 1));
+      await setValue(REFS.round, rndVal === 6 || round === '3P' ? '3P' : 'R' + (rndVal + 1));
     }
     await setValue(REFS.song, 1);
     await setValue(BOT_STATE_REF, 'STOP');
