@@ -28,7 +28,8 @@ const REFS = {
   'header': 'Dashboard!D1',
   'footer': 'Dashboard!D8',
   'match': 'Dashboard!D3:E6',
-  'size': 'Dashboard!B5'
+  'size': 'Dashboard!B5',
+  'year': 'Dashboard!B1'
 }
 
 let skipstat = false;
@@ -156,6 +157,7 @@ const nextMatch = async matches => {
   let header = ('values' in valueRanges[2]) ? valueRanges[2].values[0].toString() : null;
   let footer = ('values' in valueRanges[3]) ? valueRanges[3].values[0].toString() : null;
   let size = parseInt(valueRanges[5].values[0].toString());
+  let year = parseInt(valueRanges[6].values[0].toString());
   let rndVal = parseInt(round.slice(1));
 
   if (typeof matches == 'undefined') {
@@ -163,6 +165,17 @@ const nextMatch = async matches => {
     console.log(`${now}: Posting ${matches} matches this iteration`)
   }
   console.log(`${matches} matches left to post`);
+
+  if ( song === 1 && 
+      ( 
+        ( ( size === 128 || size === 96 ) && rndVal === 0 ) || 
+        ( ( size === 64 || size === 48 ) && rndVal === 1 ) || 
+        ( size === 32 && rndVal === 2 )
+      ) 
+    ) {
+      let sent = await channel.send( `React with 🎵 if you plan on voting in the ${year} bracket.` );
+      await sent.react('🎵');
+    }
 
   if (header) {
     await channel.send(header);

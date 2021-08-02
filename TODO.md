@@ -1,9 +1,9 @@
 # To Do List
 - ~~modularize and merge once.js~~ (made flag instead)
 - ~~add parameter or version to skip botStat~~ (also testing)
-- track check-ins and check-outs to determine round resumption time
-- record match results
-- resolve ties
+- ~~track check-ins and check-outs to determine round resumption time~~
+- ~~record match results~~
+- ~~resolve ties~~
 - emoji collision check and fallback
 - emoji failure check and fallback
 - check emojis before year starts
@@ -11,3 +11,5 @@
 - add !command for DXV and Bluey to trigger nextMatch
 - consolidate getValues and getValue
 - pin Q messages
+- add !command to append new URL to match
+- ~~post yearly check-in message~~
