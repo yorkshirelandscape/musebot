@@ -153,32 +153,32 @@ const checkRound = () => {
 
 				//format the results array properly
 				let resultsArray = []
-				rndMatchesResults.map( r => {
-					Object.values(r).map( e => {
-						resultsArray.push([parseInt(Object.values(e[0]).toString()), parseInt(Object.values(e[1]).toString()), Object.values(e[0]).toString() === Object.values(e[1]).toString() ? 1 : 0, Object.keys(r)[0] ]);
-					});
-				});
+				rndMatchesResults.map( m => {
+					Object.values(m).map( c => {
+            let tieRand = Math.round(Math.random());
+            let tieEmoji = Object.keys(c[tieRand]).toString();
+            let tieC1 = parseInt(Object.values(c[0]).toString());
+            let tieC2 = parseInt(Object.values(c[1]).toString());
+            resultsArray.push({c1: tieRand === 0 ? tieC1 + 1 : tieC1, c2: tieRand === 1 ? tieC2 + 1 : tieC2, tie: tieC1 === tieC2 ? 1 : 0, match: Object.keys(m)[0], winner: tieC1 === tieC2 ? tieRand + 1 : 0, emoji: tieC1 === tieC2 ? tieEmoji : null});
+          });
+        });
 				resultsArray.reverse();
+
 				
 				//settle ties
-				tiesArray = [];
-				resultsArray.map( r => {
-					if ( r[2] === 1 ) {
-						tiesArray.push({match: r[3]});
-					}
-				});
+				tiesArray = resultsArray.filter( m =>	m.tie === 1);
 
 				console.log(tiesArray);
 
 				if (tiesArray) {
 					for (const t of tiesArray) {
-						t.msg = await rndMatches.filter( msg =>
+						t.msg = await rndMatches.find( msg =>
 							parseInt(msg.content.slice(8,msg.content.indexOf(':'))) === t.match
 						);
 						console.log(tiesArray);
 						channel.send(t.msg.content.replace('**Match**','**Tie**'));
 						sleep(3*1000);
-						t.result = Math.round(Math.random());
+						channel.send(t.emoji);
 					}
 				}
 				
