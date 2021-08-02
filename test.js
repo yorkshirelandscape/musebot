@@ -140,13 +140,14 @@ const checkRound = () => {
 					msg.deleted === false && msg.content.includes('Match')
 				);
 				//create an array of the reaction counts for each message
-				let rndMatchesResults = [];
+				// console.log(rndMatches);
+        		let rndMatchesResults = [];
 				rndMatches.map( rm => {
 					let matchNo = parseInt(rm.content.slice(8,rm.content.indexOf(':')));
-		
 					let matchReacts = [];
 					for (const [key, value] of rm.reactions.cache) {
-						matchReacts.push({[key]: value.count});
+            			let emoKey = key.length >= 18 ? '<:' + value.emoji.name + ':' + key + '>' : key
+						matchReacts.push({[emoKey]: value.count});
 					}
 					rndMatchesResults.push({[matchNo]: matchReacts})
 				});
@@ -155,39 +156,42 @@ const checkRound = () => {
 				let resultsArray = []
 				rndMatchesResults.map( m => {
 					Object.values(m).map( c => {
-            let tieRand = Math.round(Math.random());
-            let tieEmoji = Object.keys(c[tieRand]).toString();
-            let tieC1 = parseInt(Object.values(c[0]).toString());
-            let tieC2 = parseInt(Object.values(c[1]).toString());
-            resultsArray.push({c1: tieRand === 0 ? tieC1 + 1 : tieC1, c2: tieRand === 1 ? tieC2 + 1 : tieC2, tie: tieC1 === tieC2 ? 1 : 0, match: Object.keys(m)[0], winner: tieC1 === tieC2 ? tieRand + 1 : 0, emoji: tieC1 === tieC2 ? tieEmoji : null});
-          });
-        });
+						let tieRand = Math.round(Math.random());
+						let tieEmoji = Object.keys(c[tieRand]).toString();
+						let tieC1 = parseInt(Object.values(c[0]).toString());
+						let tieC2 = parseInt(Object.values(c[1]).toString());
+						resultsArray.push({c1: tieRand === 0 ? tieC1 + 1 : tieC1, c2: tieRand === 1 ? tieC2 + 1 : tieC2, tie: tieC1 === tieC2 ? 1 : 0, match: Object.keys(m)[0], winner: tieC1 === tieC2 ? tieRand + 1 : 0, emoji: tieC1 === tieC2 ? tieEmoji : null});
+					});
+				});
 				resultsArray.reverse();
 
 				
 				//settle ties
-				tiesArray = resultsArray.filter( m =>	m.tie === 1);
-
-				console.log(tiesArray);
+				tiesArray = resultsArray.filter( m => m.tie === 1);
 
 				if (tiesArray) {
+					channel.send('Settling ties.');
 					for (const t of tiesArray) {
 						t.msg = await rndMatches.find( msg =>
-							parseInt(msg.content.slice(8,msg.content.indexOf(':'))) === t.match
+							parseInt(msg.content.slice(8,msg.content.indexOf(':'))) === parseInt(t.match)
 						);
-						console.log(tiesArray);
-						channel.send(t.msg.content.replace('**Match**','**Tie**'));
-						sleep(3*1000);
-						channel.send(t.emoji);
+						channel.send(t.msg.content.replace('**Match','**Tie'));
+						await sleep(3*1000);
+						channel.send('Winner: ' + t.emoji);
 					}
 				}
+				
+				pushArray = []
+				resultsArray.map( r => {
+					pushArray.push( [ r.c1, r.c2, r.tie ])
+				});
 				
 				//set the range to push the results to and push them
 				let round = await getValue(REFS.round);
 				let rndVal = parseInt(round.slice(1)) - 1;
 				let resultsRange = 'R' + rndVal + '!K2:M' + ((Math.pow(2,(7-rndVal))/2)+1)
 
-				// setValues(resultsRange, resultsArray);
+				setValues(resultsRange, pushArray);
 
             } else { 
 				console.log('Awaiting 80%.');
