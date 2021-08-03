@@ -58,7 +58,7 @@ const isBotEnabled = botState => {
 }
 
 
-const formatMatchRow = row => row[0] + ((typeof row[1] != 'undefined') ? ` ${row[1]}` : '');
+const formatMatchRow = row => '\u200b' + row[0] + '\u200b' + ((typeof row[1] != 'undefined') ? ` ${row[1]}` : '');
 
 
 const getMatchText = rows => rows.map(formatMatchRow).join('\n');
@@ -73,9 +73,18 @@ const getDismojiByName = name => {
   return null;
 }
 
+const getDismojiByUnicode = uni => {
+  for (let cat of Object.values(dismoji)) {
+    for (let emo of Object.values(cat)) {
+      if (emo === uni){
+        return true;
+      }
+    }
+  }
+  return false;
+}
 
-const findEmojis = async text => await Promise.all(Array.from(text.matchAll(/:([a-zA-Z0-9_]+):/g), getEmoji));
-
+const findEmojis = async text => await Promise.all(Array.from(text.matchAll(/(?<=\u200b):?([^:\n]+):?(?=\u200b)/g), getEmoji));
 
 const replaceEmojis = (text, emojis) => emojis.filter(emoji => emoji.replacement).reduce((curText, emoji) => curText.replace(emoji.text, emoji.replacement), text);
 
@@ -113,6 +122,17 @@ const getEmoji = async match => {
       console.log(`Dismoji emoji found for "${name}"`, sym);
     } else {
       console.log(`No dismoji emoji found for "${name}"`);
+    }
+    let uniTest = Array.from(text.matchAll(/:([a-zA-Z0-9_]+):/g));
+    console.log(text, uniTest.length);
+    if (uniTest.length === 0) {
+      let uniMatch = getDismojiByUnicode(text);
+      if (uniMatch === true) {
+        emoji.unicode = text;
+        console.log(`Dismoji verified for "${text}"`)
+      } else {
+        console.log(`Dismoji not found for "${text}"`)
+      }
     }
   }
   if (!emoji.id && !emoji.unicode) {
