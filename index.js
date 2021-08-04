@@ -124,7 +124,6 @@ const getEmoji = async match => {
       console.log(`No dismoji emoji found for "${name}"`);
     }
     let uniTest = Array.from(text.matchAll(/:([a-zA-Z0-9_]+):/g));
-    console.log(text, uniTest.length);
     if (uniTest.length === 0) {
       let uniMatch = getDismojiByUnicode(text);
       if (uniMatch === true) {
@@ -205,6 +204,10 @@ const nextMatch = async matches => {
 
   let matchText = getMatchText(valueRanges[4].values);
   let emojis = await findEmojis(matchText);
+  if (emojis[0].name === emojis[1].name) {
+    emojis[0].replacement = EMOJI_ONE;
+    emojis[0].unicode = EMOJI_ONE;
+  }
   matchText = replaceEmojis(matchText, emojis);
 
   if (matchText) {

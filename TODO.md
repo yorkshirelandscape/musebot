@@ -4,7 +4,8 @@
 - ~~track check-ins and check-outs to determine round resumption time~~
 - ~~record match results~~
 - ~~resolve ties~~
-- emoji collision check and fallback
+- ~~handle unicode emoji submissions~~
+- ~~emoji collision check and fallback~~
 - emoji failure check and fallback
 - check emojis before year starts
 - ~~handle 3P properly~~
