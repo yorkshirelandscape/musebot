@@ -19,6 +19,7 @@ const dismoji = require('discord-emoji');
 const enm = require('emoji-name-map');
 const EMOJI_ONE = enm.get('one');
 const EMOJI_TWO = enm.get('two');
+const EMOJI_BOOM = enm.get('boom')
 
 const BOT_STATE_REF = 'Dashboard!B4';
 
@@ -136,7 +137,12 @@ const getEmoji = async match => {
   }
   if (!emoji.id && !emoji.unicode) {
     console.log(`Emoji not found for "${name}"`);
-    return null;
+    return {
+      text: text,
+      name: name,
+      replacement: EMOJI_BOOM,
+      unicode: EMOJI_BOOM
+    };
   }
   return emoji;
 }
