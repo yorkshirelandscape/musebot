@@ -6,7 +6,7 @@
 - ~~resolve ties~~
 - ~~handle unicode emoji submissions~~
 - ~~emoji collision check and fallback~~
-- emoji failure check and fallback
+- ~~emoji failure check and fallback~~
 - check emojis before year starts
 - ~~handle 3P properly~~
 - add !command for DXV and Bluey to trigger nextMatch

@@ -1,8 +1,8 @@
 const dotenv = require('dotenv');
 dotenv.config();
 
-const Discord = require('discord.js');
-const client = new Discord.Client();
+const { Client, Intents } = require('discord.js');
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
 
 const fs = require('fs');
 const readline = require('readline');
@@ -43,7 +43,7 @@ process.argv.forEach(function (val, index, array) {
     if( val === '-o' ) {once = true;}
   });
 
-const GUILD_ID = (testing === true ? '212660788786102272' : '782213860337647636');  
+const GUILD_ID = (testing === true ? '782213860337647636' : '212660788786102272');  
 const CHANNEL_ID =  (testing === true ? '864768873270345788' : '751893730117812225');  
 const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs');
 
