@@ -123,7 +123,7 @@ const getEmoji = async (match) => {
       emoji.id = clientEmoji.id;
       emoji.replacement = `<${text}${clientEmoji.id}>`;
       console.log(`Client emoji found for "${name}"`, clientEmoji.id);
-    } catch (err) {
+    } catch (errClient) {
       console.log(`No client emoji found for "${name}"`);
     }
     const sym = getDismojiByName(name);
@@ -195,7 +195,7 @@ const nextMatch = async (matches) => {
 
   const botState = await getValue(BOT_STATE_REF);
 
-  if (!isBotEnabled(botState)) {
+  if (!isBotEnabled(botState) && !skipstat) {
     console.log(`${now}: Bot disabled, exiting`);
     return;
   }
@@ -211,8 +211,8 @@ const nextMatch = async (matches) => {
   const year = parseInt(valueRanges[6].values[0].toString());
   const rndVal = parseInt(round.slice(1));
 
-  let matchCount = null;
-  if (typeof matches === 'undefined') {
+  let matchCount = matches;
+  if (typeof matcheCount === 'undefined') {
     matchCount = getMatchesCount(rndVal, size);
     console.log(`${now}: Posting ${matchCount} matches this iteration`);
   }
@@ -313,8 +313,9 @@ const setValue = async (rng, val) => setMsg(rng, val, await getAuthClient());
 const getAuthClient = async () => authorize(loadCredentials());
 
 const authorize = async (credentials) => {
-  const { clientSecret, clientId, redirectUris } = credentials.installed;
-  const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUris[0]);
+  // eslint-disable-next-line camelcase
+  const { client_secret, client_id, redirect_uris } = credentials.installed;
+  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
   try {
     oAuth2Client.setCredentials(JSON.parse(fs.readFileSync(TOKEN_PATH)));
@@ -343,8 +344,8 @@ const getNewToken = async (oAuth2Client) => {
       if (err) return console.error('Error while trying to retrieve access token', err);
       oAuth2Client.setCredentials(token);
       // Store the token to disk for later program executions
-      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-        if (err) return console.error(err);
+      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (errAuth) => {
+        if (errAuth) return console.error(err);
         console.log('Token stored to', TOKEN_PATH);
       });
     });

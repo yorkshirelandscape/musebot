@@ -306,8 +306,8 @@ const getNewToken = async (oAuth2Client) => {
       if (err) return console.error('Error while trying to retrieve access token', err);
       oAuth2Client.setCredentials(token);
       // Store the token to disk for later program executions
-      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-        if (err) return console.error(err);
+      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (errAuth) => {
+        if (errAuth) return console.error(err);
         console.log('Token stored to', TOKEN_PATH);
       });
     });
