@@ -27,4 +27,4 @@ node_modules
 config.json
 credentials.json
 token.json
-musebot.log*
+*.log

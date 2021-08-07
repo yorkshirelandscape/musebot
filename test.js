@@ -1,8 +1,10 @@
 const dotenv = require('dotenv');
 dotenv.config();
 
-const Discord = require('discord.js');
-const client = new Discord.Client();
+
+const { Client, Intents } = require('discord.js');
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
+
 
 const fs = require('fs');
 const readline = require('readline');
@@ -28,17 +30,18 @@ const REFS = {
   'header': 'Dashboard!D1',
   'footer': 'Dashboard!D8',
   'match': 'Dashboard!D3:E6',
-  'size': 'Dashboard!B5'
+  'size': 'Dashboard!B5',
+  'year': 'Dashboard!B1'
 }
 
 let skipstat = false;
-let testing = true;
+let testing = false;
 let once = false;
 
 process.argv.forEach(function (val, index, array) {
     if( val === '-s' ) { skipstat = true;}
     if( val === '-t' ) { testing = true;}
-    if( val === '-o' ) {once = true;}
+    if( val === '-o' ) { once = true;}
   });
 
 const GUILD_ID = (testing === true ? '212660788786102272' : '782213860337647636');  
@@ -87,7 +90,7 @@ const sleep = async (interval) => {await new Promise(r => setTimeout(r, interval
 
 
 //function that pulls it all together
-const checkRound = () => {
+const checkRound = async () => {
 
     const channel = client.channels.cache.get(CHANNEL_ID);
 
@@ -228,17 +231,23 @@ const checkRound = () => {
     });
 }
 
-client.on('ready', () => {
-    console.log('Ready!');
-    
-    //run every half hour at quarter after and quarter to
-    let countdown = 1;//((60 - now.getSeconds()) + 60 * ( 30 - (getMinutes() + 15) % 30);
-    console.log(`${now}: Triggering in ${countdown / 60} minutes`);
-    setTimeout(() => {
-        checkRound();
-        setInterval(checkRound, 60 * 30 * 1000);
-    }, countdown * 1000);
-    
+client.once('ready', () => {
+  console.log('Ready!');
+});
+
+client.on('ready', async () => {
+    if (once === true) {
+      await checkRound();
+      // client.destroy();
+    } else {
+      //run every half hour at quarter after and quarter to
+      let countdown = ((60 - now.getSeconds()) + 60 * ( 30 - (getMinutes() + 15) % 30));
+      console.log(`${now}: Triggering in ${countdown / 60} minutes`);
+      setTimeout(() => {
+          checkRound();
+          setInterval(checkRound, 60 * 30 * 1000);
+      }, countdown * 1000);
+    }
 });
 
 

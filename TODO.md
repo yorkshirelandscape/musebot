@@ -11,6 +11,6 @@
 - ~~handle 3P properly~~
 - add !command for DXV and Bluey to trigger nextMatch
 - consolidate (g/s)etValue(s)
-- pin Q messages (needs expanded permissions)
-- add !command to append new URL to match
+- ~~pin Q messages (needs expanded permissions)~~
+- ~~add !command to append new URL to match~~
 - ~~post yearly check-in message~~

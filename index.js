@@ -200,12 +200,12 @@ const nextMatch = async matches => {
     ) {
       let sent = await channel.send( `React with 🎵 if you plan on voting in the ${year} bracket.` );
       await sent.react('🎵');
-      // await sent.pin();
+      await sent.pin();
     }
 
   if (header) {
     let sent = await channel.send(header);
-    // await sent.pin();
+    await sent.pin();
   }
 
   let matchText = getMatchText(valueRanges[4].values);
