@@ -1,12 +1,19 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-console */
 const dotenv = require('dotenv');
+
 dotenv.config();
 
 const { Client, Intents } = require('discord.js');
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
+
+const client = new Client({
+  intents:
+  [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
+});
 
 const fs = require('fs');
 const readline = require('readline');
-const {google} = require('googleapis');
+const { google } = require('googleapis');
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
@@ -17,157 +24,176 @@ const TOKEN_PATH = 'token.json';
 
 const dismoji = require('discord-emoji');
 const enm = require('emoji-name-map');
+
 const EMOJI_ONE = enm.get('one');
-const EMOJI_TWO = enm.get('two');
-const EMOJI_BOOM = enm.get('boom')
+// const EMOJI_TWO = enm.get('two');
+const EMOJI_BOOM = enm.get('boom');
 
 const BOT_STATE_REF = 'Dashboard!B4';
 
 const REFS = {
-  'round': 'Dashboard!B2',
-  'song': 'Dashboard!B3',
-  'header': 'Dashboard!D1',
-  'footer': 'Dashboard!D8',
-  'match': 'Dashboard!D3:E6',
-  'size': 'Dashboard!B5',
-  'year': 'Dashboard!B1'
-}
+  round: 'Dashboard!B2',
+  song: 'Dashboard!B3',
+  header: 'Dashboard!D1',
+  footer: 'Dashboard!D8',
+  match: 'Dashboard!D3:E6',
+  size: 'Dashboard!B5',
+  year: 'Dashboard!B1',
+};
 
 let skipstat = false;
 let testing = false;
 let once = false;
 
-process.argv.forEach(function (val, index, array) {
-    if( val === '-s' ) { skipstat = true;}
-    if( val === '-t' ) { testing = true;}
-    if( val === '-o' ) {once = true;}
-  });
+process.argv.forEach((val) => {
+  if (val === '-s') { skipstat = true; }
+  if (val === '-t') { testing = true; }
+  if (val === '-o') { once = true; }
+});
 
-const GUILD_ID = (testing === true ? '782213860337647636' : '212660788786102272');  
-const CHANNEL_ID =  (testing === true ? '864768873270345788' : '751893730117812225');  
+const GUILD_ID = (testing === true ? '782213860337647636' : '212660788786102272');
+const CHANNEL_ID = (testing === true ? '864768873270345788' : '751893730117812225');
 const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs');
 
-
-const START_TIME = (skipstat === true ? 0 : 5)
-const END_TIME = (skipstat === true ? 24 : 21)
+const START_TIME = (skipstat === true ? 0 : 5);
+const END_TIME = (skipstat === true ? 24 : 21);
 
 const now = new Date();
 
-const isBotEnabled = botState => {
-  let nowHour = new Date().getHours();
+const isBotEnabled = (botState) => {
+  const nowHour = new Date().getHours();
   return botState === 'GO' && START_TIME < nowHour && nowHour < END_TIME;
-}
+};
 
+const formatMatchRow = (row) => `\u200b${row[0].trim()}\u200b${(typeof row[1] !== 'undefined') ? ` ${row[1]}` : ''}`;
+const formatOther = (text) => text.replaceAll(/:[^:\n]+:/g, '\u200b$1\u200b');
 
-const formatMatchRow = row => '\u200b' + row[0] + '\u200b' + ((typeof row[1] != 'undefined') ? ` ${row[1]}` : '');
+const getMatchText = (rows) => rows.map(formatMatchRow).join('\n');
 
-
-const getMatchText = rows => rows.map(formatMatchRow).join('\n');
-
-
-const getDismojiByName = name => {
-  for (let cat of Object.values(dismoji)) {
-    if (typeof cat[name] != 'undefined') {
+const getDismojiByName = (name) => {
+  const namedDismoji = Object.values(dismoji).map((cat) => {
+    if (typeof cat[name] !== 'undefined') {
       return cat[name];
     }
-  }
-  return null;
-}
+    return null;
+  });
+  return namedDismoji;
+};
 
-const getDismojiByUnicode = uni => {
-  for (let cat of Object.values(dismoji)) {
-    for (let emo of Object.values(cat)) {
-      if (emo === uni){
+const getDismojiByUnicode = (uni) => {
+  const uniDismoji = Object.values(dismoji).map((cat) => {
+    const uniDismoji1 = Object.values(cat).map((emo) => {
+      if (emo === uni) {
         return true;
       }
-    }
-  }
-  return false;
-}
+      return null;
+    });
+    return uniDismoji1;
+  });
+  return uniDismoji;
+};
 
-const findEmojis = async text => await Promise.all(Array.from(text.matchAll(/(?<=\u200b):?([^:\n]+):?(?=\u200b)/g), getEmoji));
+const findEmojis = async (text) => await Promise.all(Array.from(text.matchAll(/(?<=\u200b):?([^:\n]+):?(?=\u200b)/g), getEmoji));
 
-const replaceEmojis = (text, emojis) => emojis.filter(emoji => emoji.replacement).reduce((curText, emoji) => curText.replace(emoji.text, emoji.replacement), text);
+const replaceEmojis = (text, emojis) => emojis.filter((emoji) => (
+  emoji.replacement)).reduce((curText, emoji) => (
+  curText.replace(emoji.text, emoji.replacement)), text);
 
-
-const getEmoji = async match => {
+const getEmoji = async (match) => {
   const guild = client.guilds.cache.get(GUILD_ID);
 
-  let text = match[0]
-  let name = match[1];
+  const text = match[0];
+  const name = match[1];
 
-  let emoji = {
-    'text': text,
-    'name': name,
-    'replacement': false,
+  const emoji = {
+    text,
+    name,
+    replacement: false,
   };
-  let matchFunc = ident => ident.name === name;
+  const matchFunc = (ident) => ident.name === name;
   try {
-    let guildEmoji = await guild.emojis.cache.find(matchFunc);
+    const guildEmoji = await guild.emojis.cache.find(matchFunc);
     emoji.id = guildEmoji.id;
     emoji.replacement = `<${text}${guildEmoji.id}>`;
     console.log(`Custom emoji found for "${name}"`, guildEmoji.id);
   } catch (err) {
     console.log(`No custom emoji found for "${name}"`);
     try {
-      let clientEmoji = await client.emojis.cache.find(matchFunc);
+      const clientEmoji = await client.emojis.cache.find(matchFunc);
       emoji.id = clientEmoji.id;
       emoji.replacement = `<${text}${clientEmoji.id}>`;
-      console.log(`Client emoji found for "${name}"`, clientEmoji.id)
+      console.log(`Client emoji found for "${name}"`, clientEmoji.id);
     } catch (err) {
       console.log(`No client emoji found for "${name}"`);
     }
-    let sym = getDismojiByName(name);
+    const sym = getDismojiByName(name);
     if (sym) {
       emoji.unicode = sym;
       console.log(`Dismoji emoji found for "${name}"`, sym);
     } else {
       console.log(`No dismoji emoji found for "${name}"`);
     }
-    let uniTest = Array.from(text.matchAll(/:([a-zA-Z0-9_]+):/g));
+    const uniTest = Array.from(text.matchAll(/:([a-zA-Z0-9_]+):/g));
     if (uniTest.length === 0) {
-      let uniMatch = getDismojiByUnicode(text);
+      const uniMatch = getDismojiByUnicode(text);
       if (uniMatch === true) {
         emoji.unicode = text;
-        console.log(`Dismoji verified for "${text}"`)
+        console.log(`Dismoji verified for "${text}"`);
       } else {
-        console.log(`Dismoji not found for "${text}"`)
+        console.log(`Dismoji not found for "${text}"`);
       }
     }
   }
   if (!emoji.id && !emoji.unicode) {
     console.log(`Emoji not found for "${name}"`);
     return {
-      text: text,
-      name: name,
+      text,
+      name,
       replacement: EMOJI_BOOM,
-      unicode: EMOJI_BOOM
+      unicode: EMOJI_BOOM,
     };
   }
   return emoji;
-}
-
+};
 
 const react = async (message, emojis) => {
-  for (let emoji of emojis) {
-    if (typeof emoji.id != 'undefined') {
+  emojis.forEach(async (emoji) => {
+    if (typeof emoji.id !== 'undefined') {
       await message.react(emoji.id);
-    } else if (typeof emoji.unicode != 'undefined' ) {
+    } else if (typeof emoji.unicode !== 'undefined') {
       await message.react(emoji.unicode);
     } else {
       console.log(`Can't react with invalid emoji "${emoji.name}"`);
     }
+  });
+};
+
+const getMatchesCount = (round, size) => {
+  let a = 0;
+  let b = 0;
+  if (round === 4) {
+    a = 4;
+  } else if (round === 5) {
+    a = 2;
+  } else if (round === 6) {
+    a = 2;
+  } else {
+    a = 8;
   }
-}
+  if (size > 64) {
+    b = 0;
+  } else if (size > 32) {
+    b = 1;
+  } else {
+    b = 2;
+  }
+  Math.min(a, 2 ** (round - b));
+};
 
-
-const getMatchesCount = (round, size) => Math.min(round === 4 ? 4 : (round === 5 ? 2 : (round === 6 ? 2 : 8)), Math.pow(2, round - (size > 64 ? 0 : (size > 32 ? 1 : 2))));
-
-
-const nextMatch = async matches => {
+const nextMatch = async (matches) => {
   const channel = client.channels.cache.get(CHANNEL_ID);
 
-  let botState = await getValue(BOT_STATE_REF)
+  const botState = await getValue(BOT_STATE_REF);
 
   if (!isBotEnabled(botState)) {
     console.log(`${now}: Bot disabled, exiting`);
@@ -175,61 +201,63 @@ const nextMatch = async matches => {
   }
 
   // Even though REFS is an object, order is guaranteed for non-string keys
-  let valueRanges = await getValues(Object.values(REFS));
+  const valueRanges = await getValues(Object.values(REFS));
 
-  let round = valueRanges[0].values[0].toString();
-  let song = parseInt(valueRanges[1].values[0].toString());
-  let header = ('values' in valueRanges[2]) ? valueRanges[2].values[0].toString() : null;
-  let footer = ('values' in valueRanges[3]) ? valueRanges[3].values[0].toString() : null;
-  let size = parseInt(valueRanges[5].values[0].toString());
-  let year = parseInt(valueRanges[6].values[0].toString());
-  let rndVal = parseInt(round.slice(1));
+  const round = valueRanges[0].values[0].toString();
+  const song = parseInt(valueRanges[1].values[0].toString());
+  const header = ('values' in valueRanges[2]) ? valueRanges[2].values[0].toString() : null;
+  const footer = ('values' in valueRanges[3]) ? valueRanges[3].values[0].toString() : null;
+  const size = parseInt(valueRanges[5].values[0].toString());
+  const year = parseInt(valueRanges[6].values[0].toString());
+  const rndVal = parseInt(round.slice(1));
 
-  if (typeof matches == 'undefined') {
-    matches = getMatchesCount(rndVal, size);
-    console.log(`${now}: Posting ${matches} matches this iteration`)
+  let matchCount = null;
+  if (typeof matches === 'undefined') {
+    matchCount = getMatchesCount(rndVal, size);
+    console.log(`${now}: Posting ${matchCount} matches this iteration`);
   }
-  console.log(`${matches} matches left to post`);
+  console.log(`${matchCount} matches left to post`);
 
-  if ( song === 1 && 
-      ( 
-        ( ( size === 128 || size === 96 ) && rndVal === 0 ) || 
-        ( ( size === 64 || size === 48 ) && rndVal === 1 ) || 
-        ( size === 32 && rndVal === 2 )
-      ) 
-    ) {
-      let sent = await channel.send( `React with 🎵 if you plan on voting in the ${year} bracket.` );
-      await sent.react('🎵');
-      await sent.pin();
-    }
+  if (song === 1
+      && (
+        ((size === 128 || size === 96) && rndVal === 0)
+        || ((size === 64 || size === 48) && rndVal === 1)
+        || (size === 32 && rndVal === 2)
+      )
+  ) {
+    const sent = await channel.send(`React with 🎵 if you plan on voting in the ${year} bracket.`);
+    await sent.react('🎵');
+    await sent.pin();
+  }
 
   if (header) {
-    let sent = await channel.send(header);
+    const sent = await channel.send(header);
     await sent.pin();
   }
 
   let matchText = getMatchText(valueRanges[4].values);
-  let emojis = await findEmojis(matchText);
-  if (emojis[0].name === emojis[1].name) {
-    emojis[0].replacement = EMOJI_ONE;
-    emojis[0].unicode = EMOJI_ONE;
+  const matchEmojis = await findEmojis(matchText);
+  if (matchEmojis[0].name === matchEmojis[1].name) {
+    matchEmojis[0].replacement = EMOJI_ONE;
+    matchEmojis[0].unicode = EMOJI_ONE;
   }
-  matchText = replaceEmojis(matchText, emojis);
+  matchText = replaceEmojis(matchText, matchEmojis);
 
   if (matchText) {
-    let sent = await channel.send(matchText);
-    await react(sent, emojis);
+    const sent = await channel.send(matchText);
+    await react(sent, matchEmojis);
   }
 
   await setValue(REFS.song, song + 1);
 
   if (footer) {
-    let sent = await channel.send(footer);
-    let emojis = await findEmojis(footer);
-    await react(sent, emojis);
+    const sent = await channel.send(footer);
+    const footText = formatOther(footer);
+    const footEmojis = await findEmojis(footText);
+    await react(sent, footEmojis);
 
-    if (typeof round != 'undefined') {
-      await setValue(REFS.round, rndVal === 6 || round === '3P' ? '3P' : 'R' + (rndVal + 1));
+    if (typeof round !== 'undefined') {
+      await setValue(REFS.round, rndVal === 6 || round === '3P' ? '3P' : `R${rndVal + 1}`);
     }
     await setValue(REFS.song, 1);
     await setValue(BOT_STATE_REF, 'STOP');
@@ -241,25 +269,22 @@ const nextMatch = async matches => {
   }
 
   if (matches > 1) {
-    await nextMatch(--matches);
+    await nextMatch(matches - 1);
   }
-}
-
-
+};
 
 client.once('ready', () => {
   console.log('Ready!');
 });
 
-
 client.on('ready', async () => {
-
   if (once === true) {
     await nextMatch();
     client.destroy();
   } else {
     // Number of seconds until the next even hour
-    let countdown = ((60 - now.getSeconds()) + 60 * (60 - now.getMinutes()) + 60 * 60 * (1 - now.getHours() % 2));
+    const countdown = ((60 - now.getSeconds()) + 60
+      * (60 - now.getMinutes()) + 60 * 60 * ((1 - now.getHours()) % 2));
     console.log(`${now}: Triggering in ${countdown / 60} minutes`);
     setTimeout(() => {
       nextMatch();
@@ -268,33 +293,28 @@ client.on('ready', async () => {
   }
 });
 
-
 const loadCredentials = () => {
   // Load client secrets from a local file.
   try {
-    return content = JSON.parse(fs.readFileSync('credentials.json'))
+    const content = JSON.parse(fs.readFileSync('credentials.json'));
+    return content;
   } catch (err) {
     console.log('Error loading client secret file:', err);
     throw err;
   }
-}
+};
 
+const getValue = async (rng) => getMsg(rng, await getAuthClient());
 
-const getValue = async rng => getMsg(rng, await getAuthClient());
-
-
-const getValues = async rng => getMsgs(rng, await getAuthClient());
-
+const getValues = async (rng) => getMsgs(rng, await getAuthClient());
 
 const setValue = async (rng, val) => setMsg(rng, val, await getAuthClient());
 
-
 const getAuthClient = async () => authorize(loadCredentials());
 
-
-const authorize = async credentials => {
-  const {client_secret, client_id, redirect_uris} = credentials.installed;
-  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+const authorize = async (credentials) => {
+  const { clientSecret, clientId, redirectUris } = credentials.installed;
+  const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUris[0]);
 
   try {
     oAuth2Client.setCredentials(JSON.parse(fs.readFileSync(TOKEN_PATH)));
@@ -303,10 +323,9 @@ const authorize = async credentials => {
     await getNewToken(oAuth2Client);
   }
   return oAuth2Client;
-}
+};
 
-
-const getNewToken = async oAuth2Client => {
+const getNewToken = async (oAuth2Client) => {
   // TODO split this into a separate utility or separate flow?
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
@@ -330,14 +349,14 @@ const getNewToken = async oAuth2Client => {
       });
     });
   });
-  // This should await readline.question and there's probably a similar thing to do with oAuth2Client.getToken
-}
-
+  // This should await readline.question and
+  // there's probably a similar thing to do with oAuth2Client.getToken
+};
 
 const getMsg = async (rng, auth) => {
-  const sheets = google.sheets({version: 'v4', auth});
+  const sheets = google.sheets({ version: 'v4', auth });
   try {
-    var response = await sheets.spreadsheets.values.get({
+    const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
       range: rng,
     });
@@ -346,13 +365,12 @@ const getMsg = async (rng, auth) => {
     console.log(`getMsg API returned an error for range "${rng}"`, err);
     throw err;
   }
-}
-
+};
 
 const getMsgs = async (rng, auth) => {
-  const sheets = google.sheets({version: 'v4', auth});
+  const sheets = google.sheets({ version: 'v4', auth });
   try {
-    var response = await sheets.spreadsheets.values.batchGet({
+    const response = await sheets.spreadsheets.values.batchGet({
       spreadsheetId: SPREADSHEET_ID,
       ranges: rng,
     });
@@ -361,13 +379,12 @@ const getMsgs = async (rng, auth) => {
     console.log(`getMsgs API returned an error for range "${rng}"`, err);
     throw err;
   }
-}
-
+};
 
 const setMsg = async (rng, val, auth) => {
-  const sheets = google.sheets({version: 'v4', auth});
+  const sheets = google.sheets({ version: 'v4', auth });
   try {
-    var confirm = await sheets.spreadsheets.values.update({
+    const confirm = await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
       range: rng,
       valueInputOption: 'USER_ENTERED',
@@ -381,6 +398,6 @@ const setMsg = async (rng, val, auth) => {
     console.log(`setMsg API returned an error for range "${rng}" and value "${val}"`, err);
     throw err;
   }
-}
+};
 
 client.login(process.env.TOKEN);
