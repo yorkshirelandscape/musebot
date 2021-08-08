@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-console */
 const dotenv = require('dotenv');
@@ -71,33 +72,33 @@ const formatOther = (text) => text.replaceAll(/:[^:\n]+:/g, '\u200b$1\u200b');
 const getMatchText = (rows) => rows.map(formatMatchRow).join('\n');
 
 const getDismojiByName = (name) => {
-  const namedDismoji = Object.values(dismoji).map((cat) => {
+  for (const cat of Object.values(dismoji)) {
     if (typeof cat[name] !== 'undefined') {
       return cat[name];
     }
-    return null;
-  });
-  return namedDismoji;
+  }
+  return null;
 };
 
 const getDismojiByUnicode = (uni) => {
-  const uniDismoji = Object.values(dismoji).map((cat) => {
-    const uniDismoji1 = Object.values(cat).map((emo) => {
+  for (const cat of Object.values(dismoji)) {
+    for (const emo of Object.values(cat)) {
       if (emo === uni) {
         return true;
       }
-      return null;
-    });
-    return uniDismoji1;
-  });
-  return uniDismoji;
+    }
+  }
+  return false;
 };
 
 const findEmojis = async (text) => await Promise.all(Array.from(text.matchAll(/(?<=\u200b):?([^:\n]+):?(?=\u200b)/g), getEmoji));
 
-const replaceEmojis = (text, emojis) => emojis.filter((emoji) => (
-  emoji.replacement)).reduce((curText, emoji) => (
-  curText.replace(emoji.text, emoji.replacement)), text);
+const replaceEmojis = (text, emojis) => (
+  emojis.filter((emoji) => emoji.replacement)
+    .reduce((curText, emoji) => (
+      curText.replace(emoji.text, emoji.replacement)
+    ), text)
+);
 
 const getEmoji = async (match) => {
   const guild = client.guilds.cache.get(GUILD_ID);
@@ -212,7 +213,7 @@ const nextMatch = async (matches) => {
   const rndVal = parseInt(round.slice(1));
 
   let matchCount = matches;
-  if (typeof matcheCount === 'undefined') {
+  if (typeof matchCount === 'undefined') {
     matchCount = getMatchesCount(rndVal, size);
     console.log(`${now}: Posting ${matchCount} matches this iteration`);
   }
@@ -296,8 +297,7 @@ client.on('ready', async () => {
 const loadCredentials = () => {
   // Load client secrets from a local file.
   try {
-    const content = JSON.parse(fs.readFileSync('credentials.json'));
-    return content;
+    return JSON.parse(fs.readFileSync('credentials.json'));
   } catch (err) {
     console.log('Error loading client secret file:', err);
     throw err;
