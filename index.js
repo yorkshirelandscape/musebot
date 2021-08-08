@@ -67,7 +67,8 @@ const isBotEnabled = (botState) => {
 };
 
 const formatMatchRow = (row) => `\u200b${row[0].trim()}\u200b${(typeof row[1] !== 'undefined') ? ` ${row[1]}` : ''}`;
-const formatOther = (text) => text.replaceAll(/:[^:\n]+:/g, '\u200b$1\u200b');
+const replacement = '\u200b$1\u200b';
+const formatOther = (text) => text.replaceAll(/(:[^:\n]+:)/g, replacement);
 
 const getMatchText = (rows) => rows.map(formatMatchRow).join('\n');
 
@@ -169,27 +170,8 @@ const react = async (message, emojis) => {
   });
 };
 
-const getMatchesCount = (round, size) => {
-  let a = 0;
-  let b = 0;
-  if (round === 4) {
-    a = 4;
-  } else if (round === 5) {
-    a = 2;
-  } else if (round === 6) {
-    a = 2;
-  } else {
-    a = 8;
-  }
-  if (size > 64) {
-    b = 0;
-  } else if (size > 32) {
-    b = 1;
-  } else {
-    b = 2;
-  }
-  Math.min(a, 2 ** (round - b));
-};
+// eslint-disable-next-line no-nested-ternary, max-len
+const getMatchesCount = (round, size) => Math.min(round === 4 ? 4 : (round === 5 ? 2 : (round === 6 ? 2 : 8)), 2 ** (round - (size > 64 ? 0 : (size > 32 ? 1 : 2))));
 
 const nextMatch = async (matches) => {
   const channel = client.channels.cache.get(CHANNEL_ID);
@@ -212,12 +194,12 @@ const nextMatch = async (matches) => {
   const year = parseInt(valueRanges[6].values[0].toString());
   const rndVal = parseInt(round.slice(1));
 
-  let matchCount = matches;
-  if (typeof matchCount === 'undefined') {
-    matchCount = getMatchesCount(rndVal, size);
-    console.log(`${now}: Posting ${matchCount} matches this iteration`);
+  if (typeof matches === 'undefined') {
+    // eslint-disable-next-line no-param-reassign
+    matches = getMatchesCount(rndVal, size);
+    console.log(`${now}: Posting ${matches} matches this iteration`);
   }
-  console.log(`${matchCount} matches left to post`);
+  console.log(`${matches} matches left to post`);
 
   if (song === 1
       && (
@@ -281,7 +263,7 @@ client.once('ready', () => {
 client.on('ready', async () => {
   if (once === true) {
     await nextMatch();
-    client.destroy();
+    // client.destroy();
   } else {
     // Number of seconds until the next even hour
     const countdown = ((60 - now.getSeconds()) + 60

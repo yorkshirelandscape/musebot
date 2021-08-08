@@ -92,6 +92,16 @@ const getChecks = (channel, search) => new Promise((resolve) => {
 
 const sleep = async (interval) => { await new Promise((r) => setTimeout(r, interval)); };
 
+const compare = (a, b) => {
+  if (a.match < b.match) {
+    return -1;
+  }
+  if (a.match > b.match) {
+    return 1;
+  }
+  return 0;
+};
+
 // function that pulls it all together
 const checkRound = async () => {
   const channel = client.channels.cache.get(CHANNEL_ID);
@@ -197,7 +207,8 @@ const checkRound = async () => {
             });
           });
         });
-        resultsArray.reverse();
+        // resultsArray.reverse();
+        resultsArray.sort(compare);
 
         // settle ties
         const tiesArray = resultsArray.filter((m) => m.tie === 1);
@@ -257,8 +268,7 @@ client.on('ready', async () => {
 const loadCredentials = () => {
   // Load client secrets from a local file.
   try {
-    const content = JSON.parse(fs.readFileSync('credentials.json'));
-    return content;
+    return JSON.parse(fs.readFileSync('credentials.json'));
   } catch (err) {
     console.log('Error loading client secret file:', err);
     throw err;
