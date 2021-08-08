@@ -14,3 +14,4 @@
 - ~~pin Q messages (needs expanded permissions)~~
 - ~~add !command to append new URL to match~~
 - ~~post yearly check-in message~~
+- slash command to replace a match

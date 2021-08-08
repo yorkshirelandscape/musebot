@@ -59,10 +59,10 @@ const isBotEnabled = botState => {
 }
 
 
-const formatMatchRow = row => '\u200b' + row[0] + '\u200b' + ((typeof row[1] != 'undefined') ? ` ${row[1]}` : '');
+const formatMatchRow = (row) => `\u200b${row[0].trim()}\u200b${(typeof row[1] !== 'undefined') ? ` ${row[1]}` : ''}`;
+const formatOther = (text) => text.replaceAll(/:[^:\n]+:/g, '\u200b$1\u200b');
 
-
-const getMatchText = rows => rows.map(formatMatchRow).join('\n');
+const getMatchText = (rows) => rows.map(formatMatchRow).join('\n');
 
 
 const getDismojiByName = name => {
