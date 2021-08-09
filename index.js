@@ -53,6 +53,12 @@ const END_TIME = (skipstat === true ? 24 : 21)
 
 const now = new Date();
 
+const addHours = (date, h) => {
+  const tmpDate = new Date(date);
+  tmpDate.setTime(tmpDate.getTime() + (h * 60 * 60 * 1000));
+  return tmpDate;
+};
+
 const isBotEnabled = botState => {
   let nowHour = new Date().getHours();
   return botState === 'GO' && START_TIME < nowHour && nowHour < END_TIME;
@@ -200,12 +206,12 @@ const nextMatch = async matches => {
     ) {
       let sent = await channel.send( `React with 🎵 if you plan on voting in the ${year} bracket.` );
       await sent.react('🎵');
-      await sent.pin();
+      // await sent.pin();
     }
 
   if (header) {
     let sent = await channel.send(header);
-    await sent.pin();
+    // await sent.pin();
   }
 
   let matchText = getMatchText(valueRanges[4].values);
@@ -224,7 +230,23 @@ const nextMatch = async matches => {
   await setValue(REFS.song, song + 1);
 
   if (footer) {
-    let sent = await channel.send(footer);
+    let roundMin = 12;
+    let roundMax = 24;
+    if (rndVal === 0
+      || (rndVal === 1 && size === 96)
+      || (rndVal === 2 && (size === 64 || size === 48))
+      || (rndVal === 3 && size < 64)) {
+      roundMin = 24;
+      roundMax = 36;
+    } else if (round === '3P') {
+      roundMin = 24;
+      roundMax = 24;
+    }
+    const footMsg = footer.replace('$1', roundMin)
+      .replace('$2', addHours(now, roundMin).toLocaleString())
+      .replace('$3', roundMax)
+      .replace('$4', addHours(now, roundMax).toLocaleString());
+    const sent = await channel.send(footMsg);
     let emojis = await findEmojis(footer);
     await react(sent, emojis);
 

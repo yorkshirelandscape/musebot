@@ -134,7 +134,7 @@ const checkRound = async () => {
 					(rndVal === 3 && size < 64 ) ) {
 				roundMin = 23;
 				roundMax = 35;
-			} else if ( round = '3P' ) {
+			} else if ( round === '3P' ) {
 				roundMin = 23;
 				roundMax = 23;
 			}
