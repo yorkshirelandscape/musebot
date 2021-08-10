@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable no-console */
 /* eslint-disable no-use-before-define */
 /* eslint-disable radix */
@@ -62,12 +63,14 @@ async function fetchMany(channel, limit = 150) {
   let sumMessages = await channel.messages.fetch({ limit: 100 });
   let lastId = sumMessages.last().id;
   let lim = Math.max(0, limit - 100);
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const options = { limit: lim };
     if (lastId) {
       options.before = lastId;
     }
 
+    // eslint-disable-next-line no-await-in-loop
     const msgs = await channel.messages.fetch(options);
     lim = Math.max(0, lim - lim);
     sumMessages = sumMessages.concat(msgs);

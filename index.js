@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-console */
@@ -98,7 +99,7 @@ const getDismojiByUnicode = (uni) => {
   return false;
 };
 
-const findEmojis = async (text) => await Promise.all(Array.from(text.matchAll(/(?<=\u200b):?([^:\n]+):?(?=\u200b)/g), getEmoji));
+const findEmojis = async (text) => Promise.all(Array.from(text.matchAll(/(?<=\u200b):?([^:\n]+):?(?=\u200b)/g), getEmoji));
 
 const replaceEmojis = (text, emojis) => (
   emojis.filter((emoji) => emoji.replacement)
