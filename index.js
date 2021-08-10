@@ -51,13 +51,9 @@ const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQN
 const START_TIME = (skipstat === true ? 0 : 5)
 const END_TIME = (skipstat === true ? 24 : 21)
 
-const now = new Date();
+const { DateTime } = require('luxon');
 
-const addHours = (date, h) => {
-  const tmpDate = new Date(date);
-  tmpDate.setTime(tmpDate.getTime() + (h * 60 * 60 * 1000));
-  return tmpDate;
-};
+const now = DateTime.now();
 
 const isBotEnabled = botState => {
   let nowHour = new Date().getHours();
@@ -215,7 +211,7 @@ const nextMatch = async matches => {
     // await sent.pin();
   }
 
-  let matchText = getMatchText(valueRanges[4].values);
+  let matchText = getMatchText(valueRanges[4].values).replaceAll(/<([^<>]+) >/g,'<$1>');
   let emojis = await findEmojis(matchText);
   if (emojis[0].name === emojis[1].name) {
     emojis[0].replacement = EMOJI_ONE;
@@ -244,9 +240,9 @@ const nextMatch = async matches => {
       roundMax = 24;
     }
     const footMsg = footer.replace('$1', roundMin)
-      .replace('$2', addHours(now, roundMin).toLocaleString())
+      .replace('$2', now.plus({ hours: roundMin }).toLocaleString(DateTime.DATETIME_MED))
       .replace('$3', roundMax)
-      .replace('$4', addHours(now, roundMax).toLocaleString());
+      .replace('$4', now.plus({ hours: roundMax }).toLocaleString(DateTime.DATETIME_MED));
     const sent = await channel.send(footMsg);
     let emojis = await findEmojis(footer);
     await react(sent, emojis);
