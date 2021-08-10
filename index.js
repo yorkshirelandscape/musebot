@@ -240,9 +240,9 @@ const nextMatch = async matches => {
       roundMax = 24;
     }
     const footMsg = footer.replace('$1', roundMin)
-      .replace('$2', now.plus({ hours: roundMin }).toLocaleString(DateTime.DATETIME_MED) + ' ET')
+      .replace('$2', `${now.plus({ hours: roundMin }).toLocaleString(DateTime.DATETIME_MED)} ET`)
       .replace('$3', roundMax)
-      .replace('$4', now.plus({ hours: roundMax }).toLocaleString(DateTime.DATETIME_MED) + ' ET');
+      .replace('$4', `${now.plus({ hours: roundMax }).toLocaleString(DateTime.DATETIME_MED)} ET`);
     const sent = await channel.send(footMsg);
     let emojis = await findEmojis(footer);
     await react(sent, emojis);
