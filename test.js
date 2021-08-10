@@ -24,12 +24,6 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // time.
 const TOKEN_PATH = 'token.json';
 
-// const dismoji = require('discord-emoji');
-// const enm = require('emoji-name-map');
-
-// const EMOJI_ONE = enm.get('one');
-// const EMOJI_TWO = enm.get('two');
-
 const BOT_STATE_REF = 'Dashboard!B4';
 
 const REFS = {
@@ -42,7 +36,6 @@ const REFS = {
   year: 'Dashboard!B1',
 };
 
-// let skipstat = false;
 let testing = false;
 let once = false;
 
@@ -52,7 +45,6 @@ process.argv.forEach((val) => {
   if (val === '-o') { once = true; }
 });
 
-// const GUILD_ID = (testing === true ? '212660788786102272' : '782213860337647636');
 const CHANNEL_ID = (testing === true ? '864768873270345788' : '751893730117812225');
 const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs');
 
@@ -113,9 +105,6 @@ const checkRound = async () => {
   const valueRanges = await getValues(Object.values(REFS));
 
   const round = valueRanges[0].values[0].toString();
-  // const song = parseInt(valueRanges[1].values[0].toString());
-  // const header = ('values' in valueRanges[2]) ? valueRanges[2].values[0].toString() : null;
-  // const footer = ('values' in valueRanges[3]) ? valueRanges[3].values[0].toString() : null;
   const size = parseInt(valueRanges[5].values[0].toString());
   // const year = parseInt(valueRanges[6].values[0].toString());
   const rndVal = parseInt(round.slice(1));
@@ -189,7 +178,6 @@ const checkRound = async () => {
           && msg.deleted === false && msg.content.includes('Match')
         ));
         // create an array of the reaction counts for each message
-        // console.log(rndMatches);
         const rndMatchesResults = [];
         rndMatches.forEach((rm) => {
           const matchNo = parseInt(rm.content.slice(8, rm.content.indexOf(':')));
@@ -242,7 +230,6 @@ const checkRound = async () => {
         });
 
         // set the range to push the results to and push them
-        // const round = await getValue(REFS.round);
         const lastRound = parseInt(round.slice(1)) - 1;
         const resultsRange = `R${lastRound}!K2:M${2 ** ((7 - rndVal) / 2) + 1}`;
 
@@ -286,8 +273,6 @@ const loadCredentials = () => {
     throw err;
   }
 };
-
-// const getValue = async (rng) => getMsg(rng, await getAuthClient());
 
 const getValues = async (rng) => getMsgs(rng, await getAuthClient());
 
@@ -337,20 +322,6 @@ const getNewToken = async (oAuth2Client) => {
   // This should await readline.question and
   // there's probably a similar thing to do with oAuth2Client.getToken
 };
-
-// const getMsg = async (rng, auth) => {
-//   const sheets = google.sheets({ version: 'v4', auth });
-//   try {
-//     const response = await sheets.spreadsheets.values.get({
-//       spreadsheetId: SPREADSHEET_ID,
-//       range: rng,
-//     });
-//     return response.data.values[0][0];
-//   } catch (err) {
-//     console.log(`getMsg API returned an error for range "${rng}"`, err);
-//     throw err;
-//   }
-// };
 
 const getMsgs = async (rng, auth) => {
   const sheets = google.sheets({ version: 'v4', auth });

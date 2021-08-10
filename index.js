@@ -62,12 +62,11 @@ const END_TIME = (skipstat === true ? 24 : 21);
 
 const { DateTime } = require('luxon');
 
-const now = DateTime.now();
+const { DateTime } = require('luxon');
 
 const isBotEnabled = (botState) => {
   const nowHour = new Date().getHours();
   return botState === 'GO' && START_TIME < nowHour && nowHour < END_TIME;
-};
 
 const formatMatchRow = (row) => `\u200b${row[0].trim()}\u200b${(typeof row[1] !== 'undefined') ? ` ${row[1]}` : ''}`;
 const replacement = '\u200b$1\u200b';
@@ -254,12 +253,14 @@ const nextMatch = async (matches) => {
       .replace('$3', roundMax)
       .replace('$4', `${now.plus({ hours: roundMax }).toLocaleString(DateTime.DATETIME_MED)} ET`);
     const sent = await channel.send(footMsg);
+
     const footText = formatOther(footer);
     const footEmojis = await findEmojis(footText);
     await react(sent, footEmojis);
 
     if (typeof round !== 'undefined') {
       await setValue(REFS.round, rndVal === 6 || round === '3P' ? '3P' : `R${rndVal + 1}`);
+
     }
     await setValue(REFS.song, 1);
     await setValue(BOT_STATE_REF, 'STOP');
