@@ -9,7 +9,7 @@
 - ~~emoji failure check and fallback~~
 - check emojis before year starts
 - ~~handle 3P properly~~
-- add !command for DXV and Bluey to trigger nextMatch
+- add slash command for DXV and Bluey to trigger nextMatch
 - consolidate (g/s)etValue(s)
 - ~~pin Q messages (needs expanded permissions)~~
 - ~~add !command to append new URL to match~~
