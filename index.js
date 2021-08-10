@@ -61,6 +61,12 @@ const END_TIME = (skipstat === true ? 24 : 21);
 
 const now = new Date();
 
+const addHours = (date, h) => {
+  const tmpDate = new Date(date);
+  tmpDate.setTime(tmpDate.getTime() + (h * 60 * 60 * 1000));
+  return tmpDate;
+};
+
 const isBotEnabled = (botState) => {
   const nowHour = new Date().getHours();
   return botState === 'GO' && START_TIME < nowHour && nowHour < END_TIME;
@@ -218,7 +224,7 @@ const nextMatch = async (matches) => {
     await sent.pin();
   }
 
-  let matchText = getMatchText(valueRanges[4].values);
+  let matchText = getMatchText(valueRanges[4].values).replaceAll(/<([^<>]+) >/g, '<$1>');
   const matchEmojis = await findEmojis(matchText);
   if (matchEmojis[0].name === matchEmojis[1].name) {
     matchEmojis[0].replacement = EMOJI_ONE;
@@ -234,7 +240,23 @@ const nextMatch = async (matches) => {
   await setValue(REFS.song, song + 1);
 
   if (footer) {
-    const sent = await channel.send(footer);
+    let roundMin = 12;
+    let roundMax = 24;
+    if (rndVal === 0
+      || (rndVal === 1 && size === 96)
+      || (rndVal === 2 && (size === 64 || size === 48))
+      || (rndVal === 3 && size < 64)) {
+      roundMin = 24;
+      roundMax = 36;
+    } else if (round === '3P') {
+      roundMin = 24;
+      roundMax = 24;
+    }
+    const footMsg = footer.replace('$1', roundMin)
+      .replace('$2', addHours(now, roundMin).toLocaleString())
+      .replace('$3', roundMax)
+      .replace('$4', addHours(now, roundMax).toLocaleString());
+    const sent = await channel.send(footMsg);
     const footText = formatOther(footer);
     const footEmojis = await findEmojis(footText);
     await react(sent, footEmojis);

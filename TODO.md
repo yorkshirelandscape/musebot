@@ -14,3 +14,6 @@
 - ~~pin Q messages (needs expanded permissions)~~
 - ~~add !command to append new URL to match~~
 - ~~post yearly check-in message~~
+- ~~trim URLs~~
+- ~~delay round end if after 8pm~~
+- slash command to replace a match

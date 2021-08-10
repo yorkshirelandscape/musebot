@@ -151,6 +151,15 @@ const checkRound = async () => {
         roundMin = 23;
         roundMax = 23;
       }
+      if (Date(roundEndTime + roundMax * 60 * 60 * 1000).getHours() > 20
+        || Date(roundEndTime + roundMax * 60 * 60 * 1000).getHours() < 5) {
+        const tmrwStart = new Date();
+        tmrwStart.setDate(now.getDate() + 1);
+        tmrwStart.setHours(5);
+        tmrwStart.setMinutes(0);
+        tmrwStart.setMilliseconds(0);
+        roundMax += (tmrwStart - roundEndTime).getHours;
+      }
       if ((pctCheckedIn >= 0.8 && now > (roundEndTime + roundMin * 60 * 60 * 1000))
           || now > (roundEndTime + roundMax * 60 * 60 * 1000)) {
         if (pctCheckedIn < 1) {
