@@ -62,11 +62,12 @@ const END_TIME = (skipstat === true ? 24 : 21);
 
 const { DateTime } = require('luxon');
 
-const { DateTime } = require('luxon');
+const now = DateTime.now();
 
 const isBotEnabled = (botState) => {
   const nowHour = new Date().getHours();
   return botState === 'GO' && START_TIME < nowHour && nowHour < END_TIME;
+}
 
 const formatMatchRow = (row) => `\u200b${row[0].trim()}\u200b${(typeof row[1] !== 'undefined') ? ` ${row[1]}` : ''}`;
 const replacement = '\u200b$1\u200b';
