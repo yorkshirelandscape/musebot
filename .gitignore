@@ -24,6 +24,8 @@ hs_err_pid*
 
 node_modules
 .env
+dev.env
+prod.env
 config.json
 credentials.json
 token.json
