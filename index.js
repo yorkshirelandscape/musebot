@@ -67,7 +67,7 @@ const now = DateTime.now();
 const isBotEnabled = (botState) => {
   const nowHour = new Date().getHours();
   return botState === 'GO' && START_TIME < nowHour && nowHour < END_TIME;
-}
+};
 
 const formatMatchRow = (row) => `\u200b${row[0].trim()}\u200b${(typeof row[1] !== 'undefined') ? ` ${row[1]}` : ''}`;
 const replacement = '\u200b$1\u200b';
@@ -218,7 +218,9 @@ const nextMatch = async (matches) => {
 
   if (header) {
     const sent = await channel.send(header);
-    await sent.pin();
+    if (header.matchAll(/[0-9]{4}R[0-9]Q[0-9]/g)) {
+      await sent.pin();
+    }
   }
 
   let matchText = getMatchText(valueRanges[4].values).replaceAll(/<([^<>]+) >/g, '<$1>');
@@ -261,7 +263,6 @@ const nextMatch = async (matches) => {
 
     if (typeof round !== 'undefined') {
       await setValue(REFS.round, rndVal === 6 || round === '3P' ? '3P' : `R${rndVal + 1}`);
-
     }
     await setValue(REFS.song, 1);
     await setValue(BOT_STATE_REF, 'STOP');

@@ -126,7 +126,6 @@ const checkRound = async () => {
       const extra = checkOuts.filter((x) => !checkIns.map((u) => u.user).includes(x.user));
       const pctCheckedIn = (checkOuts.length - extra.length) / checkIns.length;
 
-      // const roundEndTime = new Date(roundEnd.createdTimestamp * 1000)
       const roundEndTime = roundEnd.createdTimestamp;
 
       // if 80% are checked in and the round is half over OR
