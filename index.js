@@ -288,8 +288,8 @@ client.on('ready', async () => {
     // client.destroy();
   } else {
     // Number of seconds until the next even hour
-    const countdown = ((60 - now.getSeconds()) + 60
-      * (60 - now.getMinutes()) + 60 * 60 * ((1 - now.getHours()) % 2));
+    const countdown = ((60 - now.second) + 60
+      * (60 - now.minute) + 60 * 60 * (1 - (now.hour % 2)));
     console.log(`${now}: Triggering in ${countdown / 60} minutes`);
     setTimeout(() => {
       nextMatch();
