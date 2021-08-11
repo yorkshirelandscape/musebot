@@ -282,8 +282,9 @@ const setValues = async (rng, val) => setMsgs(rng, val, await getAuthClient());
 const getAuthClient = async () => authorize(loadCredentials());
 
 const authorize = async (credentials) => {
-  const { clientSecret, clientId, redirectUris } = credentials.installed;
-  const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUris[0]);
+  // eslint-disable-next-line camelcase
+  const { client_secret, client_id, redirect_uris } = credentials.installed;
+  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
   try {
     oAuth2Client.setCredentials(JSON.parse(fs.readFileSync(TOKEN_PATH)));
