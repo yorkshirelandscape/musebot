@@ -48,7 +48,9 @@ process.argv.forEach((val) => {
 const CHANNEL_ID = (testing === true ? '864768873270345788' : '751893730117812225');
 const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs');
 
-const now = new Date();
+const { DateTime } = require('luxon');
+
+const now = DateTime.now();
 
 // function to fetch more than the limit of 100 messages
 async function fetchMany(channel, limit = 150) {
@@ -123,10 +125,12 @@ const checkRound = async () => {
 
       // find the check-ins without check-outs and vice versa, then calculate the pct checked in
       const missing = checkIns.filter((x) => !checkOuts.map((u) => u.user).includes(x.user));
+      const missingList = missing.map((u) => u.user).join(', ');
       const extra = checkOuts.filter((x) => !checkIns.map((u) => u.user).includes(x.user));
+      const extraList = extra.map((u) => u.user).join(', ');
       const pctCheckedIn = (checkOuts.length - extra.length) / checkIns.length;
 
-      const roundEndTime = roundEnd.createdTimestamp;
+      const roundEndTime = DateTime.fromMillis(roundEnd.createdTimestamp);
 
       // if 80% are checked in and the round is half over OR
       // the round has one hour left to go, issue the 1-hour warning
@@ -142,17 +146,18 @@ const checkRound = async () => {
         roundMin = 23;
         roundMax = 23;
       }
-      if (Date(roundEndTime + roundMax * 60 * 60 * 1000).getHours() > 20
-        || Date(roundEndTime + roundMax * 60 * 60 * 1000).getHours() < 5) {
-        const tmrwStart = new Date();
-        tmrwStart.setDate(now.getDate() + 1);
-        tmrwStart.setHours(5);
-        tmrwStart.setMinutes(0);
-        tmrwStart.setMilliseconds(0);
-        roundMax += (tmrwStart - roundEndTime).getHours;
+
+      if (roundEndTime.plus({ hours: roundMax }) > 20
+        || roundEndTime.plus({ hours: roundMax }) < 5) {
+        const tmrwStart = DateTime.now();
+        tmrwStart.plus({ days: 1 });
+        tmrwStart.set({ hour: 5 });
+        tmrwStart.set({ minute: 0 });
+        tmrwStart.set({ millisecond: 0 });
+        roundMax += tmrwStart.diff(roundEndTime, 'hours');
       }
-      if ((pctCheckedIn >= 0.8 && now > (roundEndTime + roundMin * 60 * 60 * 1000))
-          || now > (roundEndTime + roundMax * 60 * 60 * 1000)) {
+      if ((pctCheckedIn >= 0.8 && now > roundEndTime.plus({ hours: roundMin }))
+          || now > roundEndTime.plus({ hours: roundMax })) {
         if (pctCheckedIn < 1) {
           channel.send(
             `${pctCheckedIn * 100}% checked in.\nMissing: ${missing.toString()}\nExtra: ${extra.toString()}`,
@@ -238,7 +243,9 @@ const checkRound = async () => {
       } else {
         console.log('Awaiting 80%.');
         console.log(pctCheckedIn);
-        console.log(roundEndTime);
+        console.log(roundEndTime.toFormat('M/d/yyyy HH:mm z'));
+        console.log(missingList);
+        console.log(extraList);
       }
     } else { console.log('Round in progress.'); }
   });
