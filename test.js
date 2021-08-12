@@ -126,8 +126,10 @@ const checkRound = async () => {
       // find the check-ins without check-outs and vice versa, then calculate the pct checked in
       const missing = checkIns.filter((x) => !checkOuts.map((u) => u.user).includes(x.user));
       const missingList = missing.map((u) => u.user).join(', ');
+      const missingTagList = missing.map((u) => `<!${u.id}>`).join(', ');
       const extra = checkOuts.filter((x) => !checkIns.map((u) => u.user).includes(x.user));
       const extraList = extra.map((u) => u.user).join(', ');
+      const extraTagList = missing.map((u) => `<!${u.id}>`).join(', ');
       const pctCheckedIn = (checkOuts.length - extra.length) / checkIns.length;
 
       const roundEndTime = DateTime.fromMillis(roundEnd.createdTimestamp);
@@ -160,7 +162,7 @@ const checkRound = async () => {
           || now > roundEndTime.plus({ hours: roundMax })) {
         if (pctCheckedIn < 1) {
           channel.send(
-            `${pctCheckedIn * 100}% checked in.\nMissing: ${missing.toString()}\nExtra: ${extra.toString()}`,
+            `${pctCheckedIn * 100}% checked in.\nMissing: ${missingTagList}\nExtra: ${extraTagList}`,
           );
 
           // wait an hour for the round to end, then tabulate the results

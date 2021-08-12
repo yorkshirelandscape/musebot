@@ -252,9 +252,9 @@ const nextMatch = async (matches) => {
       roundMax = 24;
     }
     const footMsg = footer.replace('$1', roundMin)
-      .replace('$2', `${now.plus({ hours: roundMin }).toLocaleString(DateTime.DATETIME_MED)} ET`)
+      .replace('$2', `<t:${now.plus({ hours: roundMin }).valueOf}:F>`)
       .replace('$3', roundMax)
-      .replace('$4', `${now.plus({ hours: roundMax }).toLocaleString(DateTime.DATETIME_MED)} ET`);
+      .replace('$4', `<t:${now.plus({ hours: roundMax }).valueOf}:F>`);
     const sent = await channel.send(footMsg);
 
     const footText = formatOther(footer);
