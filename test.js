@@ -46,6 +46,7 @@ process.argv.forEach((val) => {
 });
 
 const CHANNEL_ID = (testing === true ? '864768873270345788' : '751893730117812225');
+const MUSIC_ID = (testing === true ? '864768873270345788' : '246342398123311104');
 const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs');
 
 const { DateTime } = require('luxon');
@@ -102,6 +103,7 @@ const compare = (a, b) => {
 // function that pulls it all together
 const checkRound = async () => {
   const channel = client.channels.cache.get(CHANNEL_ID);
+  const musicChan = client.channels.cache.get(MUSIC_ID);
 
   // Even though REFS is an object, order is guaranteed for non-string keys
   const valueRanges = await getValues(Object.values(REFS));
@@ -126,10 +128,10 @@ const checkRound = async () => {
       // find the check-ins without check-outs and vice versa, then calculate the pct checked in
       const missing = checkIns.filter((x) => !checkOuts.map((u) => u.user).includes(x.user));
       const missingList = missing.map((u) => u.user).join(', ');
-      const missingTagList = missing.map((u) => `<!${u.id}>`).join(', ');
+      const missingTagList = missing.map((u) => `<@!${u.id}>`).join(', ');
       const extra = checkOuts.filter((x) => !checkIns.map((u) => u.user).includes(x.user));
       const extraList = extra.map((u) => u.user).join(', ');
-      const extraTagList = missing.map((u) => `<!${u.id}>`).join(', ');
+      const extraTagList = extra.map((u) => `<@!${u.id}>`).join(', ');
       const pctCheckedIn = (checkOuts.length - extra.length) / checkIns.length;
 
       const roundEndTime = DateTime.fromMillis(roundEnd.createdTimestamp);
@@ -161,15 +163,15 @@ const checkRound = async () => {
       if ((pctCheckedIn >= 0.8 && now > roundEndTime.plus({ hours: roundMin }))
           || now > roundEndTime.plus({ hours: roundMax })) {
         if (pctCheckedIn < 1) {
-          channel.send(
-            `${pctCheckedIn * 100}% checked in.\nMissing: ${missingTagList}\nExtra: ${extraTagList}`,
+          musicChan.send(
+            `One-Hour Warning\n${pctCheckedIn * 100}% checked in.\nMissing: ${missingTagList}\nExtra: ${extraTagList}`,
           );
 
           // wait an hour for the round to end, then tabulate the results
           sleep(60 * 60 * 1000);
         }
 
-        channel.send('Round concluded. Tabulating votes.');
+        musicChan.send('Round concluded. Tabulating votes.');
 
         // fetch 100 most recent messages (not necessary, but I wrote this out of order)
         const roundMessages = await channel.messages.fetch({ limit: 100 });
@@ -220,12 +222,12 @@ const checkRound = async () => {
         const tiesArray = resultsArray.filter((m) => m.tie === 1);
 
         if (tiesArray) {
-          channel.send('Settling ties.');
+          musicChan.send('Settling ties.');
           tiesArray.forEach(async (t) => {
             const message = await rndMatches.find((msg) => parseInt(msg.content.slice(8, msg.content.indexOf(':'))) === parseInt(t.match));
-            channel.send(message.content.replace('**Match', '**Tie'));
+            musicChan.send(message.content.replace('**Match', '**Tie'));
             await sleep(5 * 1000);
-            channel.send(`Winner: ${t.emoji}`);
+            musicChan.send(`Winner: ${t.emoji}`);
             await sleep(3 * 1000);
           });
         }
