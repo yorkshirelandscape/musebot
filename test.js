@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable consistent-return */
 /* eslint-disable no-console */
 /* eslint-disable no-use-before-define */
@@ -136,8 +137,7 @@ const checkRound = async () => {
 
       const roundEndTime = DateTime.fromMillis(roundEnd.createdTimestamp);
 
-      // if 80% are checked in and the round is half over OR
-      // the round has one hour left to go, issue the 1-hour warning
+      // calculate round limits
       let roundMin = 11;
       let roundMax = 23;
       if (rndVal === 0
@@ -160,8 +160,12 @@ const checkRound = async () => {
         tmrwStart.set({ millisecond: 0 });
         roundMax += tmrwStart.diff(roundEndTime, 'hours');
       }
+
+      // if 80% are checked in and the round is half over OR
+      // the round has one hour left to go, issue the 1-hour warning
       if ((pctCheckedIn >= 0.8 && now > roundEndTime.plus({ hours: roundMin }))
-          || now > roundEndTime.plus({ hours: roundMax })) {
+          || now > roundEndTime.plus({ hours: roundMax })
+          || pctCheckedIn >= 1) {
         if (pctCheckedIn < 1) {
           musicChan.send(
             `One-Hour Warning\n${pctCheckedIn * 100}% checked in.\nMissing: ${missingTagList}\nExtra: ${extraTagList}`,
@@ -178,11 +182,12 @@ const checkRound = async () => {
 
         // isolate the check-out messages and convert to an array
         const msgDelims = roundMessages.filter((msg) => msg.content.includes('you have checked in and are done voting') && msg.deleted === false);
-        msgDelims.array();
+        // Array.from(msgDelims);
+        // console.log(msgDelims);
         // filter all the messages for those between the two most recent delimiters
         const rndMatches = roundMessages.filter((msg) => (
-          msg.createdTimestamp < msgDelims.array[0].createdTimestamp
-          && msg.createdTimestamp > msgDelims.array[1].createdTimestamp
+          msg.createdTimestamp < msgDelims.first(2)[0].createdTimestamp
+          && msg.createdTimestamp > msgDelims.first(2)[1].createdTimestamp
           && msg.deleted === false && msg.content.includes('Match')
         ));
         // create an array of the reaction counts for each message
@@ -190,9 +195,9 @@ const checkRound = async () => {
         rndMatches.forEach((rm) => {
           const matchNo = parseInt(rm.content.slice(8, rm.content.indexOf(':')));
           const matchReacts = [];
-          rm.reactions.cache.forEach((key, value) => {
-            const emoKey = key.length >= 18 ? `<:${value.emoji.name}:${key}>` : key;
-            matchReacts.push({ [emoKey]: value.count });
+          rm.reactions.cache.forEach((r) => {
+            const emoKey = r.emoji.id ? `<:${r.emoji.name}:${r.emoji.id}>` : r.emoji.name;
+            matchReacts.push({ [emoKey]: r.count });
           });
           rndMatchesResults.push({ [matchNo]: matchReacts });
         });
@@ -205,23 +210,37 @@ const checkRound = async () => {
             const tieEmoji = Object.keys(c[tieRand]).toString();
             const tieC1 = parseInt(Object.values(c[0]).toString());
             const tieC2 = parseInt(Object.values(c[1]).toString());
+            const tie = tieC1 === tieC2 ? 1 : 0;
             resultsArray.push({
-              c1: tieRand === 0 ? tieC1 + 1 : tieC1,
-              c2: tieRand === 1 ? tieC2 + 1 : tieC2,
-              tie: tieC1 === tieC2 ? 1 : 0,
+              c1: tie === 1 && tieRand === 0 ? tieC1 + 1 : tieC1,
+              c2: tie === 1 && tieRand === 1 ? tieC2 + 1 : tieC2,
+              tie,
               match: Object.keys(m)[0],
-              winner: tieC1 === tieC2 ? tieRand + 1 : 0,
-              emoji: tieC1 === tieC2 ? tieEmoji : null,
+              winner: tie === 1 ? tieRand + 1 : 0,
+              emoji: tie === 1 ? tieEmoji : null,
             });
           });
         });
         // resultsArray.reverse();
         resultsArray.sort(compare);
 
-        // settle ties
+        const pushArray = [];
+        resultsArray.forEach((r) => {
+          pushArray.push([r.c1, r.c2, r.tie]);
+        });
+
+        // set the range to push the results to and push them
+        const lastRound = parseInt(round.slice(1)) - 1;
+        const resultsRange = `R${lastRound}!K2:M${(2 ** (7 - rndVal)) + 1}`;
+        console.log(resultsRange);
+        setValues(resultsRange, pushArray);
+
+        await setValue(BOT_STATE_REF, 'GO');
+
+        // announce tie results
         const tiesArray = resultsArray.filter((m) => m.tie === 1);
 
-        if (tiesArray) {
+        if (tiesArray.length > 0) {
           musicChan.send('Settling ties.');
           tiesArray.forEach(async (t) => {
             const message = await rndMatches.find((msg) => parseInt(msg.content.slice(8, msg.content.indexOf(':'))) === parseInt(t.match));
@@ -231,19 +250,6 @@ const checkRound = async () => {
             await sleep(3 * 1000);
           });
         }
-
-        const pushArray = [];
-        resultsArray.forEach((r) => {
-          pushArray.push([r.c1, r.c2, r.tie]);
-        });
-
-        // set the range to push the results to and push them
-        const lastRound = parseInt(round.slice(1)) - 1;
-        const resultsRange = `R${lastRound}!K2:M${2 ** ((7 - rndVal) / 2) + 1}`;
-
-        setValues(resultsRange, pushArray);
-
-        await setValue(BOT_STATE_REF, 'GO');
       } else {
         console.log('Awaiting 80%.');
         console.log(pctCheckedIn);
