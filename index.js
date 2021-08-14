@@ -64,7 +64,7 @@ const END_TIME = (skipstat === true ? 24 : 21);
 
 const { DateTime } = require('luxon');
 
-const now = DateTime.now();
+let now = DateTime.now();
 
 const isBotEnabled = (botState) => {
   const nowHour = new Date().getHours();
@@ -185,6 +185,7 @@ const nextMatch = async (matches) => {
   const botState = await getValue(BOT_STATE_REF);
 
   if (!isBotEnabled(botState) && !skipstat) {
+    now = DateTime.now();
     console.log(`${now}: Bot disabled, exiting`);
     return;
   }
@@ -203,6 +204,7 @@ const nextMatch = async (matches) => {
   if (typeof matches === 'undefined') {
     // eslint-disable-next-line no-param-reassign
     matches = getMatchesCount(rndVal, size);
+    now = DateTime.now();
     console.log(`${now}: Posting ${matches} matches this iteration`);
   }
   console.log(`${matches} matches left to post`);
@@ -261,6 +263,7 @@ const nextMatch = async (matches) => {
       roundMin = 24;
       roundMax = 24;
     }
+    now = DateTime.now();
     const footMsg = footer.replace('$1', roundMin)
       .replace('$2', `<t:${Math.round(now.plus({ hours: roundMin }).valueOf() / 1000)}:F>`)
       .replace('$3', roundMax)
@@ -300,6 +303,7 @@ client.on('ready', async () => {
     // client.destroy();
   } else {
     // Number of seconds until the next even hour
+    now = DateTime.now();
     const countdown = ((60 - now.second) + 60
       * (60 - now.minute) + 60 * 60 * (1 - (now.hour % 2)));
     console.log(`${now}: Triggering in ${countdown / 60} minutes`);

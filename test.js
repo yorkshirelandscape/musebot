@@ -59,7 +59,7 @@ const { DateTime } = require('luxon');
 
 const { Duration } = require('luxon');
 
-const now = DateTime.now();
+let now = DateTime.now();
 
 // function to fetch more than the limit of 100 messages
 async function fetchMany(channel, limit = 150) {
@@ -162,6 +162,7 @@ const checkRound = async () => {
 
       if (roundEndTime.plus({ hours: roundMax }) > 20
         || roundEndTime.plus({ hours: roundMax }) < 5) {
+        now = DateTime.now();
         const tmrwStart = DateTime.now();
         tmrwStart.plus({ days: 1 });
         tmrwStart.set({ hour: 5 });
@@ -172,6 +173,7 @@ const checkRound = async () => {
 
       // if 80% are checked in and the round is half over OR
       // the round has one hour left to go, issue the 1-hour warning
+      now = DateTime.now();
       if ((pctCheckedIn >= 0.8 && now > roundEndTime.plus({ hours: roundMin }))
           || now > roundEndTime.plus({ hours: roundMax })) {
         if (pctCheckedIn < 1) {
@@ -269,6 +271,7 @@ const checkRound = async () => {
           let msg = '';
           if (roundEndTime.plus({ hours: roundMax }) > 20
             || roundEndTime.plus({ hours: roundMax }) < 5) {
+            now = DateTime.now();
             const tomorrow = now.plus({ days: 1 });
             const fiveamtomorrow = DateTime.fromObject({
               year: tomorrow.year,
@@ -278,6 +281,7 @@ const checkRound = async () => {
             });
             msg = `The next round will begin at <t:${fiveamtomorrow.valueOf() / 1000}:F>`;
           } else {
+            now = DateTime.now();
             const resumeTime = Duration.fromObject({
               hours: 1 - (now.hour % 2),
               minutes: 60 - now.minute,
@@ -311,7 +315,7 @@ client.on('ready', async () => {
     // client.destroy();
   } else {
     // run every half hour at quarter after and quarter to
-    // const countdown = ((60 - now.second) + 60 * (30 - ((now.minute + 15) % 30)));
+    now = DateTime.now();
     const countdown = Duration.fromObject({
       minutes: 30 - ((now.minute + 15) % 30),
       seconds: 60 - now.second,
