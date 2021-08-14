@@ -54,7 +54,9 @@ process.argv.forEach((val) => {
 });
 
 const GUILD_ID = (testing === true ? '782213860337647636' : '212660788786102272');
-const CHANNEL_ID = (testing === true ? '864768873270345788' : '751893730117812225');
+const TEST_VOTES = '876135378346733628';
+const DOM_VOTES = '751893730117812225';
+const CHANNEL_ID = (testing === true ? TEST_VOTES : DOM_VOTES);
 const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs');
 
 const START_TIME = (skipstat === true ? 0 : 5);
@@ -178,6 +180,7 @@ const getMatchesCount = (round, size) => Math.min(round === 4 ? 4 : (round === 5
 
 const nextMatch = async (matches) => {
   const channel = client.channels.cache.get(CHANNEL_ID);
+  const testChan = client.channels.cache.get(TEST_VOTES);
 
   const botState = await getValue(BOT_STATE_REF);
 
@@ -212,14 +215,19 @@ const nextMatch = async (matches) => {
       )
   ) {
     const sent = await channel.send(`React with 🎵 if you plan on voting in the ${year} bracket.`);
+    const sentTest = await testChan.send(`React with 🎵 if you plan on voting in the ${year} bracket.`);
     await sent.react('🎵');
     await sent.pin();
+    await sentTest.react('🎵');
+    await sentTest.pin();
   }
 
   if (header) {
     const sent = await channel.send(header);
+    const sentTest = await testChan.send(header);
     if (header.matchAll(/[0-9]{4}R[0-9]Q[0-9]/g)) {
       await sent.pin();
+      await sentTest.pin();
     }
   }
 
@@ -234,6 +242,8 @@ const nextMatch = async (matches) => {
   if (matchText) {
     const sent = await channel.send(matchText);
     await react(sent, matchEmojis);
+    const sentTest = await testChan.send(matchText);
+    await react(sentTest, matchEmojis);
   }
 
   await setValue(REFS.song, song + 1);
@@ -256,10 +266,12 @@ const nextMatch = async (matches) => {
       .replace('$3', roundMax)
       .replace('$4', `<t:${Math.round(now.plus({ hours: roundMax }).valueOf() / 1000)}:F>`);
     const sent = await channel.send(footMsg);
+    const sentTest = await testChan.send(footMsg);
 
     const footText = formatOther(footer);
     const footEmojis = await findEmojis(footText);
     await react(sent, footEmojis);
+    await react(sentTest, footEmojis);
 
     if (typeof round !== 'undefined') {
       await setValue(REFS.round, rndVal === 6 || round === '3P' ? '3P' : `R${rndVal + 1}`);

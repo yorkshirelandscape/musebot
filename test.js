@@ -46,11 +46,18 @@ process.argv.forEach((val) => {
   if (val === '-o') { once = true; }
 });
 
-const CHANNEL_ID = (testing === true ? '864768873270345788' : '751893730117812225');
-const MUSIC_ID = (testing === true ? '864768873270345788' : '246342398123311104');
+const SKYNET = '864768873270345788';
+const TEST_VOTES = '876135378346733628';
+const DOM_MUSIC = '246342398123311104';
+const DOM_VOTES = '751893730117812225';
+const CHANNEL_ID = (testing === true ? TEST_VOTES : DOM_VOTES);
+const MUSIC_ID = (testing === true ? SKYNET : DOM_MUSIC);
+
 const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs');
 
 const { DateTime } = require('luxon');
+
+const { Duration } = require('luxon');
 
 const now = DateTime.now();
 
@@ -105,6 +112,8 @@ const compare = (a, b) => {
 const checkRound = async () => {
   const channel = client.channels.cache.get(CHANNEL_ID);
   const musicChan = client.channels.cache.get(MUSIC_ID);
+  const testChan = client.channels.cache.get(TEST_VOTES);
+  const testMusic = client.channels.cache.get(SKYNET);
 
   // Even though REFS is an object, order is guaranteed for non-string keys
   const valueRanges = await getValues(Object.values(REFS));
@@ -166,17 +175,19 @@ const checkRound = async () => {
       if ((pctCheckedIn >= 0.8 && now > roundEndTime.plus({ hours: roundMin }))
           || now > roundEndTime.plus({ hours: roundMax })) {
         if (pctCheckedIn < 1) {
-          musicChan.send(
-            `One-Hour Warning\n${pctCheckedIn * 100}% checked in.
-              \nMissing: ${missingTagList}
-              ${extraTagList ? `\nExtra: ${extraTagList}` : ''}`,
-          );
+          const msg = `One-Hour Warning
+            ${(pctCheckedIn * 100).toFixed(1)}% checked in.
+            Missing: ${missingTagList}
+            ${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
+          await musicChan.send(msg);
+          await testMusic.send(msg);
 
           // wait an hour for the round to end, then tabulate the results
-          sleep(60 * 60 * 1000);
+          await sleep(60 * 60 * 1000);
         }
 
-        musicChan.send('Round concluded. Tabulating votes.');
+        await musicChan.send('Round concluded. Tabulating votes.');
+        await testMusic.send('Round concluded. Tabulating votes.');
 
         // fetch 100 most recent messages (not necessary, but I wrote this out of order)
         const roundMessages = await channel.messages.fetch({ limit: 100 });
@@ -233,7 +244,6 @@ const checkRound = async () => {
         // set the range to push the results to and push them
         const lastRound = parseInt(round.slice(1)) - 1;
         const resultsRange = `R${lastRound}!K2:M${(2 ** (7 - rndVal)) + 1}`;
-        console.log(resultsRange);
         setValues(resultsRange, pushArray);
 
         await setValue(BOT_STATE_REF, 'GO');
@@ -242,22 +252,25 @@ const checkRound = async () => {
         const tiesArray = resultsArray.filter((m) => m.tie === 1);
 
         if (tiesArray.length > 0) {
-          musicChan.send('Settling ties.');
+          await musicChan.send('Settling ties.');
+          await testChan.send('Settling ties.');
           tiesArray.forEach(async (t) => {
             const message = await rndMatches.find((msg) => parseInt(msg.content.slice(8, msg.content.indexOf(':'))) === parseInt(t.match));
-            musicChan.send(message.content.replace('**Match', '**Tie'));
+            await musicChan.send(message.content.replace('**Match', '**Tie'));
+            await testMusic.send(message.content.replace('**Match', '**Tie'));
             await sleep(5 * 1000);
-            musicChan.send(`Winner: ${t.emoji}`);
+            await musicChan.send(`Winner: ${t.emoji}`);
+            await testMusic.send(`Winner: ${t.emoji}`);
             await sleep(3 * 1000);
           });
         }
       } else if (now < roundEndTime.plus({ hours: roundMin })) {
         console.log('Awaiting minimum time elapsed.');
-        console.log(roundEndTime.plus({ hours: roundMin }).toFormat('M/d/yyyy HH:mm z'));
+        console.log(roundEndTime.plus({ hours: roundMin }).toFormat('M/d/yyyy HH:mm'));
       } else {
         console.log('Awaiting 80%.');
-        console.log(pctCheckedIn);
-        console.log(roundEndTime.plus({ hours: roundMax }).toFormat('M/d/yyyy HH:mm z'));
+        console.log(`${(pctCheckedIn * 100).toFixed(1)}%`);
+        console.log(roundEndTime.plus({ hours: roundMin }).toFormat('M/d/yyyy HH:mm'));
         console.log('Missing:', missingList);
         console.log('Extra:', extraList);
       }
@@ -275,12 +288,16 @@ client.on('ready', async () => {
     // client.destroy();
   } else {
     // run every half hour at quarter after and quarter to
-    const countdown = ((60 - now.second) + 60 * (30 - ((now.minute + 15) % 30)));
-    console.log(`${now}: Triggering in ${countdown / 60} minutes`);
+    // const countdown = ((60 - now.second) + 60 * (30 - ((now.minute + 15) % 30)));
+    const countdown = Duration.fromObject({
+      minutes: 30 - ((now.minute + 15) % 30),
+      seconds: 60 - now.second,
+    });
+    console.log(`${now.toFormat('M/d/yyyy HH:mm')}: Triggering in ${(countdown.minutes)} minutes`);
     setTimeout(() => {
       checkRound();
       setInterval(checkRound, 60 * 30 * 1000);
-    }, countdown * 1000);
+    }, countdown.toMillis());
   }
 });
 
