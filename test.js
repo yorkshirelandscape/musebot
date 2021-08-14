@@ -264,6 +264,29 @@ const checkRound = async () => {
             await sleep(3 * 1000);
           });
         }
+
+        if (round !== '3P') {
+          let msg = '';
+          if (roundEndTime.plus({ hours: roundMax }) > 20
+            || roundEndTime.plus({ hours: roundMax }) < 5) {
+            const tomorrow = now.plus({ days: 1 });
+            const fiveamtomorrow = DateTime.fromObject({
+              year: tomorrow.year,
+              month: tomorrow.month,
+              day: tomorrow.day,
+              hour: 5,
+            });
+            msg = `The next round will begin at <t:${fiveamtomorrow.valueOf() / 1000}:F>`;
+          } else {
+            const resumeTime = Duration.fromObject({
+              hours: 1 - (now.hour % 2),
+              minutes: 60 - now.minute,
+            }).toFormat('h m');
+            msg = `The next round will begin in ${resumeTime.hours > 0 ? `${resumeTime.hours}h` : ''}${resumeTime.minutes}m.`;
+          }
+          await musicChan.send(msg);
+          await testChan.send(msg);
+        }
       } else if (now < roundEndTime.plus({ hours: roundMin })) {
         console.log('Awaiting minimum time elapsed.');
         console.log(roundEndTime.plus({ hours: roundMin }).toFormat('M/d/yyyy HH:mm'));
