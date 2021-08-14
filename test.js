@@ -164,11 +164,12 @@ const checkRound = async () => {
       // if 80% are checked in and the round is half over OR
       // the round has one hour left to go, issue the 1-hour warning
       if ((pctCheckedIn >= 0.8 && now > roundEndTime.plus({ hours: roundMin }))
-          || now > roundEndTime.plus({ hours: roundMax })
-          || pctCheckedIn >= 1) {
+          || now > roundEndTime.plus({ hours: roundMax })) {
         if (pctCheckedIn < 1) {
           musicChan.send(
-            `One-Hour Warning\n${pctCheckedIn * 100}% checked in.\nMissing: ${missingTagList}\nExtra: ${extraTagList}`,
+            `One-Hour Warning\n${pctCheckedIn * 100}% checked in.
+              \nMissing: ${missingTagList}
+              ${extraTagList ? `\nExtra: ${extraTagList}` : ''}`,
           );
 
           // wait an hour for the round to end, then tabulate the results
@@ -250,12 +251,15 @@ const checkRound = async () => {
             await sleep(3 * 1000);
           });
         }
+      } else if (now < roundEndTime.plus({ hours: roundMin })) {
+        console.log('Awaiting minimum time elapsed.');
+        console.log(roundEndTime.plus({ hours: roundMin }).toFormat('M/d/yyyy HH:mm z'));
       } else {
         console.log('Awaiting 80%.');
         console.log(pctCheckedIn);
-        console.log(roundEndTime.toFormat('M/d/yyyy HH:mm z'));
-        console.log(missingList);
-        console.log(extraList);
+        console.log(roundEndTime.plus({ hours: roundMax }).toFormat('M/d/yyyy HH:mm z'));
+        console.log('Missing:', missingList);
+        console.log('Extra:', extraList);
       }
     } else { console.log('Round in progress.'); }
   });
@@ -271,7 +275,7 @@ client.on('ready', async () => {
     // client.destroy();
   } else {
     // run every half hour at quarter after and quarter to
-    const countdown = ((60 - now.getSeconds()) + 60 * ((30 - (now.getMinutes() + 15)) % 30));
+    const countdown = ((60 - now.second) + 60 * (30 - ((now.minute + 15) % 30)));
     console.log(`${now}: Triggering in ${countdown / 60} minutes`);
     setTimeout(() => {
       checkRound();
