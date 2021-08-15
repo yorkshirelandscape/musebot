@@ -241,16 +241,32 @@ const checkRound = async () => {
           });
           resultsArray.sort(compare);
 
-          const pushArray = [];
-          resultsArray.forEach((r) => {
-            pushArray.push([r.c1, r.c2, r.tie]);
-          });
+          if (round === '3P') {
+            const pushArray1 = [];
+            const pushArray2 = [];
+            resultsArray.first().forEach((r) => {
+              pushArray1.push([r.c1, r.c2, r.tie]);
+            });
+            resultsArray.last().forEach((r) => {
+              pushArray2.push([r.c1, r.c2, r.tie]);
+            });
 
-          // set the range to push the results to and push them
-          const lastRound = parseInt(round.slice(1)) - 1;
-          const resultsRange = `R${lastRound}!K2:M${(2 ** (7 - rndVal)) + 1}`;
-          setValues(resultsRange, pushArray);
+            // set the range to push the results to and push them
+            let resultsRange = 'R6!K2:M2';
+            await setValues(resultsRange, pushArray1);
+            resultsRange = '3P!K2:M2';
+            await setValues(resultsRange, pushArray2);
+          } else {
+            const pushArray = [];
+            resultsArray.forEach((r) => {
+              pushArray.push([r.c1, r.c2, r.tie]);
+            });
 
+            // set the range to push the results to and push them
+            const lastRound = parseInt(round.slice(1)) - 1;
+            const resultsRange = `R${lastRound}!K2:M${(2 ** (7 - rndVal)) + 1}`;
+            await setValues(resultsRange, pushArray);
+          }
           await setValue(BOT_STATE_REF, 'GO');
 
           // announce tie results
