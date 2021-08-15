@@ -127,7 +127,7 @@ const checkRound = async () => {
     const rndVal = parseInt(round.slice(1));
 
     // fetch the last 150 messages (this should cover even the longest rounds)
-    fetchMany(channel, 150).then(async (messages) => {
+    fetchMany(channel, 200).then(async (messages) => {
       // of those, find the most recent messages that begin and end a round
       const roundStart = await messages.find((msg) => msg.content.includes('Begins————'));
       const roundEnd = await messages.find((msg) => msg.content.includes('you have checked in and are done voting'));
@@ -150,18 +150,21 @@ const checkRound = async () => {
         const roundEndTime = DateTime.fromMillis(roundEnd.createdTimestamp);
 
         // calculate round limits
-        let roundMin = 11;
-        let roundMax = 23;
+        let roundMin = 12;
+        let roundMax = 24;
         if (rndVal === 0
           || (rndVal === 1 && size === 96)
           || (rndVal === 2 && (size === 64 || size === 48))
           || (rndVal === 3 && size < 64)) {
-          roundMin = 23;
-          roundMax = 35;
+          roundMin = 24;
+          roundMax = 36;
         } else if (round === '3P') {
-          roundMin = 23;
-          roundMax = 23;
+          roundMin = 24;
+          roundMax = 24;
         }
+
+        const roundMinWarn = roundMin - 1;
+        let roundMaxWarn = roundMax - 1;
 
         if (roundEndTime.plus({ hours: roundMax }) > 20
           || roundEndTime.plus({ hours: roundMax }) < 5) {
@@ -171,14 +174,14 @@ const checkRound = async () => {
           tmrwStart.set({ hour: 5 });
           tmrwStart.set({ minute: 0 });
           tmrwStart.set({ millisecond: 0 });
-          roundMax += tmrwStart.diff(roundEndTime, 'hours');
+          roundMaxWarn += tmrwStart.diff(roundEndTime, 'hours');
         }
 
         // if 80% are checked in and the round is half over OR
         // the round has one hour left to go, issue the 1-hour warning
         now = DateTime.now();
-        if ((pctCheckedIn >= 0.8 && now > roundEndTime.plus({ hours: roundMin }))
-            || now > roundEndTime.plus({ hours: roundMax })) {
+        if ((pctCheckedIn >= 0.8 && now > roundEndTime.plus({ hours: roundMinWarn }))
+            || now > roundEndTime.plus({ hours: roundMaxWarn })) {
           if (pctCheckedIn < 1) {
             const msg = `One-Hour Warning
               ${(pctCheckedIn * 100).toFixed(1)}% checked in.
@@ -199,8 +202,6 @@ const checkRound = async () => {
 
           // isolate the check-out messages and convert to an array
           const msgDelims = roundMessages.filter((msg) => msg.content.includes('you have checked in and are done voting') && msg.deleted === false);
-          // Array.from(msgDelims);
-          // console.log(msgDelims);
           // filter all the messages for those between the two most recent delimiters
           const rndMatches = roundMessages.filter((msg) => (
             msg.createdTimestamp < msgDelims.first(2)[0].createdTimestamp
@@ -238,7 +239,6 @@ const checkRound = async () => {
               });
             });
           });
-          // resultsArray.reverse();
           resultsArray.sort(compare);
 
           const pushArray = [];
@@ -294,19 +294,19 @@ const checkRound = async () => {
             await musicChan.send(msg);
             await testChan.send(msg);
           }
-        } else if (now < roundEndTime.plus({ hours: roundMin })) {
+        } else if (now < roundEndTime.plus({ hours: roundMinWarn })) {
           console.log('Awaiting minimum time elapsed.');
-          console.log(roundEndTime.plus({ hours: roundMin }).toFormat('M/d/yyyy HH:mm'));
+          console.log(roundEndTime.plus({ hours: roundMinWarn }).toFormat('M/d/yyyy HH:mm'));
         } else {
           console.log('Awaiting 80%.');
           console.log(`${(pctCheckedIn * 100).toFixed(1)}%`);
-          console.log(roundEndTime.plus({ hours: roundMin }).toFormat('M/d/yyyy HH:mm'));
+          console.log(roundEndTime.plus({ hours: roundMinWarn }).toFormat('M/d/yyyy HH:mm'));
           console.log('Missing:', missingList);
           console.log('Extra:', extraList);
         }
       } else { console.log('Round in progress.'); }
     });
-  } else { console.log('Bot disabled. Round in progress?'); }
+  } else { console.log('Bot enabled. Round in progress?'); }
 };
 
 client.once('ready', () => {
