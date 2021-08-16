@@ -25,7 +25,7 @@ function replaceOccurrence(string, regex, n, replace) {
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
 
-  if (interaction.commandName === 'addurl') {
+  if (interaction.commandName === 'replaceurl') {
     const channel = client.channels.cache.get(CHANNEL_ID);
     const match = interaction.options.getInteger('match');
     const song = interaction.options.getInteger('song');
@@ -42,7 +42,7 @@ client.on('interactionCreate', async (interaction) => {
         const currentText = targetMatch.content;
         let newText = '';
         if (song === 1) {
-          newText = currentText.Replace(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/, url);
+          newText = currentText.replace(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/, url);
         } else if (song === 2) {
           newText = replaceOccurrence(currentText, /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/, 2, url);
         }
