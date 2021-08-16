@@ -111,13 +111,15 @@ const compare = (a, b) => {
 // function that pulls it all together
 const checkRound = async () => {
   const botState = await getValue(BOT_STATE_REF);
+  const channel = client.channels.cache.get(CHANNEL_ID);
+  const musicChan = client.channels.cache.get(MUSIC_ID);
+  const testChan = client.channels.cache.get(TEST_VOTES);
+  const testMusic = client.channels.cache.get(SKYNET);
 
-  if (botState === 'STOP') {
-    const channel = client.channels.cache.get(CHANNEL_ID);
-    const musicChan = client.channels.cache.get(MUSIC_ID);
-    const testChan = client.channels.cache.get(TEST_VOTES);
-    const testMusic = client.channels.cache.get(SKYNET);
+  const recentSkynet = await testMusic.messages.fetch({ limit: 1 });
+  const warnMsg = await recentSkynet.find((msg) => msg.content.includes('One-Hour Warning'));
 
+  if (botState === 'STOP' && !warnMsg) {
     // Even though REFS is an object, order is guaranteed for non-string keys
     const valueRanges = await getValues(Object.values(REFS));
 

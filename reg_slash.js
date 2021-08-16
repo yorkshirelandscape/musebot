@@ -18,12 +18,12 @@ client.on('messageCreate', async (message) => {
 
   if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
     const data = {
-      name: 'addurl',
-      description: 'Adds a URL to a specified match.',
+      name: 'replaceurl',
+      description: 'Replaces the URL of the specified song in the specified match.',
       options: [{
         name: 'match',
         type: 'INTEGER',
-        description: 'The match to add to',
+        description: 'The match within you\'re replacing within',
         required: true,
       },
       {
