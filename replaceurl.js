@@ -9,7 +9,7 @@ const client = new Client({
     Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
 });
 
-const testing = true;
+const testing = false;
 
 const CHANNEL_ID = (testing === true ? '876135378346733628' : '751893730117812225');
 
@@ -31,27 +31,21 @@ client.on('interactionCreate', async (interaction) => {
     const song = interaction.options.getInteger('song');
     const url = interaction.options.getString('url');
 
-    channel.messages.fetch({ limit: 100 })
-      .then(async (messages) => {
-        const targetMatch = messages.find((msg) => parseInt(msg.content.slice(8, msg.content.indexOf(':'))) === match);
+    const messages = await channel.messages.fetch({ limit: 100 });
+    const targetMatch = messages.find((msg) => parseInt(msg.content.slice(8, msg.content.indexOf(':'))) === match);
 
-        if (typeof targetMatch === 'undefined') {
-          return;
-        }
-
-        const currentText = targetMatch.content;
-        let newText = '';
-        if (song === 1) {
-          newText = currentText.replace(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/, url);
-        } else if (song === 2) {
-          newText = replaceOccurrence(currentText, /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/, 2, url);
-        }
-        targetMatch.edit(newText);
-      });
-
-    if (typeof currentText === 'undefined') {
-      await interaction.reply('Could not find match.');
+    if (typeof targetMatch === 'undefined') {
+      interaction.reply('Could not find match.');
     } else {
+      const currentText = targetMatch.content;
+      let newText = '';
+      if (song === 1) {
+        newText = currentText.replace(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/, url);
+      } else if (song === 2) {
+        newText = replaceOccurrence(currentText, /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/, 2, url);
+      }
+      targetMatch.edit(newText);
+
       await interaction.reply('URL replaced.');
     }
   }
