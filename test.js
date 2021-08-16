@@ -339,7 +339,8 @@ client.on('ready', async () => {
     // run every half hour at quarter after and quarter to
     now = DateTime.now();
     const countdown = Duration.fromObject({
-      minutes: 30 - ((now.minute + 15) % 30),
+      hours: now.minute > 45 ? (now.hour + 1) % 2 : now.hour % 2,
+      minutes: 60 - ((now.minute + 15) % 60),
       seconds: 60 - now.second,
     });
     console.log(`${now.toFormat('M/d/yyyy HH:mm')}: Triggering in ${(countdown.minutes)} minutes`);
