@@ -17,4 +17,5 @@
 - ~~trim URLs~~
 - ~~delay round end if after 8pm~~
 - slash command to replace a match
-- make names into pings
+- ~~make names into pings~~
+- react to manual match posts

@@ -32,7 +32,7 @@ client.on('interactionCreate', async (interaction) => {
     const url = interaction.options.getString('url');
 
     const messages = await channel.messages.fetch({ limit: 100 });
-    const targetMatch = messages.find((msg) => parseInt(msg.content.slice(8, msg.content.indexOf(':'))) === match);
+    const targetMatch = await messages.find((msg) => parseInt(msg.content.slice(8, msg.content.indexOf(':'))) === match);
 
     if (typeof targetMatch === 'undefined') {
       interaction.reply('Could not find match.');
@@ -40,13 +40,17 @@ client.on('interactionCreate', async (interaction) => {
       const currentText = targetMatch.content;
       let newText = '';
       if (song === 1) {
-        newText = currentText.replace(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/, url);
+        newText = await currentText.replace(/(https?|ftp):\/\/(-\.)?([^\s/?.#-]+\.?)+(\/[^\s]*)?/, url);
       } else if (song === 2) {
-        newText = replaceOccurrence(currentText, /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/, 2, url);
+        newText = await replaceOccurrence(currentText, /(https?|ftp):\/\/(-\.)?([^\s/?.#-]+\.?)+(\/[^\s]*)?/, 2, url);
       }
-      targetMatch.edit(newText);
+      await targetMatch.edit(newText);
 
-      await interaction.reply('URL replaced.');
+      if (currentText === newText) {
+        await interaction.reply('No matching URL.');
+      } else {
+        await interaction.reply('URL replaced.');
+      }
     }
   }
 });
