@@ -65,7 +65,7 @@ client.on('interactionCreate', async (interaction) => {
       if (currentText === newText) {
         await interaction.reply('No match.');
       } else {
-        await interaction.reply('Part replaced.');
+        await interaction.reply(`${interaction.user.name} replaced ${part === 'url' ? 'the ' : ''} ${part} of song ${song} of match ${match}.`);
       }
     }
   }
