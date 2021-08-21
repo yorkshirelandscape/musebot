@@ -49,7 +49,7 @@ client.on('interactionCreate', async (interaction) => {
       if (currentText === newText) {
         await interaction.reply('Replacement failed.');
       } else {
-        await interaction.reply(`${interaction.user.name} added a link to song ${song} of match ${match}.`);
+        await interaction.reply(`${interaction.user.username} added a link to song ${song} of match ${match}.`);
       }
     }
   }

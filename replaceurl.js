@@ -55,7 +55,7 @@ client.on('interactionCreate', async (interaction) => {
       if (currentText === newText) {
         await interaction.reply('No matching URL.');
       } else {
-        await interaction.reply(`${interaction.user.name} replaced the link for song ${song} of match ${match}.`);
+        await interaction.reply(`${interaction.user.username} replaced the link for song ${song} of match ${match}.`);
       }
     }
   }
