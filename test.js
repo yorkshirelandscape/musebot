@@ -346,7 +346,7 @@ client.on('ready', async () => {
     console.log(`${now.toFormat('M/d/yyyy HH:mm')}: Triggering in ${(countdown.minutes)} minutes`);
     setTimeout(() => {
       checkRound();
-      setInterval(checkRound, 60 * 30 * 1000);
+      setInterval(checkRound, 60 * 1000);
     }, countdown.toMillis());
   }
 });
