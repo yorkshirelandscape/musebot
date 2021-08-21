@@ -12,6 +12,11 @@ const client = new Client({
 const testing = false;
 
 const CHANNEL_ID = (testing === true ? '876135378346733628' : '751893730117812225');
+const SOURCE_CHANNELS = [
+  { name: 'music', id: '246342398123311104' },
+  { name: 'music-meta', id: '763068914480840715' },
+  { name: 'skynet', id: '864768873270345788' },
+];
 
 function replaceOccurrence(string, regex, n, replace) {
   let i = 0;
@@ -23,7 +28,8 @@ function replaceOccurrence(string, regex, n, replace) {
 }
 
 client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()) return;
+  if (!interaction.isCommand()
+  || !SOURCE_CHANNELS.find(({ id }) => id === interaction.channel.id)) return;
 
   if (interaction.commandName === 'replaceurl') {
     const channel = client.channels.cache.get(CHANNEL_ID);

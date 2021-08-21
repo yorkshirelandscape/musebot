@@ -13,9 +13,15 @@ const client = new Client({
 const testing = false;
 
 const CHANNEL_ID = (testing === true ? '876135378346733628' : '751893730117812225');
+const SOURCE_CHANNELS = [
+  { name: 'music', id: '246342398123311104' },
+  { name: 'music-meta', id: '763068914480840715' },
+  { name: 'skynet', id: '864768873270345788' },
+];
 
 client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()) return;
+  if (!interaction.isCommand()
+    || !SOURCE_CHANNELS.find(({ id }) => id === interaction.channel.id)) return;
 
   if (interaction.commandName === 'addurl') {
     const channel = client.channels.cache.get(CHANNEL_ID);
@@ -43,7 +49,7 @@ client.on('interactionCreate', async (interaction) => {
       if (currentText === newText) {
         await interaction.reply('Replacement failed.');
       } else {
-        await interaction.reply('URL added.');
+        await interaction.reply(`${interaction.user.name} added a link to song ${song} of match ${match}.`);
       }
     }
   }
