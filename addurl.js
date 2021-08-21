@@ -33,7 +33,7 @@ client.on('interactionCreate', async (interaction) => {
       let newText = '';
       if (song === 1) {
         const urlPos1 = currentText.indexOf('\n');
-        const urlPos = currentText.indexOf('\n', urlPos1 + 1) - 1;
+        const urlPos = currentText.indexOf('\n', urlPos1 + 1);
         newText = [currentText.slice(0, urlPos), ` | <${url}>`, currentText.slice(urlPos)].join('');
       } else if (song === 2) {
         newText = `${currentText} | <${url}>`;

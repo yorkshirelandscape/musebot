@@ -18,12 +18,12 @@ client.on('messageCreate', async (message) => {
 
   if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
     const data = {
-      name: 'replaceurl',
-      description: 'Replaces the URL of the specified song in the specified match.',
+      name: 'replacepart',
+      description: 'Replaces the specified part of the specified song in the specified match.',
       options: [{
         name: 'match',
         type: 'INTEGER',
-        description: 'The match within you\'re replacing within',
+        description: 'The match whose part you\'re replacing',
         required: true,
       },
       {
@@ -43,9 +43,25 @@ client.on('messageCreate', async (message) => {
         ],
       },
       {
-        name: 'url',
+        name: 'part',
         type: 'STRING',
-        description: 'The URL to add',
+        description: 'The part to replace',
+        required: true,
+        choices: [
+          {
+            name: 'All',
+            value: 'all',
+          },
+          {
+            name: 'URL',
+            value: 'url',
+          },
+        ],
+      },
+      {
+        name: 'replacement',
+        type: 'STRING',
+        description: 'The replacement',
         required: true,
       }],
     };

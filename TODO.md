@@ -16,6 +16,6 @@
 - ~~post yearly check-in message~~
 - ~~trim URLs~~
 - ~~delay round end if after 8pm~~
-- slash command to replace a match
+- slash command to replace a match (maybe)
 - ~~make names into pings~~
 - react to manual match posts
