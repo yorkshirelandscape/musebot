@@ -340,13 +340,13 @@ client.on('ready', async () => {
     now = DateTime.now();
     const countdown = Duration.fromObject({
       hours: now.minute > 45 ? (now.hour + 1) % 2 : now.hour % 2,
-      minutes: 60 - ((now.minute + 15) % 60),
+      minutes: now.minute > 45 ? 60 - (now.minute - 45) : 45 - now.minute,
       seconds: 60 - now.second,
     });
     console.log(`${now.toFormat('M/d/yyyy HH:mm')}: Triggering in ${(countdown.minutes)} minutes`);
     setTimeout(() => {
       checkRound();
-      setInterval(checkRound, 60 * 1000);
+      setInterval(checkRound, 60 * 60 * 1000);
     }, countdown.toMillis());
   }
 });
