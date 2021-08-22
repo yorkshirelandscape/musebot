@@ -32,7 +32,7 @@ function replaceOccurrence(string, regex, n, replace) {
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand() || !ADMINS.find(({ id }) => id === interaction.user.id)) return;
 
-  if (interaction.commandName === 'replacepart') {
+  if (interaction.commandName === 'replaceall') {
     const channel = client.channels.cache.get(CHANNEL_ID);
     const match = interaction.options.getInteger('match');
     const song = interaction.options.getInteger('song');
