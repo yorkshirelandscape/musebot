@@ -18,8 +18,8 @@ client.on('messageCreate', async (message) => {
 
   if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
     const data = {
-      name: 'replacepart',
-      description: 'Replaces the specified part of the specified song in the specified match.',
+      name: 'replaceall',
+      description: 'Replaces the specified song in the specified match.',
       options: [{
         name: 'match',
         type: 'INTEGER',
@@ -43,22 +43,6 @@ client.on('messageCreate', async (message) => {
         ],
       },
       {
-        name: 'part',
-        type: 'STRING',
-        description: 'The part to replace',
-        required: true,
-        choices: [
-          {
-            name: 'All',
-            value: 'all',
-          },
-          {
-            name: 'URL',
-            value: 'url',
-          },
-        ],
-      },
-      {
         name: 'replacement',
         type: 'STRING',
         description: 'The replacement',
@@ -67,6 +51,9 @@ client.on('messageCreate', async (message) => {
     };
 
     const command = await client.application?.commands.create(data);
+    // eslint-disable-next-line max-len
+    // const command = await client.application?.commands.cache.get('878715599310688287').edit(data);
+    // const command = await client.application?.commands.cache.get('878715599310688287').delete();
     // const commands = await client.application?.commands.set(data); // Update
     // const command = await client.guilds.cache.get('782213860337647636')?.commands.create(data);
     console.log(command);
