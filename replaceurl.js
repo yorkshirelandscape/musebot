@@ -46,9 +46,9 @@ client.on('interactionCreate', async (interaction) => {
       const currentText = targetMatch.content;
       let newText = '';
       if (song === 1) {
-        newText = await currentText.replace(/(https?|ftp):\/\/(-\.)?([^\s/?.#-]+\.?)+(\/[^\s]*)?/, url);
+        newText = currentText.replace(/<*(https?|ftp):\/\/(-\.)?([^\s/?.#-]+\.?)+(\/[^\s]*)?>*[^\n]*/, url);
       } else if (song === 2) {
-        newText = await replaceOccurrence(currentText, /(https?|ftp):\/\/(-\.)?([^\s/?.#-]+\.?)+(\/[^\s]*)?/g, 2, url);
+        newText = replaceOccurrence(currentText, /<*(https?|ftp):\/\/(-\.)?([^\s/?.#-]+\.?)+(\/[^\s]*)?>*[^\n]*/g, 2, url);
       }
       await targetMatch.edit(newText);
 
