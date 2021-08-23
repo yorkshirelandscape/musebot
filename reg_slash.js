@@ -53,9 +53,10 @@ client.on('messageCreate', async (message) => {
     const command = await client.application?.commands.create(data);
     // eslint-disable-next-line max-len
     // const command = await client.application?.commands.cache.get('878715599310688287').edit(data);
-    // const command = await client.application?.commands.cache.get('878715599310688287').delete();
     // const commands = await client.application?.commands.set(data); // Update
     // const command = await client.guilds.cache.get('782213860337647636')?.commands.create(data);
+    // const command = await client.guilds.cache.get('782213860337647636')?.commands.fetch();
+
     console.log(command);
   }
 });
