@@ -150,14 +150,15 @@ const checkRound = async () => {
         const pctCheckedIn = (checkOuts.length - extra.length) / checkIns.length;
 
         const roundEndTime = DateTime.fromMillis(roundEnd.createdTimestamp);
+        const lastRound = parseInt(round.slice(1)) - 1;
 
         // calculate round limits
         let roundMin = 12;
         let roundMax = 24;
-        if (rndVal === 0
-          || (rndVal === 1 && size === 96)
-          || (rndVal === 2 && (size === 64 || size === 48))
-          || (rndVal === 3 && size < 64)) {
+        if (lastRound === 0
+          || (lastRound === 1 && size === 96)
+          || (lastRound === 2 && (size === 64 || size === 48))
+          || (lastRound === 3 && size < 64)) {
           roundMin = 24;
           roundMax = 36;
         } else if (round === '3P') {
@@ -266,7 +267,6 @@ const checkRound = async () => {
             });
 
             // set the range to push the results to and push them
-            const lastRound = parseInt(round.slice(1)) - 1;
             const resultsRange = `R${lastRound}!K2:M${(2 ** (7 - rndVal)) + 1}`;
             await setValues(resultsRange, pushArray);
           }
@@ -337,17 +337,17 @@ client.on('ready', async () => {
     await checkRound();
     // client.destroy();
   } else {
-    // run every half hour at quarter after and quarter to
+    // run at quarter to every odd hour
     now = DateTime.now();
     const countdown = Duration.fromObject({
       hours: now.minute > 45 ? (now.hour + 1) % 2 : now.hour % 2,
       minutes: now.minute > 45 ? 60 - (now.minute - 45) : 45 - now.minute,
       seconds: 60 - now.second,
     });
-    console.log(`${now.toFormat('M/d/yyyy HH:mm')}: Triggering in ${(countdown.minutes)} minutes`);
+    console.log(`${now.toFormat('M/d/yyyy HH:mm')}: Triggering in ${(countdown.toFormat('m'))} minutes`);
     setTimeout(() => {
       checkRound();
-      setInterval(checkRound, 60 * 60 * 1000);
+      setInterval(checkRound, 2 * 60 * 60 * 1000);
     }, countdown.toMillis());
   }
 });
