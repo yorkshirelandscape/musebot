@@ -24,7 +24,7 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // time.
 const TOKEN_PATH = 'token.json';
 
-const testing = true;
+const testing = false;
 
 const CHANNEL_ID = (testing === true ? '876135378346733628' : '751893730117812225');
 const SOURCE_CHANNELS = [
@@ -66,9 +66,14 @@ client.on('interactionCreate', async (interaction) => {
       const searchArr = [];
       readVals.map((row) => searchArr.push(row[0]));
       const songText = currentText.match(/(?<=\u200b )[^\u200b-]+(?=\s-)/g);
-      const writeIndex = searchArr.indexOf(songText[song - 1]);
+      const writeIndex = searchArr.indexOf(songText[song - 1]) + 2;
       const writeRange = `Dashboard!L${writeIndex}`;
-      await setValue(writeRange, ` | ${url}`);
+
+      if (writeIndex > -1) {
+        await setValue(writeRange, ` | ${url}`);
+      } else {
+        console.log('Error writing to spreadsheet.');
+      }
 
       if (currentText === newText) {
         await interaction.reply('Replacement failed.');
