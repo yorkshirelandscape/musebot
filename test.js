@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable consistent-return */
 /* eslint-disable no-console */
@@ -7,7 +8,7 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const { Client, Intents } = require('discord.js');
+const { Client, Intents, Collection } = require('discord.js');
 
 const client = new Client({
   intents:
@@ -39,11 +40,13 @@ const REFS = {
 
 let testing = false;
 let once = false;
+let force = false;
 
 process.argv.forEach((val) => {
   // if (val === '-s') { skipstat = true; }
   if (val === '-t') { testing = true; }
   if (val === '-o') { once = true; }
+  if (val === '-f') { force = true; }
 });
 
 const SKYNET = '864768873270345788';
@@ -62,29 +65,39 @@ const { Duration } = require('luxon');
 let now = DateTime.now();
 
 // function to fetch more than the limit of 100 messages
-async function fetchMany(channel, limit = 150) {
-  let sumMessages = await channel.messages.fetch({ limit: 100 });
-  let lastId = sumMessages.last().id;
-  let lim = Math.max(0, limit - 100);
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const options = { limit: lim };
+async function fetchMany(channel, limit = 250) {
+  if (!channel) {
+    throw new Error(`Expected channel, got ${typeof channel}.`);
+  }
+  if (limit <= 100) {
+    return channel.messages.fetch({ limit });
+  }
+
+  let collection = new Collection();
+  let lastId = null;
+  const options = {};
+  let remaining = limit;
+
+  while (remaining > 0) {
+    options.limit = remaining > 100 ? 100 : remaining;
+    remaining = remaining > 100 ? remaining - 100 : 0;
+
     if (lastId) {
       options.before = lastId;
     }
 
     // eslint-disable-next-line no-await-in-loop
-    const msgs = await channel.messages.fetch(options);
-    lim = Math.max(0, lim - lim);
-    sumMessages = sumMessages.concat(msgs);
-    lastId = msgs.last().id;
+    const messages = await channel.messages.fetch(options);
 
-    if (lim === 0 || msgs.size !== 100 || sumMessages.length >= limit) {
+    if (!messages.last()) {
       break;
     }
+
+    collection = collection.concat(messages);
+    lastId = messages.last().id;
   }
 
-  return sumMessages;
+  return collection;
 }
 
 // function to feath the reactions to the most recent message with the specified content
@@ -96,7 +109,7 @@ const getChecks = (channel, search) => new Promise((resolve) => {
   });
 });
 
-const sleep = async (interval) => { await new Promise((r) => setTimeout(r, interval)); };
+const sleep = async (interval) => new Promise((r) => setTimeout(r, interval));
 
 const compare = (a, b) => {
   if (a.match < b.match) {
@@ -186,7 +199,7 @@ const checkRound = async () => {
         if ((pctCheckedIn >= 0.8
             && now > roundEndTime.plus({ hours: roundMinWarn }).minus({ minutes: 15 }))
             || now > roundEndTime.plus({ hours: roundMaxWarn }).minus({ minutes: 15 })) {
-          if (pctCheckedIn < 1) {
+          if (pctCheckedIn < 1 && force === false) {
             const msg = `One-Hour Warning
               ${(pctCheckedIn * 100).toFixed(1)}% checked in.
               Missing: ${missingTagList}
@@ -199,7 +212,7 @@ const checkRound = async () => {
           }
 
           await musicChan.send('Round concluded. Tabulating votes.');
-          await testMusic.send('Round concluded. Tabulating votes.');
+          if (testing === false) { await testMusic.send('Round concluded. Tabulating votes.'); }
 
           // fetch 100 most recent messages (not necessary, but I wrote this out of order)
           const roundMessages = await channel.messages.fetch({ limit: 100 });
@@ -237,7 +250,7 @@ const checkRound = async () => {
                 c1: tie === 1 && tieRand === 0 ? tieC1 + 1 : tieC1,
                 c2: tie === 1 && tieRand === 1 ? tieC2 + 1 : tieC2,
                 tie,
-                match: Object.keys(m)[0],
+                match: parseInt(Object.keys(m)[0]),
                 winner: tie === 1 ? tieRand + 1 : 0,
                 emoji: tie === 1 ? tieEmoji : null,
               });
@@ -277,22 +290,25 @@ const checkRound = async () => {
 
           if (tiesArray.length > 0) {
             await musicChan.send('Settling ties.');
-            await testChan.send('Settling ties.');
-            tiesArray.forEach(async (t) => {
-              const message = await rndMatches.find((msg) => parseInt(msg.content.slice(8, msg.content.indexOf(':'))) === parseInt(t.match));
-              await musicChan.send(message.content.replace('**Match', '**Tie'));
-              await testMusic.send(message.content.replace('**Match', '**Tie'));
+            if (testing === false) { await testChan.send('Settling ties.'); }
+            for (const tie of tiesArray) {
+              const message = rndMatches.find((msg) => parseInt(msg.content.slice(8, msg.content.indexOf(':'))) === parseInt(tie.match));
+              const msg = message.content.replace('**Match', '**Tie').replace(/\s-\s<*(https?|ftp):\/\/(-\.)?([^\s/?.#-]+\.?)+(\/[^\s]*)?>*[^\n]*/g, '');
+              await musicChan.send(msg);
               await sleep(5 * 1000);
-              await musicChan.send(`Winner: ${t.emoji}`);
-              await testMusic.send(`Winner: ${t.emoji}`);
+              await musicChan.send(`Winner: ${tie.emoji}`);
               await sleep(3 * 1000);
-            });
+              if (testing === false) {
+                await testChan.send(msg);
+                await testChan.send(`Winner: ${tie.emoji}`);
+              }
+            }
           }
 
           if (round !== '3P') {
             let msg = '';
-            if (roundEndTime.plus({ hours: roundMax }) > 20
-              || roundEndTime.plus({ hours: roundMax }) < 5) {
+            if (roundEndTime.plus({ hours: roundMax }).hours > 20
+              || roundEndTime.plus({ hours: roundMax }).hours < 5) {
               now = DateTime.now();
               const tomorrow = now.plus({ days: 1 });
               const fiveamtomorrow = DateTime.fromObject({
@@ -307,11 +323,11 @@ const checkRound = async () => {
               const resumeTime = Duration.fromObject({
                 hours: 1 - (now.hour % 2),
                 minutes: 60 - now.minute,
-              }).toFormat('h m');
+              });
               msg = `The next round will begin in ${resumeTime.hours > 0 ? `${resumeTime.hours}h` : ''}${resumeTime.minutes}m.`;
             }
             await musicChan.send(msg);
-            await testChan.send(msg);
+            if (testing === false) { await testChan.send(msg); }
           }
         } else if (now < roundEndTime.plus({ hours: roundMinWarn })) {
           console.log('Awaiting minimum time elapsed.');
