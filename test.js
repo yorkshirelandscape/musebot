@@ -183,7 +183,6 @@ const checkRound = async () => {
         // if 80% are checked in and the round is half over OR
         // the round has one hour left to go, issue the 1-hour warning
         now = DateTime.now();
-        console.log(roundEndTime.plus({ hours: roundMaxWarn }).minus({ minutes: 15 }));
         if ((pctCheckedIn >= 0.8
             && now > roundEndTime.plus({ hours: roundMinWarn }).minus({ minutes: 15 }))
             || now > roundEndTime.plus({ hours: roundMaxWarn }).minus({ minutes: 15 })) {
@@ -326,7 +325,7 @@ const checkRound = async () => {
         }
       } else { console.log('Round in progress.'); }
     });
-  } else { console.log('Bot enabled. Round in progress?'); }
+  } else { console.log(`${botState === 'GO' ? 'Bot enabled. Round in progress?' : 'Warning already issued.'}`); }
 };
 
 client.once('ready', () => {
