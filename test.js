@@ -125,10 +125,10 @@ const checkRound = async () => {
 
     const round = valueRanges[0].values[0].toString();
     const size = parseInt(valueRanges[5].values[0].toString());
-    // const year = parseInt(valueRanges[6].values[0].toString());
+    const year = parseInt(valueRanges[6].values[0].toString());
     const rndVal = parseInt(round.slice(1));
 
-    // fetch the last 150 messages (this should cover even the longest rounds)
+    // fetch the last 200 messages (this should cover even the longest rounds)
     fetchMany(channel, 200).then(async (messages) => {
       // of those, find the most recent messages that begin and end a round
       const roundStart = await messages.find((msg) => msg.content.includes('Begins————'));
@@ -137,7 +137,7 @@ const checkRound = async () => {
       // if the most recent round is complete,
       // fetch the reactions from the check-in and check-out messages
       if (roundStart.createdTimestamp < roundEnd.createdTimestamp) {
-        const checkIns = await getChecks(channel, 'if you plan on voting');
+        const checkIns = await getChecks(channel, `if you plan on voting in the ${year}`);
         const checkOuts = await getChecks(channel, 'you have checked in and are done voting');
 
         // find the check-ins without check-outs and vice versa, then calculate the pct checked in
@@ -169,20 +169,21 @@ const checkRound = async () => {
         const roundMinWarn = roundMin - 1;
         let roundMaxWarn = roundMax - 1;
 
-        if (roundEndTime.plus({ hours: roundMax }) > 20
-          || roundEndTime.plus({ hours: roundMax }) < 5) {
+        if (roundEndTime.plus({ hours: roundMax }).hours > 20
+          || roundEndTime.plus({ hours: roundMax }).hours < 5) {
           now = DateTime.now();
-          const tmrwStart = DateTime.now();
-          tmrwStart.plus({ days: 1 });
-          tmrwStart.set({ hour: 5 });
-          tmrwStart.set({ minute: 0 });
-          tmrwStart.set({ millisecond: 0 });
-          roundMaxWarn += tmrwStart.diff(roundEndTime, 'hours');
+          const delayStart = DateTime.now();
+          delayStart.plus({ days: roundEndTime.plus({ hours: roundMax }).hours > 20 ? 1 : 0 });
+          delayStart.set({ hour: 5 });
+          delayStart.set({ minute: 0 });
+          delayStart.set({ millisecond: 0 });
+          roundMaxWarn += delayStart.diff(roundEndTime, 'hours').hours;
         }
 
         // if 80% are checked in and the round is half over OR
         // the round has one hour left to go, issue the 1-hour warning
         now = DateTime.now();
+        console.log(roundEndTime.plus({ hours: roundMaxWarn }).minus({ minutes: 15 }));
         if ((pctCheckedIn >= 0.8
             && now > roundEndTime.plus({ hours: roundMinWarn }).minus({ minutes: 15 }))
             || now > roundEndTime.plus({ hours: roundMaxWarn }).minus({ minutes: 15 })) {
