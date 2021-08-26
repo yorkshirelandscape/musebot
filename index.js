@@ -381,7 +381,13 @@ const getMsg = async (rng, auth) => {
       spreadsheetId: SPREADSHEET_ID,
       range: rng,
     });
-    return response.data.values[0][0];
+    let value;
+    try {
+      [[value]] = response.data.values;
+    } catch (err) {
+      value = response.data.values;
+    }
+    return value;
   } catch (err) {
     console.log(`getMsg API returned an error for range "${rng}"`, err);
     throw err;
