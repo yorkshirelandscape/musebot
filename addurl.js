@@ -64,6 +64,7 @@ client.on('interactionCreate', async (interaction) => {
 
       const readVals = await getValue(READ_RANGE);
       const searchArr = [];
+      console.log(readVals);
       readVals.map((row) => searchArr.push(row[0]));
       const songText = currentText.match(/(?<=\u200b )[^\u200b-]+(?=\s-)/g);
       const writeIndex = searchArr.indexOf(songText[song - 1]) + 2;
@@ -149,13 +150,7 @@ const getMsg = async (rng, auth) => {
       spreadsheetId: SPREADSHEET_ID,
       range: rng,
     });
-    let value;
-    try {
-      [[value]] = response.data.values;
-    } catch (err) {
-      value = response.data.values;
-    }
-    return value;
+    return response.data.values;
   } catch (err) {
     console.log(`getMsg API returned an error for range "${rng}"`, err);
     throw err;
