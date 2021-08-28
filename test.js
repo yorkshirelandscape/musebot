@@ -349,7 +349,8 @@ const checkRound = async () => {
               const minSubTime = now.plus({ hours: minSub });
               const maxSubTime = now.plus({ hours: maxSub });
               msg = `Submissions for ${nextYear} are due between approximately <t:${minSubTime.valueOf() / 1000}:F> and <t:${maxSubTime.valueOf() / 1000}:F>.`;
-              await musicChan.send(msg);
+              const sent = await musicChan.send(msg);
+              await sent.pin();
               if (testing === false) { await testChan.send(msg); }
             }
           }
