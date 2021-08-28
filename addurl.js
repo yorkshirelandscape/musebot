@@ -64,7 +64,6 @@ client.on('interactionCreate', async (interaction) => {
 
       const readVals = await getValue(READ_RANGE);
       const searchArr = [];
-      console.log(readVals);
       readVals.map((row) => searchArr.push(row[0]));
       const songText = currentText.match(/(?<=\u200b )[^\u200b-]+(?=\s-)/g);
       const writeIndex = searchArr.indexOf(songText[song - 1]) + 2;

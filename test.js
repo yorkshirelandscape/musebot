@@ -179,8 +179,19 @@ const checkRound = async () => {
           roundMax = 24;
         }
 
-        const roundMinWarn = roundMin - 1;
+        let roundMinWarn = roundMin - 1;
         let roundMaxWarn = roundMax - 1;
+
+        if (roundEndTime.plus({ hours: roundMin }).hours > 20
+          || roundEndTime.plus({ hours: roundMin }).hours < 5) {
+          now = DateTime.now();
+          const delayStart = DateTime.now();
+          delayStart.plus({ days: roundEndTime.plus({ hours: roundMin }).hours > 20 ? 1 : 0 });
+          delayStart.set({ hour: 5 });
+          delayStart.set({ minute: 0 });
+          delayStart.set({ millisecond: 0 });
+          roundMinWarn += delayStart.diff(roundEndTime, 'hours').hours;
+        }
 
         if (roundEndTime.plus({ hours: roundMax }).hours > 20
           || roundEndTime.plus({ hours: roundMax }).hours < 5) {
@@ -335,7 +346,7 @@ const checkRound = async () => {
         } else {
           console.log('Awaiting 80%.');
           console.log(`${(pctCheckedIn * 100).toFixed(1)}%`);
-          console.log(roundEndTime.plus({ hours: roundMinWarn }).toFormat('M/d/yyyy HH:mm'));
+          console.log('MaxWarn:', roundEndTime.plus({ hours: roundMaxWarn }).toFormat('M/d/yyyy HH:mm'));
           console.log('Missing:', missingList);
           console.log('Extra:', extraList);
         }
