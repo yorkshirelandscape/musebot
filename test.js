@@ -36,6 +36,7 @@ const REFS = {
   match: 'Dashboard!D3:E6',
   size: 'Dashboard!B5',
   year: 'Dashboard!B1',
+  nextYear: 'Lists!L8',
 };
 
 let testing = false;
@@ -339,6 +340,18 @@ const checkRound = async () => {
             }
             await musicChan.send(msg);
             if (testing === false) { await testChan.send(msg); }
+
+            if (rndVal >= 2) {
+              const nextYear = parseInt(valueRanges[7].values[0].toString());
+              const minSub = (5 - rndVal) * 12 + 24;
+              const maxSub = (6 - rndVal) * 24;
+              now = DateTime.now();
+              const minSubTime = now.plus({ hours: minSub });
+              const maxSubTime = now.plus({ hours: maxSub });
+              msg = `Submissions for ${nextYear} are due between approximately <t:${minSubTime.valueOf() / 1000}:F> and <t:${maxSubTime.valueOf() / 1000}:F>.`;
+              await musicChan.send(msg);
+              if (testing === false) { await testChan.send(msg); }
+            }
           }
         } else if (now < roundEndTime.plus({ hours: roundMinWarn })) {
           console.log('Awaiting minimum time elapsed.');
