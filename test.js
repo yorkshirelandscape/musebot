@@ -37,6 +37,7 @@ const REFS = {
   size: 'Dashboard!B5',
   year: 'Dashboard!B1',
   nextYear: 'Lists!L8',
+  unsubmitted: 'Lists!J2:J',
 };
 
 let testing = false;
@@ -50,6 +51,7 @@ process.argv.forEach((val) => {
   if (val === '-f') { force = true; }
 });
 
+const GUILD_ID = (testing === true ? '782213860337647636' : '212660788786102272');
 const SKYNET = '864768873270345788';
 const TEST_VOTES = '876135378346733628';
 const DOM_MUSIC = '246342398123311104';
@@ -213,9 +215,8 @@ const checkRound = async () => {
             || now > roundEndTime.plus({ hours: roundMaxWarn }).minus({ minutes: 15 })) {
           if (pctCheckedIn < 1 && force === false) {
             const msg = `One-Hour Warning
-              ${(pctCheckedIn * 100).toFixed(1)}% checked in.
-              Missing: ${missingTagList}
-              ${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
+            ${(pctCheckedIn * 100).toFixed(1)}% checked in.
+            Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
             await musicChan.send(msg);
             await testMusic.send(msg);
 
@@ -340,6 +341,37 @@ const checkRound = async () => {
             }
             await musicChan.send(msg);
             if (testing === false) { await testChan.send(msg); }
+
+            if (rndVal === 6) {
+              const userList = [];
+              valueRanges[9].values.forEach((u) => userList.push(
+                { user: u[0], username: u[1], nickname: u[2] },
+              ));
+              const unsubmittedList = valueRanges[8].values.map((u) => u[0]);
+              userList.filter((u) => unsubmittedList.includes(u.user)
+                && (u.user !== u.username || typeof u.nickname !== 'undefined'))
+                .forEach((u) => {
+                  unsubmittedList.push(u.username);
+                  unsubmittedList.push(u.nickname);
+                });
+              const guild = client.guilds.cache.get(GUILD_ID);
+              await guild.members.fetch();
+              // eslint-disable-next-line max-len
+              const unsubUsers = guild.members.cache.filter((u) => unsubmittedList.includes(u.user.username)
+                || unsubmittedList.includes(u.nickname));
+              const unsubList = [];
+              unsubUsers.each((u) => {
+                unsubList.push({ user: u.user.username, id: u.user.id });
+              });
+              unsubList.sort((a, b) => {
+                const result = a.user.toLowerCase().localeCompare(b.user.toLowerCase());
+                return result;
+              });
+              const unsubTagList = unsubList.map((u) => `<@!${u.id}>`).join(', ');
+              msg = `Submissions are due at the end of the final round. Still awaiting submissions from:
+              ${unsubTagList}`;
+              await musicChan.send(msg);
+            }
 
             if (rndVal >= 2) {
               const nextYear = parseInt(valueRanges[7].values[0].toString());

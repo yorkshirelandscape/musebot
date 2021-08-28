@@ -19,5 +19,5 @@
 - slash command to replace a match (maybe)
 - ~~make names into pings~~
 - react to manual match posts
-- year end automatic estimates
+- ~~year end automatic estimates~~
 - reminders to submit for next year
