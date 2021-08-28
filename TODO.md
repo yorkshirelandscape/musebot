@@ -20,4 +20,4 @@
 - ~~make names into pings~~
 - react to manual match posts
 - ~~year end automatic estimates~~
-- reminders to submit for next year
+- ~~reminders to submit for next year~~

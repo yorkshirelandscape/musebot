@@ -70,7 +70,7 @@ client.on('interactionCreate', async (interaction) => {
       const writeRange = `Dashboard!L${writeIndex}`;
 
       if (writeIndex > -1) {
-        await setValue(writeRange, ` | ${url}`);
+        await setValue(writeRange, ` | <${url}>`);
       } else {
         console.log('Error writing to spreadsheet.');
       }
