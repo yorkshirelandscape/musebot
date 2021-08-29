@@ -375,8 +375,8 @@ const checkRound = async () => {
 
             if (rndVal >= 2) {
               const nextYear = parseInt(valueRanges[7].values[0].toString());
-              const minSub = (5 - rndVal) * 12 + 24;
-              const maxSub = (6 - rndVal) * 24;
+              const minSub = (6 - rndVal) * 12 + 24;
+              const maxSub = (7 - rndVal) * 24;
               now = DateTime.now();
               const minSubTime = now.plus({ hours: minSub });
               const maxSubTime = now.plus({ hours: maxSub });
