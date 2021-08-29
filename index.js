@@ -265,9 +265,9 @@ const nextMatch = async (matches) => {
     }
     now = DateTime.now();
     const footMsg = footer.replace('$1', roundMin)
-      .replace('$2', `<t:${Math.round(now.plus({ hours: roundMin }).valueOf() / 1000)}:F>`)
+      .replace('$2', `<t:${Math.round(now.plus({ hours: roundMin }).minus({ minutes: 15 }).valueOf() / 1000)}:F>`)
       .replace('$3', roundMax)
-      .replace('$4', `<t:${Math.round(now.plus({ hours: roundMax }).valueOf() / 1000)}:F>`);
+      .replace('$4', `<t:${Math.round(now.plus({ hours: roundMax }).minus({ minutes: 15 }).valueOf() / 1000)}:F>`);
     const sent = await channel.send(footMsg);
     const sentTest = await testChan.send(footMsg);
 
