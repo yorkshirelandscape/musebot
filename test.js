@@ -135,7 +135,7 @@ const checkRound = async () => {
   const recentSkynet = await testMusic.messages.fetch({ limit: 1 });
   const warnMsg = await recentSkynet.find((msg) => msg.content.includes('One-Hour Warning'));
 
-  if (botState === 'STOP' && !warnMsg && force === false) {
+  if (botState === 'STOP' && (!warnMsg || force === true)) {
     // Even though REFS is an object, order is guaranteed for non-string keys
     const valueRanges = await getValues(Object.values(REFS));
 
@@ -380,7 +380,7 @@ const checkRound = async () => {
               now = DateTime.now();
               const minSubTime = now.plus({ hours: minSub });
               const maxSubTime = now.plus({ hours: maxSub });
-              msg = `Submissions for ${nextYear} are due between approximately <t:${minSubTime.valueOf() / 1000}:F> and <t:${maxSubTime.valueOf() / 1000}:F>.`;
+              msg = `Submissions for ${nextYear} are due between approximately <t:${round(minSubTime.valueOf()) / 1000}:F> and <t:${round(maxSubTime.valueOf()) / 1000}:F>.`;
               const sent = await musicChan.send(msg);
               await sent.pin();
               if (testing === false) { await testChan.send(msg); }
