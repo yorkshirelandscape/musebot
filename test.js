@@ -135,7 +135,7 @@ const checkRound = async () => {
   const recentSkynet = await testMusic.messages.fetch({ limit: 1 });
   const warnMsg = await recentSkynet.find((msg) => msg.content.includes('One-Hour Warning'));
 
-  if (botState === 'STOP' && !warnMsg) {
+  if (botState === 'STOP' && !warnMsg && force === false) {
     // Even though REFS is an object, order is guaranteed for non-string keys
     const valueRanges = await getValues(Object.values(REFS));
 
