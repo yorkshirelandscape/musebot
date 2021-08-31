@@ -312,8 +312,8 @@ const checkRound = async () => {
               await musicChan.send(`Winner: ${tie.emoji}`);
               await sleep(3 * 1000);
               if (testing === false) {
-                await testChan.send(msg);
-                await testChan.send(`Winner: ${tie.emoji}`);
+                await testMusic.send(msg);
+                await testMusic.send(`Winner: ${tie.emoji}`);
               }
             }
           }
