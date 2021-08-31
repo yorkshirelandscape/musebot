@@ -422,7 +422,9 @@ const checkRound = async () => {
           ));
           const missingCheckOut = checkOutCheck.filter((u) => u.missing);
           const deadbeatTagList = missingCheckOut.map((u) => `<@!${u.id}>`).join(', ');
-          await channel.send(`Missing Check-Outs: ${deadbeatTagList}`);
+          const msg = `Missing Check-Outs: ${deadbeatTagList}`;
+          await channel.send(msg);
+          if (testing === false) { await testMusic.send(msg); }
 
           console.log('Awaiting 80%.');
           console.log(`${(pctCheckedIn * 100).toFixed(1)}%`);
