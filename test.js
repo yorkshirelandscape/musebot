@@ -103,7 +103,7 @@ async function fetchMany(channel, limit = 250) {
   return collection;
 }
 
-// function to feath the reactions to the most recent message with the specified content
+// function to fetch the reactions to the most recent message with the specified content
 const getChecks = (channel, search) => new Promise((resolve) => {
   const checkMsg = channel.messages.cache.find((m) => m.content.includes(search));
   checkMsg.reactions.cache.first().users.fetch().then((p) => {
@@ -390,6 +390,40 @@ const checkRound = async () => {
           console.log('Awaiting minimum time elapsed.');
           console.log(roundEndTime.plus({ hours: roundMinWarn }).toFormat('M/d/yyyy HH:mm'));
         } else {
+          // isolate the check-out messages and convert to an array
+          const msgDelims = messages.filter((msg) => msg.content.includes('you have checked in and are done voting') && msg.deleted === false);
+          // filter all the messages for those between the two most recent delimiters
+          const rndMatches = messages.filter((msg) => (
+            msg.createdTimestamp < msgDelims.first(2)[0].createdTimestamp
+            && msg.createdTimestamp > msgDelims.first(2)[1].createdTimestamp
+            && msg.deleted === false && msg.content.includes('Match')
+          ));
+
+          // create an array of the reaction counts for each message
+          const rndMatchesResults = [];
+          rndMatches.each((rm) => {
+            const matchReacts = [];
+            rm.reactions.cache.each(async (r) => {
+              await r.users.fetch();
+              r.users.cache.each((u) => matchReacts.push(u.username));
+            });
+            rndMatchesResults.push(matchReacts);
+          });
+
+          // list users who have voted on each round
+          const missingVoted = [];
+          rndMatchesResults.forEach((m) => {
+            const arr = m.filter((u) => missing.map((mu) => mu.user).includes(u));
+            missingVoted.push(arr);
+          });
+          // see whether they have checked out
+          const checkOutCheck = missing.map((m) => (
+            { user: m.user, id: m.id, missing: missingVoted.every((mv) => mv.includes(m.user)) }
+          ));
+          const missingCheckOut = checkOutCheck.filter((u) => u.missing);
+          const deadbeatTagList = missingCheckOut.map((u) => `<@!${u.id}>`).join(', ');
+          await channel.send(`Missing Check-Outs: ${deadbeatTagList}`);
+
           console.log('Awaiting 80%.');
           console.log(`${(pctCheckedIn * 100).toFixed(1)}%`);
           console.log('MaxWarn:', roundEndTime.plus({ hours: roundMaxWarn }).toFormat('M/d/yyyy HH:mm'));
