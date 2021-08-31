@@ -165,7 +165,7 @@ const getEmoji = async (match) => {
 
 const react = async (message, emojis) => {
   emojis.forEach(async (emoji) => {
-    if (typeof emoji.id !== 'undefined') {
+    if (typeof emoji.id !== 'undefined' && emoji.id !== null) {
       await message.react(emoji.id);
     } else if (typeof emoji.unicode !== 'undefined') {
       await message.react(emoji.unicode);
@@ -235,9 +235,11 @@ const nextMatch = async (matches) => {
 
   let matchText = getMatchText(valueRanges[4].values).replaceAll(/<([^<>]+) >/g, '<$1>');
   const matchEmojis = await findEmojis(matchText);
-  if (matchEmojis[0].name === matchEmojis[1].name) {
+  if (matchEmojis[0].name === matchEmojis[1].name
+    || (matchEmojis[0].id === matchEmojis[1].id && typeof matchEmojis[0].id !== 'undefined')) {
     matchEmojis[0].replacement = EMOJI_ONE;
     matchEmojis[0].unicode = EMOJI_ONE;
+    matchEmojis[0].id = null;
   }
   matchText = replaceEmojis(matchText, matchEmojis);
 
