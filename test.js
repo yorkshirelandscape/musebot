@@ -215,8 +215,8 @@ const checkRound = async () => {
             || now > roundEndTime.plus({ hours: roundMaxWarn }).minus({ minutes: 16 })) {
           if (pctCheckedIn < 1 && force === false) {
             const msg = `One-Hour Warning
-            ${(pctCheckedIn * 100).toFixed(1)}% checked in.
-            Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
+${(pctCheckedIn * 100).toFixed(1)}% checked in.
+Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
             await musicChan.send(msg);
             await testMusic.send(msg);
 
@@ -380,7 +380,7 @@ const checkRound = async () => {
               now = DateTime.now();
               const minSubTime = now.plus({ hours: minSub });
               const maxSubTime = now.plus({ hours: maxSub });
-              msg = `Submissions for ${nextYear} are due between approximately <t:${round(minSubTime.valueOf() / 1000)}:F> and <t:${round(maxSubTime.valueOf() / 1000)}:F>.`;
+              msg = `Submissions for ${nextYear} are due between approximately <t:${Math.round(minSubTime.valueOf() / 1000)}:F> and <t:${Math.round(maxSubTime.valueOf() / 1000)}:F>.`;
               const sent = await musicChan.send(msg);
               await sent.pin();
               if (testing === false) { await testChan.send(msg); }
