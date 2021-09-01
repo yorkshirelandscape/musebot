@@ -423,8 +423,7 @@ const checkRound = async () => {
           const missingCheckOut = checkOutCheck.filter((u) => u.missing);
           const deadbeatTagList = missingCheckOut.map((u) => `<@!${u.id}>`).join(', ');
           const msg = `Missing Check-Outs: ${deadbeatTagList}`;
-          console.log(missingCheckOut);
-          if (missingCheckOut) {
+          if (missingCheckOut.length > 0) {
             await channel.send(msg);
             if (testing === false) { await testMusic.send(msg); }
           }
