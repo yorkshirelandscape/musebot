@@ -380,7 +380,7 @@ const checkRound = async () => {
               now = DateTime.now();
               const minSubTime = now.plus({ hours: minSub });
               const maxSubTime = now.plus({ hours: maxSub });
-              msg = `Submissions for ${nextYear} are due between approximately <t:${round(minSubTime.valueOf()) / 1000}:F> and <t:${round(maxSubTime.valueOf()) / 1000}:F>.`;
+              msg = `Submissions for ${nextYear} are due between approximately <t:${round(minSubTime.valueOf() / 1000)}:F> and <t:${round(maxSubTime.valueOf() / 1000)}:F>.`;
               const sent = await musicChan.send(msg);
               await sent.pin();
               if (testing === false) { await testChan.send(msg); }
@@ -423,6 +423,7 @@ const checkRound = async () => {
           const missingCheckOut = checkOutCheck.filter((u) => u.missing);
           const deadbeatTagList = missingCheckOut.map((u) => `<@!${u.id}>`).join(', ');
           const msg = `Missing Check-Outs: ${deadbeatTagList}`;
+          console.log(missingCheckOut);
           if (missingCheckOut) {
             await channel.send(msg);
             if (testing === false) { await testMusic.send(msg); }
