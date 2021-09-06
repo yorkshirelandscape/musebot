@@ -72,14 +72,10 @@ client.on('interactionCreate', async (interaction) => {
       if (writeIndex > -1) {
         await setValue(writeRange, ` | <${url}>`);
       } else {
-        console.log('Error writing to spreadsheet.');
+        await interaction.reply(`${interaction.user.username} added a link to song ${song} of match ${match}, but error writing to spreadsheet.`);
       }
 
-      if (currentText === newText) {
-        await interaction.reply('Replacement failed.');
-      } else {
-        await interaction.reply(`${interaction.user.username} added a link to song ${song} of match ${match}.`);
-      }
+      await interaction.reply(`${interaction.user.username} added a link to song ${song} of match ${match}.`);
     }
   }
 });
