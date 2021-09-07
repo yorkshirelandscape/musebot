@@ -256,9 +256,8 @@ const nextMatch = async (matches) => {
     let roundMin = 12;
     let roundMax = 24;
     if (rndVal === 0
-      || (rndVal === 1 && size === 96)
-      || (rndVal === 2 && (size === 64 || size === 48))
-      || (rndVal === 3 && size < 64)) {
+      || (rndVal === 1 && (size === 64 || size === 48))
+      || (rndVal === 2 && size < 64)) {
       roundMin = 24;
       roundMax = 36;
     } else if (round === '3P') {
