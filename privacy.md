@@ -1,0 +1,1 @@
+This application was created for the sole use of its creators. Any use by a third party is done at their own risk. That being said, the developers respect everyone's data privacy rights and would not access any user's personal data except as needed by the application, nor would they share or sell said personal data.
