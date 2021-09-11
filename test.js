@@ -379,7 +379,29 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
               now = DateTime.now();
               const minSubTime = now.plus({ hours: minSub });
               const maxSubTime = now.plus({ hours: maxSub });
-              msg = `Submissions for ${nextYear} are due between approximately <t:${Math.round(minSubTime.valueOf() / 1000)}:F> and <t:${Math.round(maxSubTime.valueOf() / 1000)}:F>.`;
+
+              if (minSubTime.hours > 20 || minSubTime.hours < 5) {
+                const minNextDay = minSubTime.plus({ days: 1 });
+                const minFiveamNext = DateTime.fromObject({
+                  year: minNextDay.year,
+                  month: minNextDay.month,
+                  day: minNextDay.day,
+                  hour: 5,
+                });
+                msg = `Submissions for ${nextYear} are due between approximately <t:${Math.round(minFiveamNext.valueOf() / 1000)}:F> and <t:${Math.round(maxSubTime.valueOf() / 1000)}:F>.`;
+              } else if (maxSubTime.hours > 20 || maxSubTime.hours < 5) {
+                const maxNextDay = maxSubTime.plus({ days: 1 });
+                const maxFiveamNext = DateTime.fromObject({
+                  year: maxNextDay.year,
+                  month: maxNextDay.month,
+                  day: maxNextDay.day,
+                  hour: 5,
+                });
+                msg = `Submissions for ${nextYear} are due between approximately <t:${Math.round(minSubTime.valueOf() / 1000)}:F> and <t:${Math.round(maxFiveamNext.valueOf() / 1000)}:F>.`;
+              } else {
+                msg = `Submissions for ${nextYear} are due between approximately <t:${Math.round(minSubTime.valueOf() / 1000)}:F> and <t:${Math.round(maxSubTime.valueOf() / 1000)}:F>.`;
+              }
+
               const sent = await musicChan.send(msg);
               await sent.pin();
               if (testing === false) { await testChan.send(msg); }
