@@ -302,7 +302,7 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
 
           if (tiesArray.length > 0) {
             await musicChan.send('Settling ties.');
-            if (testing === false) { await testChan.send('Settling ties.'); }
+            if (testing === false) { await testMusic.send('Settling ties.'); }
             for (const tie of tiesArray) {
               const message = rndMatches.find((msg) => parseInt(msg.content.slice(8, msg.content.indexOf(':'))) === parseInt(tie.match));
               const msg = message.content.replace('**Match', '**Tie').replace(/\s-\s<*(https?|ftp):\/\/(-\.)?([^\s/?.#-]+\.?)+(\/[^\s]*)?>*[^\n]*/g, '');
@@ -339,7 +339,7 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
               msg = `The next round will begin in ${resumeTime.hours > 0 ? `${resumeTime.hours}h` : ''}${resumeTime.minutes}m.`;
             }
             await musicChan.send(msg);
-            if (testing === false) { await testChan.send(msg); }
+            if (testing === false) { await testMusic.send(msg); }
 
             if (rndVal === 6) {
               const userList = [];
@@ -370,6 +370,7 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
               msg = `Submissions are due at the end of the final round. Still awaiting submissions from:
               ${unsubTagList}`;
               await musicChan.send(msg);
+              if (testing === false) { await testMusic.send(msg); }
             }
 
             if (rndVal >= 2) {
@@ -404,7 +405,7 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
 
               const sent = await musicChan.send(msg);
               await sent.pin();
-              if (testing === false) { await testChan.send(msg); }
+              if (testing === false) { await testMusic.send(msg); }
             }
           }
         } else if (now < roundEndTime.plus({ hours: roundMinWarn })) {
@@ -442,6 +443,7 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
             { user: m.user, id: m.id, missing: missingVoted.every((mv) => mv.includes(m.user)) }
           ));
           const missingCheckOut = checkOutCheck.filter((u) => u.missing);
+          console.log(missingCheckOut.toString());
           const deadbeatTagList = missingCheckOut.map((u) => `<@!${u.id}>`).join(', ');
           const msg = `Missing Check-Outs: ${deadbeatTagList}`;
           if (missingCheckOut.length > 0) {
