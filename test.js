@@ -129,7 +129,7 @@ const checkRound = async () => {
   const botState = await getValue(BOT_STATE_REF);
   const channel = client.channels.cache.get(CHANNEL_ID);
   const musicChan = client.channels.cache.get(MUSIC_ID);
-  const testChan = client.channels.cache.get(TEST_VOTES);
+  // const testChan = client.channels.cache.get(TEST_VOTES);
   const testMusic = client.channels.cache.get(SKYNET);
 
   const recentSkynet = await testMusic.messages.fetch({ limit: 1 });
@@ -186,7 +186,6 @@ const checkRound = async () => {
 
         if (roundEndTime.plus({ hours: roundMin }).hours > 20
           || roundEndTime.plus({ hours: roundMin }).hours < 5) {
-          now = DateTime.now();
           const delayStart = DateTime.now();
           delayStart.plus({ days: roundEndTime.plus({ hours: roundMin }).hours > 20 ? 1 : 0 });
           delayStart.set({ hour: 5 });
@@ -197,7 +196,6 @@ const checkRound = async () => {
 
         if (roundEndTime.plus({ hours: roundMax }).hours > 20
           || roundEndTime.plus({ hours: roundMax }).hours < 5) {
-          now = DateTime.now();
           const delayStart = DateTime.now();
           delayStart.plus({ days: roundEndTime.plus({ hours: roundMax }).hours > 20 ? 1 : 0 });
           delayStart.set({ hour: 5 });
@@ -343,7 +341,7 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
 
             if (rndVal === 6) {
               const userList = [];
-              valueRanges[9].values.forEach((u) => userList.push(
+              valueRanges[8].values.forEach((u) => userList.push(
                 { user: u[0], username: u[1], nickname: u[2] },
               ));
               const unsubmittedList = valueRanges[8].values.map((u) => u[0]);
