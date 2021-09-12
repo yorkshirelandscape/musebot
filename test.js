@@ -38,6 +38,7 @@ const REFS = {
   year: 'Dashboard!B1',
   nextYear: 'Lists!L8',
   unsubmitted: 'Lists!J2:J',
+  userList: 'Lists!N2:P',
 };
 
 let testing = false;
@@ -341,7 +342,7 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
 
             if (rndVal === 6) {
               const userList = [];
-              valueRanges[8].values.forEach((u) => userList.push(
+              valueRanges[9].values.forEach((u) => userList.push(
                 { user: u[0], username: u[1], nickname: u[2] },
               ));
               const unsubmittedList = valueRanges[8].values.map((u) => u[0]);
