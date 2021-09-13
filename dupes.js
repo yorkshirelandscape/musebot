@@ -1,6 +1,7 @@
 /* eslint-disable consistent-return */
-/* eslint-disable no-console */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-use-before-define */
+/* eslint-disable no-console */
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -8,9 +9,9 @@ dotenv.config();
 const { Client, Intents } = require('discord.js');
 
 const client = new Client({
-  intents: [
-    Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
+  intents:
+  [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    Intents.FLAGS.DIRECT_MESSAGES],
 });
 
 const fs = require('fs');
@@ -24,59 +25,86 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // time.
 const TOKEN_PATH = 'token.json';
 
-const testing = false;
+const REFS = {
+  year: 'Dashboard!B1',
+  dupes: 'Dupes!A2:M'
+};
 
-const CHANNEL_ID = (testing === true ? '876135378346733628' : '751893730117812225');
-const SOURCE_CHANNELS = [
-  { name: 'music', id: '246342398123311104' },
-  { name: 'music-meta', id: '763068914480840715' },
-  { name: 'skynet', id: '864768873270345788' },
-];
+let skipstat = false;
+let testing = false;
+let once = true;
+
+process.argv.forEach((val) => {
+  if (val === '-s') { skipstat = true; }
+  if (val === '-t') { testing = true; }
+  if (val === '-o') { once = true; }
+});
+
+const GUILD_ID = (testing === true ? '782213860337647636' : '212660788786102272');
 const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1mBjOr2bNpNbPHmRGcPmxpAi3GlF6a5WhtRcjt8TvvP0');
-const READ_RANGE = 'Dashboard!H2:H129';
 
-client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()
-    || !SOURCE_CHANNELS.find(({ id }) => id === interaction.channel.id)) return;
+const { DateTime } = require('luxon');
 
-  if (interaction.commandName === 'addurl') {
-    const channel = client.channels.cache.get(CHANNEL_ID);
-    const match = interaction.options.getInteger('match');
-    const song = interaction.options.getInteger('song');
-    const url = interaction.options.getString('url');
+let now = DateTime.now();
 
-    const messages = await channel.messages.fetch({ limit: 100 });
-    const targetMatch = await messages.find((msg) => parseInt(msg.content.slice(8, msg.content.indexOf(':'))) === match);
-
-    if (typeof targetMatch === 'undefined') {
-      await interaction.reply('Could not find match.');
-    } else {
-      const currentText = targetMatch.content;
-      let newText = '';
-      if (song === 1) {
-        const urlPos1 = currentText.indexOf('\n');
-        const urlPos = currentText.indexOf('\n', urlPos1 + 1);
-        newText = [currentText.slice(0, urlPos), ` | <${url}>`, currentText.slice(urlPos)].join('');
-      } else if (song === 2) {
-        newText = `${currentText} | <${url}>`;
-      }
-      targetMatch.edit(newText);
-
-      const readVals = await getValue(READ_RANGE);
-      const searchArr = [];
-      readVals.map((row) => searchArr.push(row[0]));
-      const songText = currentText.match(/(?<=\u200b )[^\u200b-]+(?=\s-)/g);
-      const writeIndex = searchArr.indexOf(songText[song - 1]) + 2;
-      const writeRange = `Dashboard!L${writeIndex}`;
-
-      if (writeIndex > -1) {
-        await setValue(writeRange, ` | <${url}>`);
-      } else {
-        await interaction.reply(`${interaction.user.username} added a link to song ${song} of match ${match}, but error writing to spreadsheet.`);
-      }
-
-      await interaction.reply(`${interaction.user.username} added a link to song ${song} of match ${match}.`);
+const dupes = async () => {
+  const valueRanges = await getValues(Object.values(REFS));
+  const year = parseInt(valueRanges[0].values[0].toString());
+  const dupeList = [];
+  valueRanges[1].values.forEach((row) => {
+    const listYear = parseInt(row[1]);
+    const listKR = parseInt(row[6]);
+    const listTold = row[9];
+    const listTied = row[10];
+    const listOmit = row[13];
+    if (listYear !== year && (listKR === -1 || listTied === 'X')
+      && (listTold === '' || typeof listTold === 'undefined')
+      && (listOmit === '' || typeof listOmit === 'undefined')) {
+      dupeList.push(row);
     }
+  });
+
+  console.log(dupeList);
+  const guild = client.guilds.cache.get(GUILD_ID);
+  await guild.members.fetch();
+
+  dupeList.forEach((row) => {
+    const listKR = parseInt(row[6]);
+    const listRep = row[8];
+    let msg = '';
+    if (listKR === -1 && listRep === 'X') {
+      msg = `Your #${row[5]} seed, ${row[2]}, has duped. If you wish to make a direct substitution, please contact an admin with your replacement. Otherwise, submit a replacement using https://docs.google.com/forms/d/e/1FAIpQLScu6rcO8nyxyneyYzAnCUmVO6N7m4o4O78KS31SgPUY1Lt8RA/viewform.`
+    } else if (listKR === -1 && listRep !== 'X') {
+      msg = `Your #${row[5]} seed, ${row[2]}, has duped. If you wish to make a direct substitution, please contact an admin with your replacement. Otherwise, your submitted replacements will be promoted in its place.`
+    } else if (listKR === 1) {
+      const tiedUserRow = dupeList.filter((tieRow) => tieRow[1] === row[1] && tieRow[2] === row[2]
+        && tieRow[3] === row[3] && tieRow[0] !== row[0]);
+      const tiedUser = tiedUserRow[0][0];
+      msg = `You and ${tiedUser} both submitted ${row[2]} as your ${row[5]} seed. Please determine between you who will keep and replace. Whoever replaces should inform an admin and, if they have not done so already, submit a replacement using https://docs.google.com/forms/d/e/1FAIpQLScu6rcO8nyxyneyYzAnCUmVO6N7m4o4O78KS31SgPUY1Lt8RA/viewform.`;
+    }
+    const user = guild.members.cache.get((u) => u.user.username === row[0]
+      || u.nickname === row[0]);
+    user.send(msg);
+  });
+};
+
+client.once('ready', () => {
+  console.log('Ready!');
+});
+
+client.on('ready', async () => {
+  if (once === true) {
+    dupes();
+    // client.destroy();
+  } else {
+    now = DateTime.now();
+    const countdown = ((60 - now.second) + 60
+      * (60 - now.minute) + 60 * 60 * (now.hour % 2));
+    console.log(`${now}: Triggering in ${countdown / 60} minutes`);
+    setTimeout(() => {
+      dupes();
+      setInterval(dupes, 2 * 60 * 60 * 1000);
+    }, countdown * 1000);
   }
 });
 
@@ -91,6 +119,8 @@ const loadCredentials = () => {
 };
 
 const getValue = async (rng) => getMsg(rng, await getAuthClient());
+
+const getValues = async (rng) => getMsgs(rng, await getAuthClient());
 
 const setValue = async (rng, val) => setMsg(rng, val, await getAuthClient());
 
@@ -145,9 +175,23 @@ const getMsg = async (rng, auth) => {
       spreadsheetId: SPREADSHEET_ID,
       range: rng,
     });
-    return response.data.values;
+    return response.data.values[0][0];
   } catch (err) {
     console.log(`getMsg API returned an error for range "${rng}"`, err);
+    throw err;
+  }
+};
+
+const getMsgs = async (rng, auth) => {
+  const sheets = google.sheets({ version: 'v4', auth });
+  try {
+    const response = await sheets.spreadsheets.values.batchGet({
+      spreadsheetId: SPREADSHEET_ID,
+      ranges: rng,
+    });
+    return response.data.valueRanges;
+  } catch (err) {
+    console.log(`getMsgs API returned an error for range "${rng}"`, err);
     throw err;
   }
 };

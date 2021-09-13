@@ -57,7 +57,7 @@ const GUILD_ID = (testing === true ? '782213860337647636' : '212660788786102272'
 const TEST_VOTES = '876135378346733628';
 const DOM_VOTES = '751893730117812225';
 const CHANNEL_ID = (testing === true ? TEST_VOTES : DOM_VOTES);
-const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1qQBxqku14GTL70o7rpLEQXil1ghXEHff7Qolhu0XrMs');
+const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1mBjOr2bNpNbPHmRGcPmxpAi3GlF6a5WhtRcjt8TvvP0');
 
 const START_TIME = (skipstat === true ? 0 : 5);
 const END_TIME = (skipstat === true ? 24 : 21);

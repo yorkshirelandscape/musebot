@@ -26,3 +26,4 @@
 - fix token expiration problem
 - clear results for when year ends
 - change bracket year after opening rounds
+- inform submitters when their song dupes
