@@ -1,0 +1,188 @@
+
+4	0	seanahan	2003	Maps	Yeah Yeah Yeahs
+128	5	wharf_rat	2003	Vibrate	Outkast
+59	3	alatar224	2003	No Trust	The Black Keys
+74	3	Sharur	2003	Lucy Mae Blues	Buddy Guy
+
+17	1	jsh	2003	Black Cab	Jens Lekman
+94	4	markusin	2003	Homer's Day (The Simpsons: Hit & Run)	Marc Baril, Allan Levy, and Jeff Tymoschuk
+54	2	Volrath	2003	X Gon' Give It to Ya 	DMX
+86	4	bazkitcase5	2003	So Far Away	Staind
+
+15	1	Donkey-Dude	2003	Put Up Or Shut Up	Gang Starr
+110	5	Dgdanp	2003	Blinded	Third Eye Blind
+42	2	Lemonspawn	2003	My Coco	stellastarr*
+65	3	dryope	2003	Tensor	Carbon Based Lifeforms
+
+27	1	threelinewhip	2003	Deadhead	The Devin Townsend Band
+111	5	Donald X.	2003	Us	Regina Spektor
+52	2	Valendale	2003	Breaking the Habit	Linkin Park
+75	3	singletee	2003	We Will Become Silhouettes	The Postal Service
+
+6	0	tufftaeh	2003	The Closest Thing to Crazy	Katie Melua
+108	5	alatar224	2003	Total Eclipse of the Heart	The Dan Band
+48	2	Sharur	2003	The White Tree	Howard Shore
+82	3	Wonko	2003	True To Myself	Ziggy Marley
+
+22	1	nottoobad	2003	Passenger Seat	Death Cab for Cutie
+89	4	Donald X.	2003	Genius In France	Weird Al Yankovic
+57	2	xyrix	2003	Hustle Rose	Metric
+96	4	Mort	2003	Hope Leaves	Opeth
+
+9	0	wharf_rat	2003	Transdermal Celebration	Ween
+130	5	xyrix	2003	Weather Systems	Andrew Bird
+53	2	volfied	2003	Gay Bar	Electric Six
+72	3	pproteus	2003	Orca	Wintersleep
+
+10	1	aku chi	2003	Mr. Brightside	The Killers
+95	4	Mollo8	2003	Sin Aliento	Santa Sabina
+37	2	Dgdanp	2003	Weapon	Mathew Good
+87	4	Bluey The Bear	2003	The Hardest Button to Button	The White Stripes
+
+
+7	0	Volrath	2003	Windowpane	Opeth
+121	5	seanahan	2003	Queen of the Surface Streets	Devotchka
+81	3	wharf_rat	2003	Hunting Wabbits	Gordon Goodwin's Big Phat Band
+60	3	bazkitcase5	2003	Your Mistake	Sister Hazel
+
+26	1	singletee	2003	Strict Machine	Goldfrapp
+98	4	pproteus	2003	Romulus	Sufjan Stevens
+39	2	Donkey-Dude	2003	X Gon Give It To Ya	DMX
+91	4	dryope	2003	Revelation	Irfan
+
+12	1	bazkitcase5	2003	Who's Gonna Save Us	The Living End
+124	5	tufftaeh	2003	Growing On Me	The Darkness
+34	2	alatar224	2003	I Got My Eyes on You	Robert Belfour
+67	3	Lemonspawn	2003	Now It's On	Grandaddy
+
+14	1	Donald X.	2003	Title and Registration	Death Cab for Cutie
+116	5	markusin	2003	Rupi's Dance	Ian Anderson
+50	2	threelinewhip	2003	Away	The Devin Townsend Band
+106	4	xyrix	2003	Chump Change	The New Pornographers
+
+2	0	Bluey The Bear	2003	There There (The Boney King of Nowhere)	Radiohead
+109	5	Bluey The Bear	2003	In My Bed	Amy Winehouse
+73	3	seanahan	2003	Vehicles and Animals	Athlete
+58	3	aku chi	2003	Why Can't I?	Liz Phair
+
+29	1	volfied	2003	House of Jealous Lovers	The Rapture
+105	4	Wonko	2003	Give Me a Try	Sizzla
+51	2	tufftaeh	2003	Picture Of Innocence	Deep Purple
+97	4	nottoobad	2003	White Flag	Dido
+
+13	1	Dgdanp	2003	A Favor House Atlantic	Cohered and Cambria
+127	5	Volrath	2003	Ruin	Lamb Of God
+43	2	markusin	2003	Sing for Absolution	Muse
+66	3	jsh	2003	Piazza, New York Catcher	Belle & Sebastian
+
+20	1	Mollo8	2003	Eyes Wide Open	King Crimson
+118	5	Mort	2003	Catalyst	Oceansize
+45	2	Mort	2003	Honor Thy Father	Dream Theater
+103	4	Valendale	2003	Another Joe	Masami Ueda & Masakazu Sugimori
+
+
+3	0	seanahan	2003	Red Right Ankle	The Decemberists
+112	5	Donkey-Dude	2003	Sweet Amber	Metallica
+80	3	Volrath	2003	I Don't Wanna Be Me	Type O Negative
+70	3	Mort	2003	The Noose	A Perfect Circle
+
+16	1	dryope	2003	Sparkling Truth	Dhafer Youssef
+85	4	alatar224	2003	Siam vs. Mexico (The Saddest Music in the World)	Xio Nan Wang, The Mini-Mariachis
+35	2	bazkitcase5	2003	Dare You To Move	Switchfoot
+101	4	threelinewhip	2003	A Room and a Riddle	Hammers of Misfortune
+
+32	1	xyrix	2003	Easy Lee	Ricardo Villalobos
+123	5	singletee	2003	Loreley	Blackmore's Night
+47	2	pproteus	2003	Reptilia	The Strokes
+69	3	Mollo8	2003	The Paper-Hearted Ghost	Chamber
+
+19	1	markusin	2003	Trogdor	Strong Bad
+114	5	jsh	2003	Black Math	The White Stripes
+49	2	singletee	2003	Toxic	Britney Spears
+79	3	volfied	2003	Gravedigger	Dave Matthews
+
+1	0	bazkitcase5	2003	Bring Me To Life	Evanescence
+107	5	aku chi	2003	One Big Holiday	My Morning Jacket
+61	3	Bluey The Bear	2003	New Killer Star	David Bowie
+62	3	Dgdanp	2003	Dream to Make Believe	Armor For Sleep
+
+18	1	Lemonspawn	2003	Defying Gravity	Idina Menzel, Kristin Chenoweth
+99	4	Sharur	2003	Have Love, Will Travel	The Black Keys
+38	2	Donald X.	2003	All For Swinging You Around	The New Pornographers
+102	4	tufftaeh	2003	Tear Off Your Own Head	The Bangles
+
+30	1	wharf_rat	2003	Tweezer | 2/28/03 | Uniondale, NY	Phish
+119	5	nottoobad	2003	Cavalier Eternal	Against Me!
+56	2	Wonko	2003	Through the Wire	Kanye West
+71	3	nottoobad	2003	Callin' Out	Lyrics Born
+
+28	1	Valendale	2003	J'en ai marre!	Alizée
+84	4	aku chi	2003	Hysteria	Muse
+41	2	jsh	2003	The First Single	The Format
+90	4	Donkey-Dude	2003	Son et Lumiere / Inertiatic Esp	The Mars Volta
+
+
+8	0	Volrath	2003	Seven Nation Army	The White Stripes
+126	5	volfied	2003	Out of Time	Blur
+77	3	tufftaeh	2003	Did I Say That?	Meat Loaf
+76	3	threelinewhip	2003	Go To Sleep	Radiohead
+
+25	1	Sharur	2003	Hardware Store	"Weird Al" Yankovic
+92	4	jsh	2003	O Vencedor	Los Hermanos
+36	2	Bluey The Bear	2003	迷彩 [Meisai]	Sheena Ringo
+100	4	singletee	2003	As the Rush Comes	Motorcycle
+
+21	1	Mort	2003	I am the Morning	Oceansize
+120	5	pproteus	2003	Slipping Husband	The National
+44	2	Mollo8	2003	Rucci	Austin TV
+63	3	Donald X.	2003	Bouncer's Conversation	Liz Phair
+
+11	1	alatar224	2003	Ridiculosous	Electrocution 250
+117	5	Mollo8	2003	Hey! Amigo!	Alizée
+46	2	nottoobad	2003	Far From Any Road	The Handsome Family
+78	3	Valendale	2003	Angry White Polka	Weird Al Yankovic
+
+5	0	Sharur	2003	Instrumental Illness	The Allman Brothers Band
+122	5	Sharur	2003	Shadow Boxed	Procol Harum
+64	3	Donkey-Dude	2003	In My Time of Need	Opeth
+83	3	xyrix	2003	Galang	M.I.A.
+
+31	1	Wonko	2003	Art is Hard	Cursive
+93	4	Lemonspawn	2003	Kissing the Lipless	The Shins
+55	2	wharf_rat	2003	I Saw A Hippie Girl On 8th Avenue	Jeffrey Lewis
+104	4	volfied	2003	Loneliness	Annie Lennox
+
+24	1	seanahan	2003	The Quiet Things That No One Ever Knows	Brand New
+129	5	Wonko	2003	Time	East Star All-stars
+40	2	dryope	2003	Sogeki-syu	Susumu Hirasawa
+68	3	markusin	2003	Missouri Loves Company	Ringo Starr
+
+23	1	pproteus	2003	Where Is The Love?	The Black Eyed Peas
+113	5	dryope	2003	Seventh Heaven Suite	Dhafer Youssef
+33	2	aku chi	2003	Hands Down	Dashboard Confessional
+88	4	Dgdanp	2003	Meant to Live	Switchfoot
+
+125	5	Valendale	2003	Faint	Linkin Park
+115	5	Lemonspawn	2003	I Believe in a Thing Called Love	The Darkness
+143	6	nottoobad	2003	If I Ain't Got You	Alicia Keys
+138	6	dryope	2003	Outhouse	Nathan Fake
+149	6	volfied	2003	One Bedroom	The Sea and Cake
+145	6	seanahan	2003	Televators	The Mars Volta
+150	6	wharf_rat	2003	Beat Laments the World	Nujabes
+131	6	aku chi	2003	My Last Breath	Evanescence
+147	6	tufftaeh	2003	Angeline	Blackberry Smoke
+152	6	xyrix	2003	D Song	Bonobo
+140	6	Lemonspawn	2003	Such Great Heights	The Postal Service
+141	6	markusin	2003	Rainmaker	Iron Maiden
+139	6	Jsh	2003	I Was Born (A Unicorn)	The Unicorns
+137	6	Donkey-Dude	2003	Skills	Gang Starr
+132	6	alatar224	2003	A Smaller God	Darling Violetta
+142	6	Mollo8	2003	The bitter end	Placebo
+146	6	singletee	2003	Navras	Juno Reactor and Don Davis
+148	6	Valendale	2003	Blue The True Hero	Masami Ueda & Masakazu Sugimori
+135	6	Dgdanp	2003	I Hate Everything About You	Three Days Grace
+134	6	Bluey The Bear	2003	Seven Tears	The Creatures
+151	6	Wonko	2003	The Recluse	Cursive
+136	6	Donald X.	2003	Young Pilgrims	The Shins
+133	6	bazkitcase5	2003	Grand Theft Autumn / Where Is Your Boy	Fall Out Boy
+144	6	pproteus	2003	For The Widows Of Paradise, For The Fatherless In Ypsilanti	Sufjan Stevens
