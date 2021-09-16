@@ -222,6 +222,17 @@ const nextMatch = async (matches) => {
     await sent.pin();
     await sentTest.react('🎵');
     await sentTest.pin();
+    const VOTE_RANGES = {
+      R0: 'R0!K2:M65',
+      R1: 'R1!K2:M33',
+      R2: 'R2!K2:M17',
+      R3: 'R3!K2:M9',
+      R4: 'R4!K2:M5',
+      R5: 'R5!K2:M3',
+      R6: 'R6!K2:M2',
+      P3: '3P!K2:M2',
+    };
+    await clearRanges(Object.values(VOTE_RANGES));
   }
 
   if (header) {
@@ -325,6 +336,8 @@ const loadCredentials = () => {
   }
 };
 
+const clearRanges = async (rng) => clearRngs(rng, await getAuthClient());
+
 const getValue = async (rng) => getMsg(rng, await getAuthClient());
 
 const getValues = async (rng) => getMsgs(rng, await getAuthClient());
@@ -373,6 +386,20 @@ const getNewToken = async (oAuth2Client) => {
   });
   // This should await readline.question and
   // there's probably a similar thing to do with oAuth2Client.getToken
+};
+
+const clearRngs = async (rng, auth) => {
+  const sheets = google.sheets({ version: 'v4', auth });
+  try {
+    const response = await sheets.spreadsheets.values.batchClear({
+      spreadsheetId: SPREADSHEET_ID,
+      ranges: rng,
+    });
+    return response.data;
+  } catch (err) {
+    console.log(`clearRngs API returned an error for range "${rng}"`, err);
+    throw err;
+  }
 };
 
 const getMsg = async (rng, auth) => {
