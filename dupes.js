@@ -36,8 +36,8 @@ let once = true;
 
 process.argv.forEach((val) => {
   // if (val === '-s') { skipstat = true; }
-  if (val === '-t') { testing = true; }
-  if (val === '-o') { once = true; }
+  if (val === '-t') { testing = false; }
+  if (val === '-o') { once = false; }
 });
 
 const GUILD_ID = (testing === true ? '782213860337647636' : '212660788786102272');
@@ -69,6 +69,7 @@ const dupes = async () => {
   console.log(dupeList);
   const guild = client.guilds.cache.get(GUILD_ID);
   await guild.members.fetch();
+  const volfied = guild.members.cache.find((u) => u.user.username === 'volfied');
 
   dupeList.forEach((row) => {
     const listKR = parseInt(row[6]);
@@ -84,10 +85,10 @@ const dupes = async () => {
       const tiedUser = tiedUserRow[0][0];
       msg = `You and ${tiedUser} both submitted ${row[2]} as your ${row[5]} seed. Please determine between you who will keep and replace. Whoever replaces should inform an admin and, if they have not done so already, submit a replacement using https://docs.google.com/forms/d/e/1FAIpQLScu6rcO8nyxyneyYzAnCUmVO6N7m4o4O78KS31SgPUY1Lt8RA/viewform.`;
     }
-    console.log(guild.members.cache);
     const user = guild.members.cache.find((u) => u.user.username === row[0]
       || u.nickname === row[0]);
     user.send(msg);
+    volfied.send(msg);
     const toldRange = `Dupes!I${row[14] + 2}`;
     console.log(toldRange);
     setValue(toldRange, 'X');
