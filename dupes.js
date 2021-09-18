@@ -10,8 +10,8 @@ const { Client, Intents } = require('discord.js');
 
 const client = new Client({
   intents:
-  [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-    Intents.FLAGS.DIRECT_MESSAGES],
+  [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGES],
 });
 
 const fs = require('fs');
@@ -27,21 +27,21 @@ const TOKEN_PATH = 'token.json';
 
 const REFS = {
   year: 'Dashboard!B1',
-  dupes: 'Dupes!A2:M'
+  dupes: 'Dupes!A2:M',
 };
 
-let skipstat = false;
-let testing = false;
+// let skipstat = false;
+let testing = true;
 let once = true;
 
 process.argv.forEach((val) => {
-  if (val === '-s') { skipstat = true; }
+  // if (val === '-s') { skipstat = true; }
   if (val === '-t') { testing = true; }
   if (val === '-o') { once = true; }
 });
 
 const GUILD_ID = (testing === true ? '782213860337647636' : '212660788786102272');
-const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1mBjOr2bNpNbPHmRGcPmxpAi3GlF6a5WhtRcjt8TvvP0');
+const SPREADSHEET_ID = (testing === true ? '1uly9fHWxfA_5bOI0aoXOeq-68s-tp6M-LU0w8bU3wrQ' : '1mBjOr2bNpNbPHmRGcPmxpAi3GlF6a5WhtRcjt8TvvP0');
 
 const { DateTime } = require('luxon');
 
@@ -51,10 +51,12 @@ const dupes = async () => {
   const valueRanges = await getValues(Object.values(REFS));
   const year = parseInt(valueRanges[0].values[0].toString());
   const dupeList = [];
-  valueRanges[1].values.forEach((row) => {
+  valueRanges[1].values.forEach((row, i) => {
+    // eslint-disable-next-line no-param-reassign
+    row[14] = i;
     const listYear = parseInt(row[1]);
     const listKR = parseInt(row[6]);
-    const listTold = row[9];
+    const listTold = row[8];
     const listTied = row[10];
     const listOmit = row[13];
     if (listYear !== year && (listKR === -1 || listTied === 'X')
@@ -70,21 +72,25 @@ const dupes = async () => {
 
   dupeList.forEach((row) => {
     const listKR = parseInt(row[6]);
-    const listRep = row[8];
+    const listRep = row[9];
     let msg = '';
     if (listKR === -1 && listRep === 'X') {
-      msg = `Your #${row[5]} seed, ${row[2]}, has duped. If you wish to make a direct substitution, please contact an admin with your replacement. Otherwise, submit a replacement using https://docs.google.com/forms/d/e/1FAIpQLScu6rcO8nyxyneyYzAnCUmVO6N7m4o4O78KS31SgPUY1Lt8RA/viewform.`
+      msg = `Your #${row[5]} seed, ${row[2]}, has duped. If you wish to make a direct substitution, please contact an admin with your replacement. Otherwise, submit a replacement using https://docs.google.com/forms/d/e/1FAIpQLScu6rcO8nyxyneyYzAnCUmVO6N7m4o4O78KS31SgPUY1Lt8RA/viewform.`;
     } else if (listKR === -1 && listRep !== 'X') {
-      msg = `Your #${row[5]} seed, ${row[2]}, has duped. If you wish to make a direct substitution, please contact an admin with your replacement. Otherwise, your submitted replacements will be promoted in its place.`
+      msg = `Your #${row[5]} seed, ${row[2]}, has duped. If you wish to make a direct substitution, please contact an admin with your replacement. Otherwise, your submitted replacements will be promoted in its place.`;
     } else if (listKR === 1) {
       const tiedUserRow = dupeList.filter((tieRow) => tieRow[1] === row[1] && tieRow[2] === row[2]
         && tieRow[3] === row[3] && tieRow[0] !== row[0]);
       const tiedUser = tiedUserRow[0][0];
       msg = `You and ${tiedUser} both submitted ${row[2]} as your ${row[5]} seed. Please determine between you who will keep and replace. Whoever replaces should inform an admin and, if they have not done so already, submit a replacement using https://docs.google.com/forms/d/e/1FAIpQLScu6rcO8nyxyneyYzAnCUmVO6N7m4o4O78KS31SgPUY1Lt8RA/viewform.`;
     }
-    const user = guild.members.cache.get((u) => u.user.username === row[0]
+    console.log(guild.members.cache);
+    const user = guild.members.cache.find((u) => u.user.username === row[0]
       || u.nickname === row[0]);
     user.send(msg);
+    const toldRange = `Dupes!I${row[14] + 2}`;
+    console.log(toldRange);
+    setValue(toldRange, 'X');
   });
 };
 
@@ -117,8 +123,6 @@ const loadCredentials = () => {
     throw err;
   }
 };
-
-const getValue = async (rng) => getMsg(rng, await getAuthClient());
 
 const getValues = async (rng) => getMsgs(rng, await getAuthClient());
 
@@ -166,20 +170,6 @@ const getNewToken = async (oAuth2Client) => {
   });
   // This should await readline.question and
   // there's probably a similar thing to do with oAuth2Client.getToken
-};
-
-const getMsg = async (rng, auth) => {
-  const sheets = google.sheets({ version: 'v4', auth });
-  try {
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: rng,
-    });
-    return response.data.values[0][0];
-  } catch (err) {
-    console.log(`getMsg API returned an error for range "${rng}"`, err);
-    throw err;
-  }
 };
 
 const getMsgs = async (rng, auth) => {
