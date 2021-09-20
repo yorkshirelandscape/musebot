@@ -74,7 +74,7 @@ export default class MuseGoogleAuth {
 
   async getToken() {
     try {
-      return this.readToken();
+      return await this.readToken();
     } catch (err) {
       this.logger.error(err, `Unable to load tokens, getting new token from user`);
       return this.getNewToken();
