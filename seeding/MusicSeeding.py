@@ -4,134 +4,134 @@ year = 2003
 bracketsize = 128
 
 #Paste songs in here from the Seeds tab. Columns B through H
-songstxt = """1	0	seanahan	Maps	Yeah Yeah Yeahs	https://www.youtube.com/watch?v=UKRo86ccTtY
-2	0	seanahan	Red Right Ankle	The Decemberists	https://www.youtube.com/watch?v=axkyYrismAw
-3	0	Volrath	Seven Nation Army	The White Stripes	https://youtu.be/RDuzszjrdcc
-4	0	Volrath	Windowpane	Opeth	https://youtu.be/bSpqLqC7U6g
-5	0	Bluey The Bear	There There (The Boney King of Nowhere)	Radiohead	https://www.youtube.com/watch?v=Z2aH-sluR5s
-6	0	Sharur	Instrumental Illness	The Allman Brothers Band	https://youtu.be/Z1_6HPpTuuU
-7	0	bazkitcase5	Bring Me To Life	Evanescence	https://youtu.be/-eGM0IJc70Y
-8	0	tufftaeh	The Closest Thing to Crazy	Katie Melua	https://www.youtube.com/watch?v=a3C4Efws8QU
-9	0	wharf_rat	Transdermal Celebration	Ween	https://www.youtube.com/watch?v=Nt9uNomdCHg
-10	1	wharf_rat	Tweezer | 2/28/03 | Uniondale, NY	Phish	https://www.youtube.com/watch?v=25GWjze0WlU
-11	1	seanahan	The Quiet Things That No One Ever Knows	Brand New	https://www.youtube.com/watch?v=MB6ESvoBwxI
-12	1	Dgdanp	A Favor House Atlantic	Cohered and Cambria	https://m.youtube.com/watch?v=IcrCoHFUML0
-13	1	bazkitcase5	Who's Gonna Save Us	The Living End	https://youtu.be/NWX2c1yNfaM
-14	1	Mort	I am the Morning	Oceansize	https://youtu.be/_-bT4hcfoRw
-15	1	xyrix	Easy Lee	Ricardo Villalobos	https://www.youtube.com/watch?v=JvoipeZSh6k 
-16	1	Donkey-Dude	Put Up Or Shut Up	Gang Starr	https://www.youtube.com/watch?v=A-WdRSfC0kU
-17	1	threelinewhip	Deadhead	The Devin Townsend Band	https://www.youtube.com/watch?v=2_vOX3s9f_w
-18	1	markusin	Trogdor	Strong Bad	https://www.youtube.com/watch?v=HjAmB6vDGmI
-19	1	alatar224	Ridiculosous	Electrocution 250	https://www.youtube.com/watch?v=nGRpahTo5xw
-20	1	Donald X.	Title and Registration	Death Cab for Cutie	https://www.youtube.com/watch?v=KGEyqP0744c
-21	1	Mollo8	Eyes Wide Open	King Crimson	https://youtu.be/92ldx4Ze8RA
-22	1	pproteus	Where Is The Love?	The Black Eyed Peas	https://www.youtube.com/watch?v=PZj_I0DBtKU
-23	1	Valendale	J'en ai marre!	Alizée	https://youtu.be/HeWF_fy8tLE
-24	1	aku chi	Mr. Brightside	The Killers	https://www.youtube.com/watch?v=m2zUrruKjDQ
-25	1	nottoobad	Passenger Seat	Death Cab for Cutie	https://www.youtube.com/watch?v=J0Iv4onsrIE
-26	1	Lemonspawn	Defying Gravity	Idina Menzel, Kristin Chenoweth	https://youtu.be/fEq3xM-i0Ng
-27	1	Wonko	Art is Hard	Cursive	https://youtu.be/AoNA-MkygH8
-28	1	volfied	House of Jealous Lovers	The Rapture	https://www.youtube.com/watch?v=C_l4b6xEUCM
-29	1	singletee	Strict Machine	Goldfrapp	https://www.youtube.com/watch?v=zU51JiFYhY4
-30	1	Sharur	Hardware Store	"Weird Al" Yankovic	https://youtu.be/DFI6cV9slfI
-31	1	dryope	Sparkling Truth	Dhafer Youssef	https://youtu.be/qZ_6tQ62KHQ
-32	1	jsh	Black Cab	Jens Lekman	https://www.youtube.com/watch?v=vdX0nf8nzDM
-33	2	Volrath	X Gon' Give It to Ya 	DMX	https://youtu.be/vkOJ9uNj9EY
-34	2	bazkitcase5	Dare You To Move	Switchfoot	https://youtu.be/B5Gvdgs_R1c
-35	2	Bluey The Bear	迷彩 [Meisai]	Sheena Ringo	https://www.youtube.com/watch?v=WbUNBDizSIQ
-36	2	Donkey-Dude	X Gon Give It To Ya	DMX	https://www.youtube.com/watch?v=ChUUcW4aw2k
-37	2	tufftaeh	Picture Of Innocence	Deep Purple	https://www.youtube.com/watch?v=FAxq8SUKccs
-38	2	wharf_rat	I Saw A Hippie Girl On 8th Avenue	Jeffrey Lewis	https://www.youtube.com/watch?v=vJKbPLVswmY
-39	2	Donald X.	All For Swinging You Around	The New Pornographers	https://www.youtube.com/watch?v=PaFEPctPebE
-40	2	xyrix	Hustle Rose	Metric	https://www.youtube.com/watch?v=A_UFawnJwOc
-41	2	Dgdanp	Weapon	Mathew Good	https://m.youtube.com/watch?v=XOee1xTUubc
-42	2	jsh	The First Single	The Format	https://www.youtube.com/watch?v=irSF0OGDX5k
-43	2	aku chi	Hands Down	Dashboard Confessional	https://www.youtube.com/watch?v=V_4qNnbbtsY
-44	2	Mort	Honor Thy Father	Dream Theater	https://youtu.be/P_8brIcOiG8
-45	2	threelinewhip	Away	The Devin Townsend Band	https://www.youtube.com/watch?v=oEJJxPgwkzA
-46	2	nottoobad	Far From Any Road	The Handsome Family	https://www.youtube.com/watch?v=TRJ_s2G76Hg
-47	2	singletee	Toxic	Britney Spears	https://www.youtube.com/watch?v=tVdr_JWmnsA
-48	2	Valendale	Breaking the Habit	Linkin Park	https://youtu.be/_e7bqZGPyFI
-49	2	Lemonspawn	My Coco	stellastarr*	https://youtu.be/RZTVm8ouBBQ
-50	2	pproteus	Reptilia	The Strokes	https://www.youtube.com/watch?v=h-GJOlf9HtE
-51	2	Mollo8	Rucci	Austin TV	https://youtu.be/beJ92hKfSG0
-52	2	alatar224	I Got My Eyes on You	Robert Belfour	https://www.youtube.com/watch?v=5UmT9O_RNrQ
-53	2	markusin	Sing for Absolution	Muse	https://www.youtube.com/watch?v=xDOwjPWCU3g
-54	2	dryope	Sogeki-syu	Susumu Hirasawa	https://youtu.be/an2VLnLfzP0
-55	2	Wonko	Through the Wire	Kanye West	https://youtu.be/AE8y25CcE6s
-56	2	volfied	Gay Bar	Electric Six	https://www.youtube.com/watch?v=J04sfXbS2PA
-57	2	Sharur	The White Tree	Howard Shore	https://youtu.be/kbf94uPFXNA
-58	3	Bluey The Bear	New Killer Star	David Bowie	https://www.youtube.com/watch?v=aiJ0CoVsEm0
-59	3	Donkey-Dude	In My Time of Need	Opeth	https://www.youtube.com/watch?v=razzBeBLDG4
-60	3	seanahan	Vehicles and Animals	Athlete	https://www.youtube.com/watch?v=WUVSrkcZMf4
-61	3	wharf_rat	Hunting Wabbits	Gordon Goodwin's Big Phat Band	https://www.youtube.com/watch?v=Ai-SuZUYOH8
-62	3	tufftaeh	Did I Say That?	Meat Loaf	https://www.youtube.com/watch?v=6HBd-TZnH2o
-63	3	Volrath	I Don't Wanna Be Me	Type O Negative	https://youtu.be/A8rpm0Eue-o
-64	3	alatar224	No Trust	The Black Keys	https://www.youtube.com/watch?v=R-AKSxqHhOE
-65	3	Sharur	Lucy Mae Blues	Buddy Guy	https://youtu.be/AADvGVLClpc
-66	3	Mort	The Noose	A Perfect Circle	https://youtu.be/ngZvHBUdYYY
-67	3	threelinewhip	Go To Sleep	Radiohead	https://www.youtube.com/watch?v=6qn5SfmkbKE
-68	3	bazkitcase5	Your Mistake	Sister Hazel	https://youtu.be/PzRc8Xc6uB0
-69	3	aku chi	Why Can't I?	Liz Phair	https://www.youtube.com/watch?v=Rtm9xNKfgd0
-70	3	xyrix	Galang	M.I.A.	https://www.youtube.com/watch?v=7rg4u3byLcs
-71	3	Dgdanp	Dream to Make Believe	Armor For Sleep	https://m.youtube.com/watch?v=KHKGeoVOIPE
-72	3	Wonko	True To Myself	Ziggy Marley	https://youtu.be/c_ac824FUU8
-73	3	pproteus	Orca	Wintersleep	https://www.youtube.com/watch?v=2e2e3QU4ft0
-74	3	nottoobad	Callin' Out	Lyrics Born	https://www.youtube.com/watch?v=gL-xQbb5BaM
-75	3	markusin	Missouri Loves Company	Ringo Starr	https://www.youtube.com/watch?v=_ETe32_q0VY
-76	3	jsh	Piazza, New York Catcher	Belle & Sebastian	https://www.youtube.com/watch?v=QXiRbf-4RXc
-77	3	Lemonspawn	Now It's On	Grandaddy	https://youtu.be/lJCSJhYbFHQ
-78	3	Donald X.	Bouncer's Conversation	Liz Phair	https://www.youtube.com/watch?v=sscPyQLQRI0
-79	3	Mollo8	The Paper-Hearted Ghost	Chamber	https://youtu.be/WNgl3VkjdGQ
-80	3	dryope	Tensor	Carbon Based Lifeforms	https://youtu.be/aibZkcOsmcE
-81	3	singletee	We Will Become Silhouettes	The Postal Service	https://www.youtube.com/watch?v=pp2N2u4uAg4
-82	3	volfied	Gravedigger	Dave Matthews	https://www.youtube.com/watch?v=-XtjGR46hEU
-83	3	Valendale	Angry White Polka	Weird Al Yankovic	https://youtu.be/BeklDFFg6p8
-84	4	xyrix	Chump Change	The New Pornographers	https://www.youtube.com/watch?v=i1VQwpjyrXU
-85	4	Valendale	Another Joe	Masami Ueda & Masakazu Sugimori	https://youtu.be/_OjJ_64d_vU
-86	4	Dgdanp	Meant to Live	Switchfoot	https://m.youtube.com/watch?v=OXcrEVFZOXs
-87	4	Donkey-Dude	Son et Lumiere / Inertiatic Esp	The Mars Volta	https://www.youtube.com/watch?v=f4ntjKcRh8w
-88	4	Bluey The Bear	The Hardest Button to Button	The White Stripes	https://www.youtube.com/watch?v=N3ceE43AHyw
-89	4	Mort	Hope Leaves	Opeth	https://youtu.be/cGPRoszjnWA
-90	4	tufftaeh	Tear Off Your Own Head	The Bangles	https://www.youtube.com/watch?v=FwVvf_8oWFk
-91	4	volfied	Loneliness	Annie Lennox	https://www.youtube.com/watch?v=twUPnqQRaUA
-92	4	nottoobad	White Flag	Dido	https://www.youtube.com/watch?v=jRqhGC5vgC0
-93	4	dryope	Revelation	Irfan	https://youtu.be/Bg0OOwEozcg
-94	4	singletee	As the Rush Comes	Motorcycle	https://www.youtube.com/watch?v=Bi2dYFk65uw
-95	4	threelinewhip	A Room and a Riddle	Hammers of Misfortune	https://www.youtube.com/watch?v=qmKTaMry1V4
-96	4	bazkitcase5	So Far Away	Staind	https://youtu.be/vTxFQGb3Op4
-97	4	markusin	Homer's Day (The Simpsons: Hit & Run)	Marc Baril, Allan Levy, and Jeff Tymoschuk	https://www.youtube.com/watch?v=7u65WiPxZKc
-98	4	alatar224	Siam vs. Mexico (The Saddest Music in the World)	Xio Nan Wang, The Mini-Mariachis	https://www.youtube.com/watch?v=v6S6TPVLuYw
-99	4	jsh	O Vencedor	Los Hermanos	https://www.youtube.com/watch?v=9mXBTKKXCQU
-100	4	pproteus	Romulus	Sufjan Stevens	https://www.youtube.com/watch?v=KOuepo6DP4k
-101	4	Wonko	Give Me a Try	Sizzla	https://youtu.be/55Iv_y1SxgU
-102	4	Lemonspawn	Kissing the Lipless	The Shins	https://youtu.be/ffQji-kJ7Tg
-103	4	Sharur	Have Love, Will Travel	The Black Keys	https://youtu.be/EqGJyffCyow
-104	4	Donald X.	Genius In France	Weird Al Yankovic	https://www.youtube.com/watch?v=ZwFf9vGRqcs
-105	4	Mollo8	Sin Aliento	Santa Sabina	https://youtu.be/ZpiX-7cIzSc
-106	4	aku chi	Hysteria	Muse	https://www.youtube.com/watch?v=27zOar_iEOA
-107	5	dryope	Seventh Heaven Suite	Dhafer Youssef	https://youtu.be/FzdfHp1hss0
-108	5	Mort	Catalyst	Oceansize	https://youtu.be/XP5NGB-sBFY
-109	5	markusin	Rupi's Dance	Ian Anderson	https://www.youtube.com/watch?v=qnXbhLaRxs4
-110	5	Mollo8	Hey! Amigo!	Alizée	https://youtu.be/Asz1lgXsUyo
-111	5	jsh	Black Math	The White Stripes	https://www.youtube.com/watch?v=WMbL2K3xVEM
-112	5	Donald X.	Us	Regina Spektor	https://www.youtube.com/watch?v=wtejQSAl_NI
-113	5	Dgdanp	Blinded	Third Eye Blind	https://m.youtube.com/watch?v=G9o4FTTQkDM
-114	5	singletee	Loreley	Blackmore's Night	https://www.youtube.com/watch?v=tUhmjmkLnxY
-115	5	pproteus	Slipping Husband	The National	https://www.youtube.com/watch?v=YELOZayRHrc
-116	5	tufftaeh	Growing On Me	The Darkness	https://www.youtube.com/watch?v=xSP8zikWPDw
-117	5	Volrath	Ruin	Lamb Of God	 https://youtu.be/W3QoLh8fKGc
-118	5	Wonko	Time	East Star All-stars	https://youtu.be/Z6mzAGRY7uo
-119	5	nottoobad	Cavalier Eternal	Against Me!	https://www.youtube.com/watch?v=a0re5ioFPXI
-120	5	xyrix	Weather Systems	Andrew Bird	https://www.youtube.com/watch?v=1kAKKUk7TSQ 
-121	5	alatar224	Total Eclipse of the Heart	The Dan Band	https://www.youtube.com/watch?v=ZRFYAjS-PZM
-122	5	aku chi	One Big Holiday	My Morning Jacket	https://www.youtube.com/watch?v=vhd7vOmevWk
-123	5	Sharur	Shadow Boxed	Procol Harum	https://youtu.be/L8wl98Cf-z0
-124	5	Bluey The Bear	In My Bed	Amy Winehouse	https://www.youtube.com/watch?v=IWhJQqwQwiA
-125	5	seanahan	Queen of the Surface Streets	Devotchka	https://www.youtube.com/watch?v=T-D3hgLYidY
-126	5	volfied	Out of Time	Blur	https://www.youtube.com/watch?v=WPMgj1xMvX4
-127	5	Donkey-Dude	Sweet Amber	Metallica	https://www.youtube.com/watch?v=58-AndGTKy0
-128	5	wharf_rat	Vibrate	Outkast	https://www.youtube.com/watch?v=mQlp9Va80A4"""
+songstxt = """1	0	Volrath	2003	Windowpane	Opeth	https://youtu.be/bSpqLqC7U6g
+2	0	Bluey The Bear	2003	There There (The Boney King of Nowhere)	Radiohead	https://www.youtube.com/watch?v=Z2aH-sluR5s
+3	0	wharf_rat	2003	Transdermal Celebration	Ween	https://www.youtube.com/watch?v=Nt9uNomdCHg
+4	0	Volrath	2003	Seven Nation Army	The White Stripes	https://youtu.be/RDuzszjrdcc
+5	0	Sharur	2003	Instrumental Illness	The Allman Brothers Band	https://youtu.be/Z1_6HPpTuuU
+6	0	bazkitcase5	2003	Bring Me To Life	Evanescence	https://youtu.be/-eGM0IJc70Y
+7	0	seanahan	2003	Maps	Yeah Yeah Yeahs	https://www.youtube.com/watch?v=UKRo86ccTtY
+8	0	tufftaeh	2003	The Closest Thing to Crazy	Katie Melua	https://www.youtube.com/watch?v=a3C4Efws8QU
+9	0	seanahan	2003	Red Right Ankle	The Decemberists	https://www.youtube.com/watch?v=axkyYrismAw
+10	1	Mort	2003	Hope Leaves	Opeth	https://youtu.be/cGPRoszjnWA
+11	1	threelinewhip	2003	Deadhead	The Devin Townsend Band	https://www.youtube.com/watch?v=2_vOX3s9f_w
+12	1	seanahan	2003	The Quiet Things That No One Ever Knows	Brand New	https://www.youtube.com/watch?v=MB6ESvoBwxI
+13	1	Donkey-Dude	2003	Put Up Or Shut Up	Gang Starr	https://www.youtube.com/watch?v=A-WdRSfC0kU
+14	1	aku chi	2003	Mr. Brightside	The Killers	https://www.youtube.com/watch?v=m2zUrruKjDQ
+15	1	wharf_rat	2003	Tweezer | 2/28/03 | Uniondale, NY	Phish	https://www.youtube.com/watch?v=25GWjze0WlU
+16	1	Donald X.	2003	Title and Registration	Death Cab for Cutie	https://www.youtube.com/watch?v=KGEyqP0744c
+17	1	Sharur	2003	Hardware Store	"Weird Al" Yankovic	https://youtu.be/DFI6cV9slfI
+18	1	dryope	2003	Sparkling Truth	Dhafer Youssef	https://youtu.be/qZ_6tQ62KHQ
+19	1	xyrix	2003	Easy Lee	Ricardo Villalobos	https://www.youtube.com/watch?v=JvoipeZSh6k 
+20	1	Dgdanp	2003	A Favor House Atlantic	Coheed and Cambria	https://m.youtube.com/watch?v=IcrCoHFUML0
+21	1	alatar224	2003	Ridiculosous	Electrocution 250	https://www.youtube.com/watch?v=nGRpahTo5xw
+22	1	nottoobad	2003	Passenger Seat	Death Cab for Cutie	https://www.youtube.com/watch?v=J0Iv4onsrIE
+23	1	Valendale	2003	J'en ai marre!	Alizée	https://youtu.be/HeWF_fy8tLE
+24	1	bazkitcase5	2003	Who's Gonna Save Us	The Living End	https://youtu.be/NWX2c1yNfaM
+25	1	Mollo8	2003	Eyes Wide Open	King Crimson	https://youtu.be/92ldx4Ze8RA
+26	1	markusin	2003	Trogdor	Strong Bad	https://www.youtube.com/watch?v=HjAmB6vDGmI
+27	1	singletee	2003	Strict Machine	Goldfrapp	https://www.youtube.com/watch?v=zU51JiFYhY4
+28	1	Wonko	2003	Art is Hard	Cursive	https://youtu.be/AoNA-MkygH8
+29	1	Lemonspawn	2003	Defying Gravity	Idina Menzel, Kristin Chenoweth	https://youtu.be/fEq3xM-i0Ng
+30	1	volfied	2003	House of Jealous Lovers	The Rapture	https://www.youtube.com/watch?v=C_l4b6xEUCM
+31	1	sweetjohn33	2003	The Fine Print	King Geedorah	https://youtu.be/e4dsyKNEb-c
+32	1	pproteus	2003	Where Is The Love?	The Black Eyed Peas	https://www.youtube.com/watch?v=PZj_I0DBtKU
+33	1	jsh	2003	Black Cab	Jens Lekman	https://www.youtube.com/watch?v=vdX0nf8nzDM
+34	6	Donkey-Dude	2003	Skills	Gang Starr	https://www.youtube.com/watch?v=S1y3UVmmFMo
+35	2	alatar224	2003	I Got My Eyes on You	Robert Belfour	https://www.youtube.com/watch?v=5UmT9O_RNrQ
+36	2	tufftaeh	2003	Picture Of Innocence	Deep Purple	https://www.youtube.com/watch?v=FAxq8SUKccs
+37	2	wharf_rat	2003	I Saw A Hippie Girl On 8th Avenue	Jeffrey Lewis	https://www.youtube.com/watch?v=vJKbPLVswmY
+38	2	dryope	2003	Sogeki-syu	Susumu Hirasawa	https://youtu.be/an2VLnLfzP0
+39	2	threelinewhip	2003	Away	The Devin Townsend Band	https://www.youtube.com/watch?v=oEJJxPgwkzA
+40	2	Bluey The Bear	2003	迷彩 [Meisai]	Sheena Ringo	https://www.youtube.com/watch?v=WbUNBDizSIQ
+41	0	Donkey-Dude	2003	X Gon' Give It To Ya	DMX	https://www.youtube.com/watch?v=ChUUcW4aw2k
+42	2	bazkitcase5	2003	Dare You To Move	Switchfoot	https://youtu.be/B5Gvdgs_R1c
+43	2	Valendale	2003	Breaking the Habit	Linkin Park	https://youtu.be/_e7bqZGPyFI
+44	2	aku chi	2003	Hands Down	Dashboard Confessional	https://www.youtube.com/watch?v=V_4qNnbbtsY
+45	2	nottoobad	2003	Far From Any Road	The Handsome Family	https://www.youtube.com/watch?v=TRJ_s2G76Hg
+46	2	Donald X.	2003	All For Swinging You Around	The New Pornographers	https://www.youtube.com/watch?v=PaFEPctPebE
+47	2	Wonko	2003	Flim	The Bad Plus	https://youtu.be/HeMre0Sp7o4
+48	2	markusin	2003	Sing for Absolution	Muse	https://www.youtube.com/watch?v=xDOwjPWCU3g
+49	2	xyrix	2003	Hustle Rose	Metric	https://www.youtube.com/watch?v=A_UFawnJwOc
+50	2	Sharur	2003	The White Tree	Howard Shore	https://youtu.be/kbf94uPFXNA
+51	2	Dgdanp	2003	Weapon	Mathew Good	https://m.youtube.com/watch?v=XOee1xTUubc
+52	2	volfied	2003	Gay Bar	Electric Six	https://www.youtube.com/watch?v=J04sfXbS2PA
+53	2	jsh	2003	The First Single	The Format	https://www.youtube.com/watch?v=irSF0OGDX5k
+54	2	Mort	2003	I am the Morning	Oceansize	https://youtu.be/_-bT4hcfoRw
+55	2	Mollo8	2003	Rucci	Austin TV	https://youtu.be/beJ92hKfSG0
+56	2	sweetjohn33	2003	Anti-Matter	King Geedorah	https://youtu.be/BU0KjU2o0lA
+57	2	singletee	2003	Toxic	Britney Spears	https://www.youtube.com/watch?v=tVdr_JWmnsA
+58	2	pproteus	2003	Reptilia	The Strokes	https://www.youtube.com/watch?v=h-GJOlf9HtE
+59	2	Lemonspawn	2003	My Coco	stellastarr*	https://youtu.be/RZTVm8ouBBQ
+60	3	Bluey The Bear	2003	New Killer Star	David Bowie	https://www.youtube.com/watch?v=aiJ0CoVsEm0
+61	3	threelinewhip	2003	Go To Sleep	Radiohead	https://www.youtube.com/watch?v=6qn5SfmkbKE
+62	3	seanahan	2003	Vehicles and Animals	Athlete	https://www.youtube.com/watch?v=WUVSrkcZMf4
+63	3	Donald X.	2003	Bouncer's Conversation	Liz Phair	https://www.youtube.com/watch?v=sscPyQLQRI0
+64	3	Mort	2003	Honor Thy Father	Dream Theater	https://youtu.be/P_8brIcOiG8
+65	3	wharf_rat	2003	Hunting Wabbits	Gordon Goodwin's Big Phat Band	https://www.youtube.com/watch?v=Ai-SuZUYOH8
+66	3	nottoobad	2003	Callin' Out	Lyrics Born	https://www.youtube.com/watch?v=gL-xQbb5BaM
+67	2	Volrath	2003	I Don't Wanna Be Me	Type O Negative	https://youtu.be/A8rpm0Eue-o
+68	3	xyrix	2003	Galang	M.I.A.	https://www.youtube.com/watch?v=7rg4u3byLcs
+69	3	markusin	2003	Missouri Loves Company	Ringo Starr	https://www.youtube.com/watch?v=_ETe32_q0VY
+70	3	Donkey-Dude	2003	In My Time of Need	Opeth	https://www.youtube.com/watch?v=razzBeBLDG4
+71	3	volfied	2003	Gravedigger	Dave Matthews	https://www.youtube.com/watch?v=-XtjGR46hEU
+72	3	dryope	2003	Tensor	Carbon Based Lifeforms	https://youtu.be/aibZkcOsmcE
+73	3	Valendale	2003	Angry White Polka	Weird Al Yankovic	https://youtu.be/BeklDFFg6p8
+74	3	alatar224	2003	No Trust	The Black Keys	https://www.youtube.com/watch?v=R-AKSxqHhOE
+75	3	tufftaeh	2003	Did I Say That?	Meat Loaf	https://www.youtube.com/watch?v=6HBd-TZnH2o
+76	3	singletee	2003	We Will Become Silhouettes	The Postal Service	https://www.youtube.com/watch?v=pp2N2u4uAg4
+77	3	pproteus	2003	Orca	Wintersleep	https://www.youtube.com/watch?v=2e2e3QU4ft0
+78	3	sweetjohn33	2003	Lady Brown	Nujabes	https://youtu.be/V8Xh5ErjIyM
+79	3	Dgdanp	2003	Dream to Make Believe	Armor For Sleep	https://m.youtube.com/watch?v=KHKGeoVOIPE
+80	3	aku chi	2003	Why Can't I?	Liz Phair	https://www.youtube.com/watch?v=Rtm9xNKfgd0
+81	3	Wonko	2003	True To Myself	Ziggy Marley	https://youtu.be/c_ac824FUU8
+82	3	Lemonspawn	2003	Now It's On	Grandaddy	https://youtu.be/lJCSJhYbFHQ
+83	3	jsh	2003	Piazza, New York Catcher	Belle & Sebastian	https://www.youtube.com/watch?v=QXiRbf-4RXc
+84	3	Mollo8	2003	The Paper-Hearted Ghost	Chamber	https://youtu.be/WNgl3VkjdGQ
+85	3	bazkitcase5	2003	Your Mistake	Sister Hazel	https://youtu.be/PzRc8Xc6uB0
+86	3	Sharur	2003	Lucy Mae Blues	Buddy Guy	https://youtu.be/AADvGVLClpc
+87	4	Donkey-Dude	2003	Son et Lumiere / Inertiatic Esp	The Mars Volta	https://www.youtube.com/watch?v=f4ntjKcRh8w
+88	4	threelinewhip	2003	A Room and a Riddle	Hammers of Misfortune	https://www.youtube.com/watch?v=qmKTaMry1V4
+89	4	alatar224	2003	Siam vs. Mexico (The Saddest Music in the World)	Xio Nan Wang, The Mini-Mariachis	https://www.youtube.com/watch?v=v6S6TPVLuYw
+90	4	xyrix	2003	Chump Change	The New Pornographers	https://www.youtube.com/watch?v=i1VQwpjyrXU
+91	4	Bluey The Bear	2003	The Hardest Button to Button	The White Stripes	https://www.youtube.com/watch?v=N3ceE43AHyw
+92	4	Mort	2003	The Noose	A Perfect Circle	https://youtu.be/ngZvHBUdYYY
+93	5	Dgdanp	2003	I Hate Everything About You	Three Days Grace	https://m.youtube.com/watch?v=gqbQuypKCCU
+94	4	markusin	2003	Homer's Day (The Simpsons: Hit & Run)	Marc Baril, Allan Levy, and Jeff Tymoschuk	https://www.youtube.com/watch?v=7u65WiPxZKc
+95	4	tufftaeh	2003	Tear Off Your Own Head	The Bangles	https://www.youtube.com/watch?v=FwVvf_8oWFk
+96	0	sweetjohn33	2003	Meant to Live	Switchfoot	https://youtu.be/OXcrEVFZOXs
+97	4	nottoobad	2003	White Flag	Dido	https://www.youtube.com/watch?v=jRqhGC5vgC0
+98	4	aku chi	2003	Hysteria	Muse	https://www.youtube.com/watch?v=27zOar_iEOA
+99	4	Sharur	2003	Have Love, Will Travel	The Black Keys	https://youtu.be/EqGJyffCyow
+100	4	Valendale	2003	Another Joe	Masami Ueda & Masakazu Sugimori	https://youtu.be/_OjJ_64d_vU
+101	4	Donald X.	2003	Genius In France	Weird Al Yankovic	https://www.youtube.com/watch?v=ZwFf9vGRqcs
+102	4	Wonko	2003	Give Me a Try	Sizzla	https://youtu.be/55Iv_y1SxgU
+103	4	singletee	2003	As the Rush Comes	Motorcycle	https://www.youtube.com/watch?v=Bi2dYFk65uw
+104	4	Lemonspawn	2003	Kissing the Lipless	The Shins	https://youtu.be/ffQji-kJ7Tg
+105	4	volfied	2003	Loneliness	Annie Lennox	https://www.youtube.com/watch?v=twUPnqQRaUA
+106	4	jsh	2003	O Vencedor	Los Hermanos	https://www.youtube.com/watch?v=9mXBTKKXCQU
+107	4	pproteus	2003	Romulus	Sufjan Stevens	https://www.youtube.com/watch?v=KOuepo6DP4k
+108	4	dryope	2003	Revelation	Irfan	https://youtu.be/Bg0OOwEozcg
+109	4	bazkitcase5	2003	So Far Away	Staind	https://youtu.be/vTxFQGb3Op4
+110	4	Mollo8	2003	Sin Aliento	Santa Sabina	https://youtu.be/ZpiX-7cIzSc
+111	5	volfied	2003	Out of Time	Blur	https://www.youtube.com/watch?v=WPMgj1xMvX4
+112	5	jsh	2003	Black Math	The White Stripes	https://www.youtube.com/watch?v=WMbL2K3xVEM
+113	5	Valendale	2003	Faint	Linkin Park	https://youtu.be/yOW7Eh81Gto
+114	5	pproteus	2003	Slipping Husband	The National	https://www.youtube.com/watch?v=YELOZayRHrc
+115	5	singletee	2003	Loreley	Blackmore's Night	https://www.youtube.com/watch?v=tUhmjmkLnxY
+116	5	dryope	2003	Seventh Heaven Suite	Dhafer Youssef	https://youtu.be/FzdfHp1hss0
+117	5	Mollo8	2003	Hey! Amigo!	Alizée	https://youtu.be/Asz1lgXsUyo
+118	5	alatar224	2003	Total Eclipse of the Heart	The Dan Band	https://www.youtube.com/watch?v=ZRFYAjS-PZM
+119	5	Wonko	2003	Heart of Glass	The Bad Plus	https://youtu.be/2zmg_msBtDQ
+120	5	aku chi	2003	One Big Holiday	My Morning Jacket	https://www.youtube.com/watch?v=vhd7vOmevWk
+121	5	nottoobad	2003	Cavalier Eternal	Against Me!	https://www.youtube.com/watch?v=a0re5ioFPXI
+122	5	Donald X.	2003	Us	Regina Spektor	https://www.youtube.com/watch?v=wtejQSAl_NI
+123	5	wharf_rat	2003	Vibrate	Outkast	https://www.youtube.com/watch?v=mQlp9Va80A4
+124	4	Volrath	2003	Ruin	Lamb Of God	 https://youtu.be/W3QoLh8fKGc
+125	5	Sharur	2003	Shadow Boxed	Procol Harum	https://youtu.be/L8wl98Cf-z0
+126	5	tufftaeh	2003	Growing On Me	The Darkness	https://www.youtube.com/watch?v=xSP8zikWPDw
+127	5	xyrix	2003	Weather Systems	Andrew Bird	https://www.youtube.com/watch?v=1kAKKUk7TSQ 
+128	5	Donkey-Dude	2003	Sweet Amber	Metallica	https://www.youtube.com/watch?v=58-AndGTKy0"""
 
 #μ
 
@@ -320,7 +320,7 @@ for qb in qbs:
     print()
 
 
-output = open("outputsongs.txt", "w")
+output = open("seeding/outputsongs.txt", "w")
 
 #within each qb it's currently unordered so this gives an order to them based on relative seed
 qbseedorder128 = [1, 32, 16, 17, 8, 25, 9, 24, 4, 29, 13, 20, 5, 28, 12, 21, 2, 31, 15, 18, 7, 26, 10, 23, 3, 30, 14, 19, 6, 27, 11, 22]

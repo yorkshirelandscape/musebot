@@ -30,7 +30,7 @@ songstxt = """
 """
 
 if songstxt.isspace():
-    f = open("outputsongs.txt", "r")
+    f = open("seeding/outputsongs.txt", "r")
     rawsongs = f.readlines()
     f.close()
 else:
