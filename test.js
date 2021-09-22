@@ -408,7 +408,9 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
             }
           }
         } else if (now < roundEndTime.plus({ hours: roundMinWarn })) {
-          console.log('Awaiting minimum time elapsed.');
+          const msg = 'Awaiting minimum time elapsed.';
+          testMusic.send(msg);
+          console.log(msg);
           console.log(roundEndTime.plus({ hours: roundMinWarn }).toFormat('M/d/yyyy HH:mm'));
         } else {
           // isolate the check-out messages and convert to an array
@@ -444,21 +446,31 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
           const missingCheckOut = checkOutCheck.filter((u) => u.missing);
           console.log(missingCheckOut.toString());
           const deadbeatTagList = missingCheckOut.map((u) => `<@!${u.id}>`).join(', ');
-          const msg = `Missing Check-Outs: ${deadbeatTagList}`;
+          let msg = `Missing Check-Outs: ${deadbeatTagList}`;
           if (missingCheckOut.length > 0) {
             await channel.send(msg);
             if (testing === false) { await testMusic.send(msg); }
           }
 
-          console.log('Awaiting 80%.');
+          msg = 'Awaiting 80%.';
+          testMusic.send(msg);
+          console.log(msg);
           console.log(`${(pctCheckedIn * 100).toFixed(1)}%`);
           console.log('MaxWarn:', roundEndTime.plus({ hours: roundMaxWarn }).toFormat('M/d/yyyy HH:mm'));
           console.log('Missing:', missingList);
           console.log('Extra:', extraList);
         }
-      } else { console.log('Round in progress.'); }
+      } else {
+        const msg = 'Round in progress.';
+        console.log(msg);
+        testMusic.send(msg);
+      }
     });
-  } else { console.log(`${botState === 'GO' ? 'Bot enabled. Round in progress?' : 'Warning already issued.'}`); }
+  } else {
+    const msg = `${botState === 'GO' ? 'Bot enabled. Round in progress?' : 'Warning already issued.'}`;
+    console.log(msg);
+    testMusic.send(msg);
+  }
 };
 
 client.once('ready', () => {
