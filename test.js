@@ -134,7 +134,8 @@ const checkRound = async () => {
   const testMusic = client.channels.cache.get(SKYNET);
 
   const recentSkynet = await testMusic.messages.fetch({ limit: 1 });
-  const warnMsg = await recentSkynet.find((msg) => msg.content.includes('One-Hour Warning') || msg.content.includes('Round concluded.'));
+  const warnMsg = await recentSkynet.find((msg) => msg.content.includes('One-Hour Warning')
+  || msg.content.includes('Round concluded.') || msg.content.includes('Warning already issued.'));
 
   if (botState === 'STOP' && (!warnMsg || force === true)) {
     // Even though REFS is an object, order is guaranteed for non-string keys

@@ -54,6 +54,7 @@ process.argv.forEach((val) => {
 });
 
 const GUILD_ID = (testing === true ? '782213860337647636' : '212660788786102272');
+const SKYNET = '864768873270345788';
 const TEST_VOTES = '876135378346733628';
 const DOM_VOTES = '751893730117812225';
 const CHANNEL_ID = (testing === true ? TEST_VOTES : DOM_VOTES);
@@ -181,6 +182,7 @@ const getMatchesCount = (round, size) => Math.min(round === 4 ? 4 : (round === 5
 const nextMatch = async (matches) => {
   const channel = client.channels.cache.get(CHANNEL_ID);
   const testChan = client.channels.cache.get(TEST_VOTES);
+  const testMusic = client.channels.cache.get(SKYNET);
 
   const botState = await getValue(BOT_STATE_REF);
 
@@ -205,6 +207,7 @@ const nextMatch = async (matches) => {
     // eslint-disable-next-line no-param-reassign
     matches = getMatchesCount(rndVal, size);
     now = DateTime.now();
+    testMusic.send('Posting next batch of matches.');
     console.log(`${now}: Posting ${matches} matches this iteration`);
   }
   console.log(`${matches} matches left to post`);
@@ -216,6 +219,7 @@ const nextMatch = async (matches) => {
         || (size === 32 && rndVal === 2)
       )
   ) {
+    testMusic.send('Beginning next year.');
     const sent = await channel.send(`React with 🎵 if you plan on voting in the ${year} bracket.`);
     const sentTest = await testChan.send(`React with 🎵 if you plan on voting in the ${year} bracket.`);
     await sent.react('🎵');
@@ -236,6 +240,7 @@ const nextMatch = async (matches) => {
   }
 
   if (header) {
+    testMusic.send('Beginning next round.');
     const sent = await channel.send(header);
     const sentTest = await testChan.send(header);
     if (header.matchAll(/[0-9]{4}R[0-9]Q[0-9]/g).length > 0) {
@@ -264,6 +269,7 @@ const nextMatch = async (matches) => {
   await setValue(REFS.song, song + 1);
 
   if (footer) {
+    testMusic.send('Concluding round.');
     let roundMin = 12;
     let roundMax = 24;
     if (rndVal === 0
