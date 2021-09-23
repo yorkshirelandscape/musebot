@@ -104,7 +104,7 @@ export default class MuseGoogleAuth {
       throw err;
     }
     tokens = tokens.tokens;
-    await this.writeToken();
+    await this.writeToken(tokens);
     return tokens;
   }
 }
