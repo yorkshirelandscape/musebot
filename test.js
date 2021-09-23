@@ -461,17 +461,9 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
           console.log('Missing:', missingList);
           console.log('Extra:', extraList);
         }
-      } else {
-        const msg = 'Round in progress.';
-        console.log(msg);
-        testMusic.send(msg);
-      }
+      } else { console.log('Round in progress.'); }
     });
-  } else {
-    const msg = `${botState === 'GO' ? 'Bot enabled. Round in progress?' : 'Warning already issued.'}`;
-    console.log(msg);
-    testMusic.send(msg);
-  }
+  } else { console.log(`${botState === 'GO' ? 'Bot enabled. Round in progress?' : 'Warning already issued.'}`); }
 };
 
 client.once('ready', () => {
