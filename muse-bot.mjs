@@ -1,4 +1,4 @@
-import MuseDiscord from './muse-discord.mjs';
+import MuseDiscord from './discord/muse-discord.mjs';
 import MuseGoogle from './google/muse-google.mjs';
 
 const START_TIME = 5;
@@ -15,8 +15,7 @@ export default class MuseBot {
     this.endTime = null;
     this.initialized = false;
     this.discordClient = null;
-    // this.destroyClient = true;
-    this.destroyClient = false;
+    this.destroyClient = true;
   }
 
   /**
@@ -28,7 +27,7 @@ export default class MuseBot {
     this.discordClient = new MuseDiscord(this.logger);
     this.googleClient = new MuseGoogle(this.logger);
     await Promise.all([
-      // this.discordClient.init(),
+      this.discordClient.init(),
       this.googleClient.init(),
     ]);
     this.initialized = true;
@@ -121,6 +120,15 @@ export default class MuseBot {
         // We authorize the client on init, this is to verify that worked
         this.logger.info('Test Google API authorization');
         await this.googleClient.testAuthorization();
+        break;
+      case 'testDiscord':
+        // We authorize the client on init, this is to verify that worked
+        this.logger.info('Test Discord API authorization');
+        await this.discordClient.testAuthorization();
+        break;
+      case 'testEmoji':
+        this.logger.info('Test finding emoji');
+        await this.discordClient.findRecentEmoji();
         break;
       default:
         this.logger.error(`Unknown action: "${action}"`);

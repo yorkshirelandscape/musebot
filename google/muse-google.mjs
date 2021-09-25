@@ -11,6 +11,9 @@ const REFS = {
   match: 'Dashboard!D3:E6',
   size: 'Dashboard!B5',
   year: 'Dashboard!B1',
+  nextYear: 'Lists!L8',
+  unsubmitted: 'Lists!J2:J',
+  userList: 'Lists!N2:P',
 };
 
 export default class MuseGoogle {

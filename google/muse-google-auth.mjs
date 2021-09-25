@@ -76,7 +76,7 @@ export default class MuseGoogleAuth {
     try {
       return await this.readToken();
     } catch (err) {
-      this.logger.error(err, `Unable to load tokens, getting new token from user`);
+      this.logger.error(err, 'Unable to load tokens, getting new token from user');
       return this.getNewToken();
     }
   }

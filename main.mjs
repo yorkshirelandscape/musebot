@@ -18,6 +18,7 @@ const getOptions = () => new Getopt([
   ['f', 'force', 'Skip checking if the bot should be active and force action'],
   ['h', 'help', 'Display this help message'],
   ['v', 'verbose', 'Print more debug messages'],
+  ['', 'json', 'Format log messages as JSON objects'],
 ]).bindHelp().parseSystem();
 
 /**
@@ -36,12 +37,12 @@ const getLogLevel = (verbose) => process.env.LOG_LEVEL || (verbose ? 'debug' : '
  *
  * @param {string} level - The log level to configure the new logger with
  */
-const getLogger = (level) => pino({ level, prettyPrint: true });
+const getLogger = (level, pretty) => pino({ level, prettyPrint: pretty });
 
 const main = async () => {
   const opt = getOptions();
   dotenv.config({ path: opt.options.testing ? 'dev.env' : 'prod.env' });
-  const logger = getLogger(getLogLevel(opt.options.verbose));
+  const logger = getLogger(getLogLevel(opt.options.verbose), !opt.options.json);
   const bot = new MuseBot(logger, opt.options);
   await bot.init();
   await bot.process(opt.argv || []);
