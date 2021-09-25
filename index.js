@@ -244,7 +244,7 @@ const nextMatch = async (matches) => {
   if (header) {
     const sent = await channel.send(header);
     const sentTest = await testChan.send(header);
-    if (header.matchAll(/[0-9]{4}R[0-9]Q[0-9]/g).length > 0) {
+    if (header.matchAll(/[0-9]{4}R[0-9]Q[0-9]/g)) {
       await sent.pin();
       await sentTest.pin();
     }
