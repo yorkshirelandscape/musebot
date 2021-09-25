@@ -239,8 +239,9 @@ const nextMatch = async (matches) => {
     await clearRanges(Object.values(VOTE_RANGES));
   }
 
+  if (song === 1) { testMusic.send('Beginning next round.'); }
+
   if (header) {
-    testMusic.send('Beginning next round.');
     const sent = await channel.send(header);
     const sentTest = await testChan.send(header);
     if (header.matchAll(/[0-9]{4}R[0-9]Q[0-9]/g).length > 0) {
