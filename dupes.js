@@ -66,7 +66,6 @@ const dupes = async () => {
     }
   });
 
-  console.log(dupeList);
   const guild = client.guilds.cache.get(GUILD_ID);
   await guild.members.fetch();
   const volfied = guild.members.cache.find((u) => u.user.username === 'volfied');
@@ -90,7 +89,6 @@ const dupes = async () => {
     user.send(msg);
     if (user !== volfied) { volfied.send(msg); }
     const toldRange = `Dupes!I${row[14] + 2}`;
-    console.log(toldRange);
     setValue(toldRange, 'X');
   });
 };
