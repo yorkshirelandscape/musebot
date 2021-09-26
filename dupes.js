@@ -31,13 +31,13 @@ const REFS = {
 };
 
 // let skipstat = false;
-let testing = true;
-let once = true;
+let testing = false;
+let once = false;
 
 process.argv.forEach((val) => {
   // if (val === '-s') { skipstat = true; }
-  if (val === '-t') { testing = false; }
-  if (val === '-o') { once = false; }
+  if (val === '-t') { testing = true; }
+  if (val === '-o') { once = true; }
 });
 
 const GUILD_ID = (testing === true ? '782213860337647636' : '212660788786102272');
@@ -88,7 +88,7 @@ const dupes = async () => {
     const user = guild.members.cache.find((u) => u.user.username === row[0]
       || u.nickname === row[0]);
     user.send(msg);
-    volfied.send(msg);
+    if (user !== volfied) { volfied.send(msg); }
     const toldRange = `Dupes!I${row[14] + 2}`;
     console.log(toldRange);
     setValue(toldRange, 'X');
