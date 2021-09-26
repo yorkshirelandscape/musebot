@@ -8,7 +8,9 @@
     "googleapis": "^84.0.0",
     "luxon": "^2.0.2",
     "node-getopt": "^0.3.2",
-    "pino": "^6.13.0"
+    "open": "^8.2.1",
+    "pino": "^6.13.0",
+    "server-destroy": "^1.0.1"
   },
   "devDependencies": {
     "eslint": "^7.32.0",
