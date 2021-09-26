@@ -377,9 +377,10 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
               const nextYear = parseInt(valueRanges[7].values[0].toString());
               const minSub = (6 - rndVal) * 12 + 24;
               const maxSub = (7 - rndVal) * 24;
+              const voteHours = rndVal === 2 && size > 64 ? 8 : 0;
               now = DateTime.now();
-              const minSubTime = now.plus({ hours: minSub });
-              const maxSubTime = now.plus({ hours: maxSub });
+              const minSubTime = now.plus({ hours: minSub }).plus({ hours: voteHours });
+              const maxSubTime = now.plus({ hours: maxSub }).plus({ hours: voteHours });
 
               if (minSubTime.hours > 20 || minSubTime.hours < 5) {
                 const minNextDay = minSubTime.plus({ days: 1 });
