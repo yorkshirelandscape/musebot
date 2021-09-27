@@ -67,7 +67,8 @@ export default class MuseGoogle {
 
   getSheets() {
     this.requireInit();
-    return google.sheets({ version: 'v4', auth: this.oAuth2Client });
+    // return google.sheets({ version: 'v4', auth: this.oAuth2Client });
+    return google.sheets({ version: 'v4', auth: this.JwtClient });
   }
 
   async getValue(range) {

@@ -28,3 +28,7 @@ config.json
 credentials.json
 token.json
 *.log
+oauth2.keys.json
+musebot-323400-e8fb4a8ba97f.json
+dev.env
+prod.env

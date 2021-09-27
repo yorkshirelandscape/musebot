@@ -27,10 +27,14 @@ export default class MuseGoogleAuth {
   async getAuthorizedClient() {
     const credentials = await this.getClientSecrets();
     // eslint-disable-next-line camelcase
-    const { client_secret, client_id, redirect_uris } = credentials.installed || credentials.web;
-    this.oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-    await this.authorizeClient();
-    return this.oAuth2Client;
+    // const { client_secret, client_id, redirect_uris } = credentials.installed || credentials.web;
+    // this.oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+    // eslint-disable-next-line camelcase
+    const { client_email, private_key } = credentials;
+    this.JwtClient = new google.auth.JWT(client_email, null, private_key, SCOPES);
+    // await this.authorizeClient();
+    // return this.oAuth2Client;
+    return this.JwtClient;
   }
 
   async getClientSecrets() {
@@ -45,11 +49,14 @@ export default class MuseGoogleAuth {
   }
 
   async authorizeClient() {
-    this.logger.info('Getting OAuth2 client token');
+    // this.logger.info('Getting OAuth2 client token');
+    this.logger.info('Getting JWT client token');
     const token = await this.getToken();
-    this.logger.info('Setting OAuth2 client credentials');
+    // this.logger.info('Setting OAuth2 client credentials');
+    this.logger.info('Setting JWT client credentials');
     this.logger.debug(token, 'Setting tokens');
-    this.oAuth2Client.setCredentials(token);
+    // this.oAuth2Client.setCredentials(token);
+    this.JwtClient.setCredentials(token);
   }
 
   async readToken() {
