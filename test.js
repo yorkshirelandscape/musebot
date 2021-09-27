@@ -42,7 +42,7 @@ const REFS = {
 };
 
 let testing = false;
-let once = false;
+let once = true;
 let force = false;
 
 process.argv.forEach((val) => {
@@ -132,6 +132,7 @@ const checkRound = async () => {
   const musicChan = client.channels.cache.get(MUSIC_ID);
   // const testChan = client.channels.cache.get(TEST_VOTES);
   const testMusic = client.channels.cache.get(SKYNET);
+  console.log(channel);
 
   const recentSkynet = await testMusic.messages.fetch({ limit: 1 });
   const warnMsg = await recentSkynet.find((msg) => msg.author.bot && (msg.content.includes('One-Hour Warning')
@@ -382,6 +383,8 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
               const minSubTime = now.plus({ hours: minSub }).plus({ hours: voteHours });
               const maxSubTime = now.plus({ hours: maxSub }).plus({ hours: voteHours });
 
+              let msgMin = DateTime.now();
+              let msgMax = DateTime.now();
               if (minSubTime.hours > 20 || minSubTime.hours < 5) {
                 const minNextDay = minSubTime.plus({ days: 1 });
                 const minFiveamNext = DateTime.fromObject({
@@ -390,8 +393,10 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
                   day: minNextDay.day,
                   hour: 5,
                 });
-                msg = `Submissions for ${nextYear} are due between approximately <t:${Math.round(minFiveamNext.valueOf() / 1000)}:F> and <t:${Math.round(maxSubTime.valueOf() / 1000)}:F>.`;
-              } else if (maxSubTime.hours > 20 || maxSubTime.hours < 5) {
+                msgMin = minFiveamNext;
+              } else { msgMin = minSubTime; }
+
+              if (maxSubTime.hours > 20 || maxSubTime.hours < 5) {
                 const maxNextDay = maxSubTime.plus({ days: 1 });
                 const maxFiveamNext = DateTime.fromObject({
                   year: maxNextDay.year,
@@ -399,10 +404,9 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
                   day: maxNextDay.day,
                   hour: 5,
                 });
-                msg = `Submissions for ${nextYear} are due between approximately <t:${Math.round(minSubTime.valueOf() / 1000)}:F> and <t:${Math.round(maxFiveamNext.valueOf() / 1000)}:F>.`;
-              } else {
-                msg = `Submissions for ${nextYear} are due between approximately <t:${Math.round(minSubTime.valueOf() / 1000)}:F> and <t:${Math.round(maxSubTime.valueOf() / 1000)}:F>.`;
-              }
+                msgMax = maxFiveamNext;
+              } else { msgMax = maxSubTime; }
+              msg = `Submissions for ${nextYear} are due between approximately <t:${Math.round(msgMin.valueOf() / 1000)}:F> and <t:${Math.round(msgMax.valueOf() / 1000)}:F>.`;
 
               const sent = await musicChan.send(msg);
               await sent.pin();
