@@ -219,6 +219,10 @@ const nextMatch = async (matches) => {
         || (size === 32 && rndVal === 2)
       )
   ) {
+    const pins = await testChan.messages.fetchPinned();
+    const delPins = pins.filter((p) => p.author.bot);
+    delPins.each((p) => { p.unpin(); });
+
     testMusic.send('Beginning next year.');
     const sent = await channel.send(`React with 🎵 if you plan on voting in the ${year} bracket.`);
     const sentTest = await testChan.send(`React with 🎵 if you plan on voting in the ${year} bracket.`);
@@ -239,7 +243,12 @@ const nextMatch = async (matches) => {
     await clearRanges(Object.values(VOTE_RANGES));
   }
 
-  if (song === 1) { testMusic.send('Beginning next round.'); }
+  if (song === 1) {
+    testMusic.send('Beginning next round.');
+    const pins = await testChan.messages.fetchPinned();
+    const delPins = pins.filter((p) => p.author.bot && !p.content.includes('🎵'));
+    delPins.each((p) => { p.unpin(); });
+  }
 
   if (header) {
     const sent = await channel.send(header);
