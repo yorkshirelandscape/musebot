@@ -282,11 +282,37 @@ const nextMatch = async (matches) => {
       roundMin = 24;
       roundMax = 24;
     }
-    now = DateTime.now();
+
+    const roundEndMin = now.plus({ hours: roundMin }).minus({ minutes: 15 });
+    const roundEndMax = now.plus({ hours: roundMax }).minus({ minutes: 15 });
+    let roundMinExtra = 0;
+    let roundMaxExtra = 0;
+
+    if (roundEndMin.hours > 20 || roundEndMin.hours < 5) {
+      const delayStart = DateTime.now();
+      delayStart.plus({ days: roundEndMin.hours > 20 ? 1 : 0 });
+      delayStart.set({ hour: 5 });
+      delayStart.set({ minute: 0 });
+      delayStart.set({ millisecond: 0 });
+      roundMinExtra += delayStart.diff(roundEndMin, 'hours').hours;
+    }
+
+    if (roundEndMax.hours > 20 || roundEndMax.hours < 5) {
+      const delayStart = DateTime.now();
+      delayStart.plus({ days: roundEndMax.hours > 20 ? 1 : 0 });
+      delayStart.set({ hour: 5 });
+      delayStart.set({ minute: 0 });
+      delayStart.set({ millisecond: 0 });
+      roundMaxExtra += delayStart.diff(roundEndMax, 'hours').hours;
+    }
+
+    roundMin += roundMinExtra;
+    roundMax += roundMaxExtra;
+
     const footMsg = footer.replace('$1', roundMin)
-      .replace('$2', `<t:${Math.round(now.plus({ hours: roundMin }).minus({ minutes: 15 }).valueOf() / 1000)}:F>`)
+      .replace('$2', `<t:${Math.round(roundEndMin.plus({ hours: roundMinExtra }).valueOf() / 1000)}:F>`)
       .replace('$3', roundMax)
-      .replace('$4', `<t:${Math.round(now.plus({ hours: roundMax }).minus({ minutes: 15 }).valueOf() / 1000)}:F>`);
+      .replace('$4', `<t:${Math.round(roundEndMax.plus({ hours: roundMaxExtra }).valueOf() / 1000)}:F>`);
     const sent = await channel.send(footMsg);
     const sentTest = await testChan.send(footMsg);
 
