@@ -27,7 +27,7 @@ const TOKEN_PATH = 'token.json';
 
 const REFS = {
   year: 'Dashboard!B1',
-  dupes: 'Dupes!A2:M',
+  dupes: 'Dupes!A2:N',
 };
 
 // let skipstat = false;
