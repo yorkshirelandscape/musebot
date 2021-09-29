@@ -42,7 +42,7 @@ const REFS = {
 };
 
 let testing = false;
-let once = true;
+let once = false;
 let force = false;
 
 process.argv.forEach((val) => {
@@ -132,7 +132,6 @@ const checkRound = async () => {
   const musicChan = client.channels.cache.get(MUSIC_ID);
   // const testChan = client.channels.cache.get(TEST_VOTES);
   const testMusic = client.channels.cache.get(SKYNET);
-  console.log(channel);
 
   const recentSkynet = await testMusic.messages.fetch({ limit: 1 });
   const warnMsg = await recentSkynet.find((msg) => msg.author.bot && (msg.content.includes('One-Hour Warning')
