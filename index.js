@@ -219,7 +219,7 @@ const nextMatch = async (matches) => {
         || (size === 32 && rndVal === 2)
       )
   ) {
-    const pins = await testChan.messages.fetchPinned();
+    const pins = await channel.messages.fetchPinned();
     const delPins = pins.filter((p) => p.author.bot);
     delPins.each((p) => { p.unpin(); });
 
@@ -245,7 +245,7 @@ const nextMatch = async (matches) => {
 
   if (song === 1) {
     testMusic.send('Beginning next round.');
-    const pins = await testChan.messages.fetchPinned();
+    const pins = await channel.messages.fetchPinned();
     const delPins = pins.filter((p) => p.author.bot && !p.content.includes('🎵'));
     delPins.each((p) => { p.unpin(); });
   }
