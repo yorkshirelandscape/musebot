@@ -1,137 +1,137 @@
 import random, math
 
-year = 2003
+year = 1970
 bracketsize = 128
 
 #Paste songs in here from the Seeds tab. Columns B through H
-songstxt = """1	0	Volrath	2003	Windowpane	Opeth	https://youtu.be/bSpqLqC7U6g
-2	0	Bluey The Bear	2003	There There (The Boney King of Nowhere)	Radiohead	https://www.youtube.com/watch?v=Z2aH-sluR5s
-3	0	wharf_rat	2003	Transdermal Celebration	Ween	https://www.youtube.com/watch?v=Nt9uNomdCHg
-4	0	Volrath	2003	Seven Nation Army	The White Stripes	https://youtu.be/RDuzszjrdcc
-5	0	Sharur	2003	Instrumental Illness	The Allman Brothers Band	https://youtu.be/Z1_6HPpTuuU
-6	0	bazkitcase5	2003	Bring Me To Life	Evanescence	https://youtu.be/-eGM0IJc70Y
-7	0	seanahan	2003	Maps	Yeah Yeah Yeahs	https://www.youtube.com/watch?v=UKRo86ccTtY
-8	0	tufftaeh	2003	The Closest Thing to Crazy	Katie Melua	https://www.youtube.com/watch?v=a3C4Efws8QU
-9	0	seanahan	2003	Red Right Ankle	The Decemberists	https://www.youtube.com/watch?v=axkyYrismAw
-10	1	Mort	2003	Hope Leaves	Opeth	https://youtu.be/cGPRoszjnWA
-11	1	threelinewhip	2003	Deadhead	The Devin Townsend Band	https://www.youtube.com/watch?v=2_vOX3s9f_w
-12	1	seanahan	2003	The Quiet Things That No One Ever Knows	Brand New	https://www.youtube.com/watch?v=MB6ESvoBwxI
-13	1	Donkey-Dude	2003	Put Up Or Shut Up	Gang Starr	https://www.youtube.com/watch?v=A-WdRSfC0kU
-14	1	aku chi	2003	Mr. Brightside	The Killers	https://www.youtube.com/watch?v=m2zUrruKjDQ
-15	1	wharf_rat	2003	Tweezer | 2/28/03 | Uniondale, NY	Phish	https://www.youtube.com/watch?v=25GWjze0WlU
-16	1	Donald X.	2003	Title and Registration	Death Cab for Cutie	https://www.youtube.com/watch?v=KGEyqP0744c
-17	1	Sharur	2003	Hardware Store	"Weird Al" Yankovic	https://youtu.be/DFI6cV9slfI
-18	1	dryope	2003	Sparkling Truth	Dhafer Youssef	https://youtu.be/qZ_6tQ62KHQ
-19	1	xyrix	2003	Easy Lee	Ricardo Villalobos	https://www.youtube.com/watch?v=JvoipeZSh6k 
-20	1	Dgdanp	2003	A Favor House Atlantic	Coheed and Cambria	https://m.youtube.com/watch?v=IcrCoHFUML0
-21	1	alatar224	2003	Ridiculosous	Electrocution 250	https://www.youtube.com/watch?v=nGRpahTo5xw
-22	1	nottoobad	2003	Passenger Seat	Death Cab for Cutie	https://www.youtube.com/watch?v=J0Iv4onsrIE
-23	1	Valendale	2003	J'en ai marre!	Alizée	https://youtu.be/HeWF_fy8tLE
-24	1	bazkitcase5	2003	Who's Gonna Save Us	The Living End	https://youtu.be/NWX2c1yNfaM
-25	1	Mollo8	2003	Eyes Wide Open	King Crimson	https://youtu.be/92ldx4Ze8RA
-26	1	markusin	2003	Trogdor	Strong Bad	https://www.youtube.com/watch?v=HjAmB6vDGmI
-27	1	singletee	2003	Strict Machine	Goldfrapp	https://www.youtube.com/watch?v=zU51JiFYhY4
-28	1	Wonko	2003	Art is Hard	Cursive	https://youtu.be/AoNA-MkygH8
-29	1	Lemonspawn	2003	Defying Gravity	Idina Menzel, Kristin Chenoweth	https://youtu.be/fEq3xM-i0Ng
-30	1	volfied	2003	House of Jealous Lovers	The Rapture	https://www.youtube.com/watch?v=C_l4b6xEUCM
-31	1	sweetjohn33	2003	The Fine Print	King Geedorah	https://youtu.be/e4dsyKNEb-c
-32	1	pproteus	2003	Where Is The Love?	The Black Eyed Peas	https://www.youtube.com/watch?v=PZj_I0DBtKU
-33	1	jsh	2003	Black Cab	Jens Lekman	https://www.youtube.com/watch?v=vdX0nf8nzDM
-34	6	Donkey-Dude	2003	Skills	Gang Starr	https://www.youtube.com/watch?v=S1y3UVmmFMo
-35	2	alatar224	2003	I Got My Eyes on You	Robert Belfour	https://www.youtube.com/watch?v=5UmT9O_RNrQ
-36	2	tufftaeh	2003	Picture Of Innocence	Deep Purple	https://www.youtube.com/watch?v=FAxq8SUKccs
-37	2	wharf_rat	2003	I Saw A Hippie Girl On 8th Avenue	Jeffrey Lewis	https://www.youtube.com/watch?v=vJKbPLVswmY
-38	2	dryope	2003	Sogeki-syu	Susumu Hirasawa	https://youtu.be/an2VLnLfzP0
-39	2	threelinewhip	2003	Away	The Devin Townsend Band	https://www.youtube.com/watch?v=oEJJxPgwkzA
-40	2	Bluey The Bear	2003	迷彩 [Meisai]	Sheena Ringo	https://www.youtube.com/watch?v=WbUNBDizSIQ
-41	0	Donkey-Dude	2003	X Gon' Give It To Ya	DMX	https://www.youtube.com/watch?v=ChUUcW4aw2k
-42	2	bazkitcase5	2003	Dare You To Move	Switchfoot	https://youtu.be/B5Gvdgs_R1c
-43	2	Valendale	2003	Breaking the Habit	Linkin Park	https://youtu.be/_e7bqZGPyFI
-44	2	aku chi	2003	Hands Down	Dashboard Confessional	https://www.youtube.com/watch?v=V_4qNnbbtsY
-45	2	nottoobad	2003	Far From Any Road	The Handsome Family	https://www.youtube.com/watch?v=TRJ_s2G76Hg
-46	2	Donald X.	2003	All For Swinging You Around	The New Pornographers	https://www.youtube.com/watch?v=PaFEPctPebE
-47	2	Wonko	2003	Flim	The Bad Plus	https://youtu.be/HeMre0Sp7o4
-48	2	markusin	2003	Sing for Absolution	Muse	https://www.youtube.com/watch?v=xDOwjPWCU3g
-49	2	xyrix	2003	Hustle Rose	Metric	https://www.youtube.com/watch?v=A_UFawnJwOc
-50	2	Sharur	2003	The White Tree	Howard Shore	https://youtu.be/kbf94uPFXNA
-51	2	Dgdanp	2003	Weapon	Mathew Good	https://m.youtube.com/watch?v=XOee1xTUubc
-52	2	volfied	2003	Gay Bar	Electric Six	https://www.youtube.com/watch?v=J04sfXbS2PA
-53	2	jsh	2003	The First Single	The Format	https://www.youtube.com/watch?v=irSF0OGDX5k
-54	2	Mort	2003	I am the Morning	Oceansize	https://youtu.be/_-bT4hcfoRw
-55	2	Mollo8	2003	Rucci	Austin TV	https://youtu.be/beJ92hKfSG0
-56	2	sweetjohn33	2003	Anti-Matter	King Geedorah	https://youtu.be/BU0KjU2o0lA
-57	2	singletee	2003	Toxic	Britney Spears	https://www.youtube.com/watch?v=tVdr_JWmnsA
-58	2	pproteus	2003	Reptilia	The Strokes	https://www.youtube.com/watch?v=h-GJOlf9HtE
-59	2	Lemonspawn	2003	My Coco	stellastarr*	https://youtu.be/RZTVm8ouBBQ
-60	3	Bluey The Bear	2003	New Killer Star	David Bowie	https://www.youtube.com/watch?v=aiJ0CoVsEm0
-61	3	threelinewhip	2003	Go To Sleep	Radiohead	https://www.youtube.com/watch?v=6qn5SfmkbKE
-62	3	seanahan	2003	Vehicles and Animals	Athlete	https://www.youtube.com/watch?v=WUVSrkcZMf4
-63	3	Donald X.	2003	Bouncer's Conversation	Liz Phair	https://www.youtube.com/watch?v=sscPyQLQRI0
-64	3	Mort	2003	Honor Thy Father	Dream Theater	https://youtu.be/P_8brIcOiG8
-65	3	wharf_rat	2003	Hunting Wabbits	Gordon Goodwin's Big Phat Band	https://www.youtube.com/watch?v=Ai-SuZUYOH8
-66	3	nottoobad	2003	Callin' Out	Lyrics Born	https://www.youtube.com/watch?v=gL-xQbb5BaM
-67	2	Volrath	2003	I Don't Wanna Be Me	Type O Negative	https://youtu.be/A8rpm0Eue-o
-68	3	xyrix	2003	Galang	M.I.A.	https://www.youtube.com/watch?v=7rg4u3byLcs
-69	3	markusin	2003	Missouri Loves Company	Ringo Starr	https://www.youtube.com/watch?v=_ETe32_q0VY
-70	3	Donkey-Dude	2003	In My Time of Need	Opeth	https://www.youtube.com/watch?v=razzBeBLDG4
-71	3	volfied	2003	Gravedigger	Dave Matthews	https://www.youtube.com/watch?v=-XtjGR46hEU
-72	3	dryope	2003	Tensor	Carbon Based Lifeforms	https://youtu.be/aibZkcOsmcE
-73	3	Valendale	2003	Angry White Polka	Weird Al Yankovic	https://youtu.be/BeklDFFg6p8
-74	3	alatar224	2003	No Trust	The Black Keys	https://www.youtube.com/watch?v=R-AKSxqHhOE
-75	3	tufftaeh	2003	Did I Say That?	Meat Loaf	https://www.youtube.com/watch?v=6HBd-TZnH2o
-76	3	singletee	2003	We Will Become Silhouettes	The Postal Service	https://www.youtube.com/watch?v=pp2N2u4uAg4
-77	3	pproteus	2003	Orca	Wintersleep	https://www.youtube.com/watch?v=2e2e3QU4ft0
-78	3	sweetjohn33	2003	Lady Brown	Nujabes	https://youtu.be/V8Xh5ErjIyM
-79	3	Dgdanp	2003	Dream to Make Believe	Armor For Sleep	https://m.youtube.com/watch?v=KHKGeoVOIPE
-80	3	aku chi	2003	Why Can't I?	Liz Phair	https://www.youtube.com/watch?v=Rtm9xNKfgd0
-81	3	Wonko	2003	True To Myself	Ziggy Marley	https://youtu.be/c_ac824FUU8
-82	3	Lemonspawn	2003	Now It's On	Grandaddy	https://youtu.be/lJCSJhYbFHQ
-83	3	jsh	2003	Piazza, New York Catcher	Belle & Sebastian	https://www.youtube.com/watch?v=QXiRbf-4RXc
-84	3	Mollo8	2003	The Paper-Hearted Ghost	Chamber	https://youtu.be/WNgl3VkjdGQ
-85	3	bazkitcase5	2003	Your Mistake	Sister Hazel	https://youtu.be/PzRc8Xc6uB0
-86	3	Sharur	2003	Lucy Mae Blues	Buddy Guy	https://youtu.be/AADvGVLClpc
-87	4	Donkey-Dude	2003	Son et Lumiere / Inertiatic Esp	The Mars Volta	https://www.youtube.com/watch?v=f4ntjKcRh8w
-88	4	threelinewhip	2003	A Room and a Riddle	Hammers of Misfortune	https://www.youtube.com/watch?v=qmKTaMry1V4
-89	4	alatar224	2003	Siam vs. Mexico (The Saddest Music in the World)	Xio Nan Wang, The Mini-Mariachis	https://www.youtube.com/watch?v=v6S6TPVLuYw
-90	4	xyrix	2003	Chump Change	The New Pornographers	https://www.youtube.com/watch?v=i1VQwpjyrXU
-91	4	Bluey The Bear	2003	The Hardest Button to Button	The White Stripes	https://www.youtube.com/watch?v=N3ceE43AHyw
-92	4	Mort	2003	The Noose	A Perfect Circle	https://youtu.be/ngZvHBUdYYY
-93	5	Dgdanp	2003	I Hate Everything About You	Three Days Grace	https://m.youtube.com/watch?v=gqbQuypKCCU
-94	4	markusin	2003	Homer's Day (The Simpsons: Hit & Run)	Marc Baril, Allan Levy, and Jeff Tymoschuk	https://www.youtube.com/watch?v=7u65WiPxZKc
-95	4	tufftaeh	2003	Tear Off Your Own Head	The Bangles	https://www.youtube.com/watch?v=FwVvf_8oWFk
-96	0	sweetjohn33	2003	Meant to Live	Switchfoot	https://youtu.be/OXcrEVFZOXs
-97	4	nottoobad	2003	White Flag	Dido	https://www.youtube.com/watch?v=jRqhGC5vgC0
-98	4	aku chi	2003	Hysteria	Muse	https://www.youtube.com/watch?v=27zOar_iEOA
-99	4	Sharur	2003	Have Love, Will Travel	The Black Keys	https://youtu.be/EqGJyffCyow
-100	4	Valendale	2003	Another Joe	Masami Ueda & Masakazu Sugimori	https://youtu.be/_OjJ_64d_vU
-101	4	Donald X.	2003	Genius In France	Weird Al Yankovic	https://www.youtube.com/watch?v=ZwFf9vGRqcs
-102	4	Wonko	2003	Give Me a Try	Sizzla	https://youtu.be/55Iv_y1SxgU
-103	4	singletee	2003	As the Rush Comes	Motorcycle	https://www.youtube.com/watch?v=Bi2dYFk65uw
-104	4	Lemonspawn	2003	Kissing the Lipless	The Shins	https://youtu.be/ffQji-kJ7Tg
-105	4	volfied	2003	Loneliness	Annie Lennox	https://www.youtube.com/watch?v=twUPnqQRaUA
-106	4	jsh	2003	O Vencedor	Los Hermanos	https://www.youtube.com/watch?v=9mXBTKKXCQU
-107	4	pproteus	2003	Romulus	Sufjan Stevens	https://www.youtube.com/watch?v=KOuepo6DP4k
-108	4	dryope	2003	Revelation	Irfan	https://youtu.be/Bg0OOwEozcg
-109	4	bazkitcase5	2003	So Far Away	Staind	https://youtu.be/vTxFQGb3Op4
-110	4	Mollo8	2003	Sin Aliento	Santa Sabina	https://youtu.be/ZpiX-7cIzSc
-111	5	volfied	2003	Out of Time	Blur	https://www.youtube.com/watch?v=WPMgj1xMvX4
-112	5	jsh	2003	Black Math	The White Stripes	https://www.youtube.com/watch?v=WMbL2K3xVEM
-113	5	Valendale	2003	Faint	Linkin Park	https://youtu.be/yOW7Eh81Gto
-114	5	pproteus	2003	Slipping Husband	The National	https://www.youtube.com/watch?v=YELOZayRHrc
-115	5	singletee	2003	Loreley	Blackmore's Night	https://www.youtube.com/watch?v=tUhmjmkLnxY
-116	5	dryope	2003	Seventh Heaven Suite	Dhafer Youssef	https://youtu.be/FzdfHp1hss0
-117	5	Mollo8	2003	Hey! Amigo!	Alizée	https://youtu.be/Asz1lgXsUyo
-118	5	alatar224	2003	Total Eclipse of the Heart	The Dan Band	https://www.youtube.com/watch?v=ZRFYAjS-PZM
-119	5	Wonko	2003	Heart of Glass	The Bad Plus	https://youtu.be/2zmg_msBtDQ
-120	5	aku chi	2003	One Big Holiday	My Morning Jacket	https://www.youtube.com/watch?v=vhd7vOmevWk
-121	5	nottoobad	2003	Cavalier Eternal	Against Me!	https://www.youtube.com/watch?v=a0re5ioFPXI
-122	5	Donald X.	2003	Us	Regina Spektor	https://www.youtube.com/watch?v=wtejQSAl_NI
-123	5	wharf_rat	2003	Vibrate	Outkast	https://www.youtube.com/watch?v=mQlp9Va80A4
-124	4	Volrath	2003	Ruin	Lamb Of God	 https://youtu.be/W3QoLh8fKGc
-125	5	Sharur	2003	Shadow Boxed	Procol Harum	https://youtu.be/L8wl98Cf-z0
-126	5	tufftaeh	2003	Growing On Me	The Darkness	https://www.youtube.com/watch?v=xSP8zikWPDw
-127	5	xyrix	2003	Weather Systems	Andrew Bird	https://www.youtube.com/watch?v=1kAKKUk7TSQ 
-128	5	Donkey-Dude	2003	Sweet Amber	Metallica	https://www.youtube.com/watch?v=58-AndGTKy0"""
+songstxt = """1	0	aku chi	1970	25 or 6 to 4	Chicago	https://www.youtube.com/watch?v=iPYH4s7_e34
+2	0	aku chi	1970	All Right Now	Free	https://www.youtube.com/watch?v=lSdBtoIIYT4
+3	0	bazkitcase5	1970	Up Around The Bend	Creedence Clearwater Revival	https://youtu.be/DX3o1O8ZsTw
+4	0	bazkitcase5	1970	Paranoid	Black Sabbath	https://youtu.be/I-ZQZC4lUfk
+5	0	Bluey The Bear	1970	The Man Who Sold the World	David Bowie	https://www.youtube.com/watch?v=g33-W9t2q2Q
+6	0	Bluey The Bear	1970	My Sweet Lord	George Harrison	https://www.youtube.com/watch?v=SP9wms6oEMo
+7	0	Donkey-Dude	1970	Layla	Derek & the Dominos	https://www.youtube.com/watch?v=TngViNw2pOo
+8	0	Donkey-Dude	1970	Let It Be	The Beatles	https://www.youtube.com/watch?v=QDYfEBY9NM4
+9	0	jsh	1970	War Pigs	Black Sabbath	https://www.youtube.com/watch?v=LQUXuQ6Zd9w
+10	0	markusin	1970	Black Magic Woman/Gypsy Queen	Santana	https://www.youtube.com/watch?v=9wT1s96JIb0
+11	0	markusin	1970	Moondance	Van Morrison	https://www.youtube.com/watch?v=7kfYOGndVfU
+12	0	markusin	1970	With You There to Help Me	Jethro Tull	https://www.youtube.com/watch?v=gfKzPV-Ely4
+13	0	Mollo8	1970	Samba Pa Ti	Santana	https://youtu.be/timZoOs9ozo
+14	0	MuensterCheese	1970	Immigrant Song	Led Zeppelin	https://youtu.be/5eHkjPCGXKQ
+15	0	nottoobad	1970	Wild World	Cat Stevens	https://www.youtube.com/watch?v=jiG7a0q-KYI
+16	0	nottoobad	1970	Fire and Rain	James Taylor	https://www.youtube.com/watch?v=N8u8tASPtwg
+17	0	nottoobad	1970	Box of Rain	Grateful Dead	https://www.youtube.com/watch?v=lx4msy_rZAI
+18	0	pproteus	1970	The Boxer	Simon & Garfunkel	https://www.youtube.com/watch?v=l3LFML_pxlY
+19	0	pproteus	1970	Atom Heart Mother	Pink Floyd	https://www.youtube.com/watch?v=uUHb3cBvWMY
+20	0	seanahan	1970	Have You Ever Seen the Rain	Creedence Clearwater Revival	https://www.youtube.com/watch?v=Gu2pVPWGYMQ
+21	0	Sharur	1970	Midnight Rider	The Allman Brothers Band	https://youtu.be/CoCaPJWqa28
+22	0	singletee	1970	Bridge Over Troubled Water	Simon & Garfunkel	https://www.youtube.com/watch?v=4G-YQA_bsOU
+23	0	singletee	1970	Teach Your Children	Crosby, Stills, Nash & Young	https://www.youtube.com/watch?v=r72QF7JOQvw
+24	0	singletee	1970	Have You Ever Seen the Rain?	Creedence Clearwater Revival	https://www.youtube.com/watch?v=iyf0ZIh3SVo
+25	0	tufftaeh	1970	Your Song	Elton John	https://www.youtube.com/watch?v=FT3D1Cu6g10
+26	0	volfied	1970	Green-Eyed Lady	Sugarloaf	https://www.youtube.com/watch?v=RYbmls7c8EM
+27	0	Volrath	1970	Gallows Pole	Led Zeppelin	https://youtu.be/CmxaT37yeOs
+28	0	Wonko	1970	Miles From Nowhere	Cat Stevens	https://youtu.be/fsI5IiHVVXw
+29	0	xyrix	1970	I Heard It Through The Grapevine	Creedence Clearwater Revival	https://www.youtube.com/watch?v=bukPjk5zdLc 
+30	1	alatar224	1970	No More White Horses	T2	https://www.youtube.com/watch?v=EkF7TQMbo68
+31	1	bazkitcase5	1970	Everything Is Beautiful	Ray Stevens	https://youtu.be/F-zhLihVN3U
+32	1	Donald X.	1970	Are You Sleeping?	Harry Nilsson	https://www.youtube.com/watch?v=_6rCoShZjjQ
+33	1	Donkey-Dude	1970	Wicked World	Black Sabbath	https://www.youtube.com/watch?v=q9_sGE54wo4
+34	1	dryope	1970	Misty Canyon	Sven Libaek And His Orchestra	https://youtu.be/6iniYD3sryE
+35	1	jsh	1970	Northern Sky	Nick Drake	https://www.youtube.com/watch?v=BBBkFWXiL9Q
+36	1	Lemonspawn	1970	Lucretia Mac Evil	Blood, Sweat & Tears	https://youtu.be/CGMGBYfg334
+37	1	Mollo8	1970	El triste	José José	https://youtu.be/D42jooB9ghk
+38	1	Mort	1970	Then	Yes	https://youtu.be/5lJPJrVz26s
+39	1	nottoobad	1970	Don't Let It Bring You Down	Neil Young	https://www.youtube.com/watch?v=eVy1h2FcRiM
+40	1	seanahan	1970	Strangers	The Kinks	https://www.youtube.com/watch?v=MR52MIJuZJY
+41	1	Sharur	1970	Wade in the Water	Little Sonny	https://youtu.be/tW-ulrOA-CA
+42	1	singletee	1970	Trouble	Cat Stevens	https://www.youtube.com/watch?v=7a2A7C3XA2A
+43	1	tufftaeh	1970	Gethsemane (I Only Want To Say)	Ian Gillan	https://www.youtube.com/watch?v=tf6yhMynTRo
+44	1	volfied	1970	Since I've Been Loving You	Led Zeppelin	https://www.youtube.com/watch?v=vcIem-L398w
+45	1	wharf_rat	1970	O-o-h Child	The Five Stairsteps	https://www.youtube.com/watch?v=gIsj8VxQNkw
+46	2	alatar224	1970	Swallow Song	Vashti Bunyan	https://www.youtube.com/watch?v=vPRIyJQa_iU
+47	2	Bluey The Bear	1970	Ride a White Swan	T. Rex	https://www.youtube.com/watch?v=K_5IQrQ6x04
+48	2	Donald X.	1970	Dark Globe	Syd Barrett	https://www.youtube.com/watch?v=xEr6w7P44Nk
+49	2	dryope	1970	Walkin' Down The Gloomy Streets...Alone...Broke...Depressed...Gonna Kill Myself Blues	Gil Mellé	https://youtu.be/E6hbfGbH9sU
+50	2	jsh	1970	Força bruta	Jorge Ben	https://youtu.be/uVjR30c-AYE
+51	2	Lemonspawn	1970	Make Me Smile	Chicago	https://youtu.be/fm4E_mxoamk
+52	2	markusin	1970	Southern Man	Neil Young	https://www.youtube.com/watch?v=m5FCcDEA6mY
+53	2	Mort	1970	Introduction	Gracious!	https://youtu.be/Mhra6Daq05Q
+54	2	MuensterCheese	1970	Pictures of a City	King Crimson	https://youtu.be/EY8lPaA0f9o
+55	2	pproteus	1970	Heaven On Their Minds	Andrew Lloyd Webber & Tim Rice	https://www.youtube.com/watch?v=NcWxdbkyCkc
+56	2	Sharur	1970	It Brings a Tear	Audience	https://youtu.be/Mz0yecAmXS0
+57	2	tufftaeh	1970	Speed King	Deep Purple	https://www.youtube.com/watch?v=W_jfHvcAXRY
+58	2	volfied	1970	The Seeker	The Who	https://www.youtube.com/watch?v=UAbzlj3nf4E
+59	2	Volrath	1970	Roadhouse Blues	The Doors	https://youtu.be/n2_X4VTCoEo
+60	2	wharf_rat	1970	Friend of the Devil	Grateful Dead	https://www.youtube.com/watch?v=6uWwSJ0OCsM
+61	2	Wonko	1970	To Beat The Devil	Kris Kristofferson	https://youtu.be/faF0wOsVucw
+62	2	xyrix	1970	Morse	Som Imaginário 	https://www.youtube.com/watch?v=jxFrjtxk5iU 
+63	3	aku chi	1970	Sunny Road to Salina (Road to Salina)	Christophe	https://www.youtube.com/watch?v=nqu0LdNhJls
+64	3	alatar224	1970	Naü Ektila	Magma	https://www.youtube.com/watch?v=ime7DgdTPLY
+65	3	bazkitcase5	1970	To Cry You a Song	Jethro Tull	https://youtu.be/S5vto70Q23E
+66	3	Bluey The Bear	1970	Down on the Street	The Stooges	https://www.youtube.com/watch?v=xEcLZ5x4WDs
+67	3	Donald X.	1970	9 to 5 Pollution Blues	The World	https://www.youtube.com/watch?v=NlqDLestH84
+68	3	Donkey-Dude	1970	Black Sabbath	Black Sabbath	https://www.youtube.com/watch?v=ISXnYu-Or4w
+69	3	dryope	1970	Fragment of Fear	Johnny Harris	https://youtu.be/usnlPDLVFpI
+70	3	jsh	1970	Ripple	Grateful Dead	https://www.youtube.com/watch?v=n8Zb55njp8E
+71	3	Lemonspawn	1970	Fire and Water	Free	https://youtu.be/khMURIbXV9g
+72	3	Mollo8	1970	We've Only Just Begun	The Carpenters 	https://youtu.be/pAYiSb9rens
+73	3	MuensterCheese	1970	The Wizard	Black Sabbath	https://youtu.be/69rU9ajij10
+74	3	pproteus	1970	The Width Of A Circle	David Bowie	https://www.youtube.com/watch?app=desktop&v=pnRNAIQAc50
+75	3	seanahan	1970	The Only Living Boy in New York	Simon & Garfunkel	https://www.youtube.com/watch?v=5biEjyXNa2o
+76	3	Sharur	1970	What?	The Move	https://youtu.be/Q3S-U6jJjD0
+77	3	Volrath	1970	Run Through The Jungle	Creedence Clearwater Revival	https://youtu.be/EbI0cMyyw_M
+78	3	wharf_rat	1970	Brokedown Palace	Grateful Dead	https://www.youtube.com/watch?v=V3cNVAcfQLA
+79	3	Wonko	1970	Don't Let The Green Grass Fool Ya	Wilson Pickett	https://youtu.be/LCl0HPyrdQg
+80	3	xyrix	1970	Zanzibar 	Edu Lobo 	https://www.youtube.com/watch?v=0IfFu1c3BMg 
+81	4	aku chi	1970	Ohio	Crosby, Stills, Nash & Young	https://www.youtube.com/watch?v=l1PrUU2S_iw
+82	4	alatar224	1970	What Did I Say About the Box, Jack?	If	https://www.youtube.com/watch?v=XvqThvuUR68
+83	4	bazkitcase5	1970	Lucky Man	Emerson, Lake & Palmer	https://youtu.be/NyV1WCm1_hM
+84	4	Bluey The Bear	1970	Into the Mystic	Van Morrison	https://www.youtube.com/watch?v=pbZf8GY1-Ag
+85	4	Donald X.	1970	Out Where the Hills	Seatrain	https://www.youtube.com/watch?v=QyJGW9GZziE
+86	4	dryope	1970	Stepping Stones	Johnny Harris	https://youtu.be/kx_AtnvrSxg
+87	4	jsh	1970	The Man in Me	Bob Dylan	https://www.youtube.com/watch?v=G6oBqDkNz38
+88	4	Lemonspawn	1970	Lola	The Kinks	https://youtu.be/LFeqkIH80NE
+89	4	Mollo8	1970	Make It With You	Bread	https://youtu.be/ndY9yaSwnxM
+90	4	nottoobad	1970	Carry On	Crosby, Stills, Nash & Young	https://www.youtube.com/watch?v=EYl6nVr3aSI
+91	4	pproteus	1970	Free Your Mind And Your Ass Will Follow	Funkadelic	https://www.youtube.com/watch?v=Yw4lqwh5c1g
+92	4	seanahan	1970	Only Love Can Break Your Heart	Neil Young	https://www.youtube.com/watch?v=GsSHPc-tBms
+93	4	Sharur	1970	Amos Moses	Jerry Reed	https://youtu.be/PbXFHSa4YmQ
+94	4	tufftaeh	1970	She Came In Through The Bathroom Window	Joe Cocker	https://www.youtube.com/watch?v=hQTyPU9-FXQ
+95	4	volfied	1970	White Mountain	Genesis	https://www.youtube.com/watch?v=6hgYH3-HVrY
+96	4	Volrath	1970	American Woman	The Guess Who	 https://youtu.be/9uf6EY2BZBw
+97	4	wharf_rat	1970	Stage Fright	The Band	https://www.youtube.com/watch?v=NZMfZe7OFFk
+98	4	Wonko	1970	Sunday Sermon	Booker T & the M.G.s	https://youtu.be/MZeO2FY67LQ
+99	4	xyrix	1970	E.V.A.	Jean-Jacques Perrey 	https://www.youtube.com/watch?v=dXTGN_St-ho 
+100	5	aku chi	1970	Who'll Stop The Rain	Creedence Clearwater Revival	https://www.youtube.com/watch?v=T9MXNbpXQ3g
+101	5	alatar224	1970	Squeet	May Blitz	https://www.youtube.com/watch?v=BNPcyAedAWk
+102	5	Donald X.	1970	Sweet Jane	The Velvet Underground	https://www.youtube.com/watch?v=nkumhBVPGdg
+103	5	Donkey-Dude	1970	ABC	The Jackson 5	https://www.youtube.com/watch?v=X0Ph9Tc8tUw
+104	5	dryope	1970	Dodesukaden	Toru Takemitsu	https://youtu.be/vEWSK9N4Tqo
+105	5	jsh	1970	Move On Up	Curtis Mayfield	https://www.youtube.com/watch?v=6Z66wVo7uNw
+106	5	Lemonspawn	1970	Get Up (I Feel Like Being a) Sex Machine	James Brown	https://youtu.be/JOD-M7WZkZQ
+107	5	markusin	1970	Viens Tous Les Soirs	Nino Ferrer	https://www.youtube.com/watch?v=dBj-BLjHOJc
+108	5	Mollo8	1970	I'm Your Captain (Closer to home) 	Grand Funk Railroad	https://youtu.be/mmG1sjsv8fo
+109	5	seanahan	1970	Castles in the Air	Don McLean	https://www.youtube.com/watch?v=TI9NjQK_xm8
+110	5	Sharur	1970	Rock and Roll, Hoochie Koo	Johnny Winter	https://youtu.be/4rN8raAgkMo
+111	5	singletee	1970	Superstar	Murray Head and The Trinidad Singers	https://www.youtube.com/watch?v=gcekqH2FFhw
+112	5	tufftaeh	1970	Across the Universe	The Beatles	https://www.youtube.com/watch?v=90M60PzmxEE
+113	5	volfied	1970	Glad	Traffic	https://www.youtube.com/watch?v=mDwbO_aWu9Q
+114	5	Volrath	1970	All The Madmen	David Bowie	https://youtu.be/KrlvgARHdzc
+115	5	wharf_rat	1970	Darling Dear	The Jackson 5	https://www.youtube.com/watch?v=wKCrcZc0sWU
+116	5	Wonko	1970	Where Do The Children Play	Cat Stevens	https://youtu.be/gXDjnPvnDyE
+117	5	xyrix	1970	The Boxer 	Simon & Garfunkel	https://www.youtube.com/watch?v=l3LFML_pxlY
+118	6	alatar224	1970	Nasty Sex	La Revolución de Emiliano Zapata	https://www.youtube.com/watch?v=_mb0xL2Y2b8
+119	6	Bluey The Bear	1970	The Falconer	Nico	https://www.youtube.com/watch?v=85UN7BVkcYg
+120	6	Donald X.	1970	After the Gold Rush	Neil Young	https://www.youtube.com/watch?v=d6Zf4D1tHdw
+121	6	dryope	1970	Expectations	Sven Libaek And His Orchestra	https://youtu.be/X1d5a6jsDRE
+122	6	markusin	1970	Mississippi Queen	Mountain	https://www.youtube.com/watch?v=VbP4qf8PjfI
+123	6	Mollo8	1970	Mi árbol y yo	Alberto Cortez	https://youtu.be/bxKEYWc4Ubw
+124	6	nottoobad	1970	Cecilia	Simon & Garfunkel	https://www.youtube.com/watch?v=e5uei2AFEaQ
+125	6	pproteus	1970	The Silent Boatman	Parliament	https://www.youtube.com/watch?v=_CK8KPh167g
+126	6	singletee	1970	Father and Son	Cat Stevens	https://www.youtube.com/watch?v=ZxjTC0bmKls
+127	6	tufftaeh	1970	Blues Power (live, from Just One Night)	Eric Clapton	https://www.youtube.com/watch?v=2pQE5IN5hPE
+128	6	volfied	1970	Woodstock	Crosby, Stills, Nash & Young	https://www.youtube.com/watch?v=4lx86B6a3kc"""
 
 #μ
 

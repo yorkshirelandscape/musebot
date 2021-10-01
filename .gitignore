@@ -28,3 +28,4 @@ config.json
 credentials.json
 token.json
 *.log
+temp.js
