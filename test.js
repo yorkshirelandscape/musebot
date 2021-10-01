@@ -1,3 +1,4 @@
+/* eslint-disable no-unreachable */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable consistent-return */
@@ -12,7 +13,8 @@ const { Client, Intents, Collection } = require('discord.js');
 
 const client = new Client({
   intents:
-  [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
+  [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    Intents.FLAGS.GUILD_MEMBERS],
 });
 
 const fs = require('fs');
@@ -186,24 +188,37 @@ const checkRound = async () => {
         let roundMinWarn = roundMin - 1;
         let roundMaxWarn = roundMax - 1;
 
-        if (roundEndTime.plus({ hours: roundMin }).hours > 20
-          || roundEndTime.plus({ hours: roundMin }).hours < 5) {
-          const delayStart = DateTime.now();
-          delayStart.plus({ days: roundEndTime.plus({ hours: roundMin }).hours > 20 ? 1 : 0 });
-          delayStart.set({ hour: 5 });
-          delayStart.set({ minute: 0 });
-          delayStart.set({ millisecond: 0 });
-          roundMinWarn += delayStart.diff(roundEndTime, 'hours').hours;
+        console.log(roundEndTime.plus({ hours: roundMinWarn }).hour);
+
+        if (roundEndTime.plus({ hours: roundMin }).hour > 20
+          || roundEndTime.plus({ hours: roundMin }).hour < 5) {
+          const dtWarn = roundEndTime.plus({
+            hours: roundMin,
+            days: roundEndTime.plus({ hours: roundMin }).hour > 20 ? 1 : 0,
+          });
+          const delayStart = DateTime.fromObject({
+            year: dtWarn.year,
+            month: dtWarn.month,
+            day: dtWarn.day,
+            hour: 5,
+          });
+          roundMinWarn += Math.round(delayStart.diff(roundEndTime.plus({ hours: roundMinWarn }), 'hours').hours);
+          console.log(delayStart.hour);
         }
 
-        if (roundEndTime.plus({ hours: roundMax }).hours > 20
-          || roundEndTime.plus({ hours: roundMax }).hours < 5) {
-          const delayStart = DateTime.now();
-          delayStart.plus({ days: roundEndTime.plus({ hours: roundMax }).hours > 20 ? 1 : 0 });
-          delayStart.set({ hour: 5 });
-          delayStart.set({ minute: 0 });
-          delayStart.set({ millisecond: 0 });
-          roundMaxWarn += delayStart.diff(roundEndTime, 'hours').hours;
+        if (roundEndTime.plus({ hours: roundMax }).hour > 20
+          || roundEndTime.plus({ hours: roundMax }).hour < 5) {
+          const dtWarn = roundEndTime.plus({
+            hours: roundMax,
+            days: roundEndTime.plus({ hours: roundMax }).hour > 20 ? 1 : 0,
+          });
+          const delayStart = DateTime.fromObject({
+            year: dtWarn.year,
+            month: dtWarn.month,
+            day: dtWarn.day,
+            hour: 5,
+          });
+          roundMaxWarn += Math.round(delayStart.diff(roundEndTime.plus({ hours: roundMaxWarn }), 'hours').hours);
         }
 
         // if 80% are checked in and the round is half over OR
