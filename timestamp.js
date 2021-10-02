@@ -18,7 +18,8 @@ const { DateTime } = require('luxon');
 client.on('interactionCreate', async (interaction) => {
   if (interaction.commandName === 'tzstamp') {
     const msg = interaction.options.getString('msg');
-    const replacer = (match) => `<t:${DateTime.fromFormat(match, 'yyyy/MM/dd HH:mm').valueOf() / 1000}:F>`;
+    const raw = interaction.options.getBoolean('raw');
+    const replacer = (match) => `${raw ? '`' : ''}<t:${DateTime.fromFormat(match, 'yyyy/MM/dd HH:mm').valueOf() / 1000}:F>${raw ? '`' : ''}`;
     const newMsg = msg.replaceAll(/((\d{4})\/(\d{2})\/(\d{2}) (\d{2}):?(\d{2}))/g, replacer);
     if (newMsg === msg) {
       await interaction.reply('Could not find a suitable timestamp. Use yyyy/MM/dd HH:mm.');
