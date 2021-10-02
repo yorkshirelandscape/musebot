@@ -59,7 +59,7 @@ client.on('interactionCreate', async (interaction) => {
 
     if (typeof table !== 'string') {
       await interaction.reply('Could not find any submissions.');
-    } else if (interaction.guildId === null) {
+    } else if (interaction.guildId === null || hist === true) {
       await interaction.reply(`${table}`);
     } else {
       interaction.user.send(table);
