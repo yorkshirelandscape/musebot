@@ -24,15 +24,19 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // time.
 const TOKEN_PATH = 'token.json';
 
-const testing = false;
-
 const SOURCE_CHANNELS = [
   { name: 'music', id: '246342398123311104' },
   { name: 'music-meta', id: '763068914480840715' },
   { name: 'skynet', id: '864768873270345788' },
 ];
-const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1mBjOr2bNpNbPHmRGcPmxpAi3GlF6a5WhtRcjt8TvvP0');
+
+let hist = false;
+const MASTER_ID = '1mBjOr2bNpNbPHmRGcPmxpAi3GlF6a5WhtRcjt8TvvP0';
+const HISTORICAL_ID = '1MkRLpTvUiB5yKtRCexD7ooC0dbeUBrrQjrLyAocaT-4';
+// const TESTING_ID = '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po';
+let SPREADSHEET_ID = (hist === true ? HISTORICAL_ID : MASTER_ID);
 const READ_RANGE = 'SongsStaging!C2:G';
+const HIST_RANGE = 'Submissions!A2:E';
 const YEAR_RANGE = 'Lists!K2';
 
 client.on('interactionCreate', async (interaction) => {
@@ -41,15 +45,18 @@ client.on('interactionCreate', async (interaction) => {
       || SOURCE_CHANNELS.find(({ id }) => id === interaction.channel?.id))) return;
 
   if (interaction.commandName === 'songs') {
-    const year = (await getValue(YEAR_RANGE)).toString();
-    const readVals = await getValue(READ_RANGE);
+    const histYear = interaction.options.getString('year');
+    if (histYear !== null) hist = true;
+    SPREADSHEET_ID = (hist === true ? HISTORICAL_ID : MASTER_ID);
+    const year = (histYear !== null ? histYear : (await getValue(YEAR_RANGE)).toString());
+    const readVals = await getValue((histYear !== null ? HIST_RANGE : READ_RANGE));
 
     const filtArr = readVals.filter((s) => s[2] === year
     && (interaction.user.username.startsWith(s[1])
     || ((typeof interaction.member?.nickname !== 'undefined' && interaction.member?.nickname !== null) ? interaction.member?.nickname.startsWith(s[1]) : false)));
-
     const strArr = filtArr.map((r) => r.join('\t'));
     const table = strArr.join('\n');
+
     if (typeof table !== 'string') {
       await interaction.reply('Could not find any submissions.');
     } else if (interaction.guildId === null) {
