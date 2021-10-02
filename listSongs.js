@@ -26,17 +26,19 @@ const TOKEN_PATH = 'token.json';
 
 const testing = false;
 
-// const SOURCE_CHANNELS = [
-//   { name: 'music', id: '246342398123311104' },
-//   { name: 'music-meta', id: '763068914480840715' },
-//   { name: 'skynet', id: '864768873270345788' },
-// ];
+const SOURCE_CHANNELS = [
+  { name: 'music', id: '246342398123311104' },
+  { name: 'music-meta', id: '763068914480840715' },
+  { name: 'skynet', id: '864768873270345788' },
+];
 const SPREADSHEET_ID = (testing === true ? '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po' : '1mBjOr2bNpNbPHmRGcPmxpAi3GlF6a5WhtRcjt8TvvP0');
 const READ_RANGE = 'SongsStaging!C2:G';
 const YEAR_RANGE = 'Lists!K2';
 
 client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()) return;
+  if (!interaction.isCommand()
+    || !(interaction.guildId === null
+      || SOURCE_CHANNELS.find(({ id }) => id === interaction.channel?.id))) return;
 
   if (interaction.commandName === 'songs') {
     const year = (await getValue(YEAR_RANGE)).toString();
@@ -44,7 +46,7 @@ client.on('interactionCreate', async (interaction) => {
 
     const filtArr = readVals.filter((s) => s[2] === year
     && (interaction.user.username.startsWith(s[1])
-    || interaction.member.nickname?.startsWith(s[1])));
+    || ((typeof interaction.member?.nickname !== 'undefined' && interaction.member?.nickname !== null) ? interaction.member?.nickname.startsWith(s[1]) : false)));
 
     const strArr = filtArr.map((r) => r.join('\t'));
     const table = strArr.join('\n');
