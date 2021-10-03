@@ -333,26 +333,12 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
           }
 
           if (round !== '3P') {
-            let msg = '';
-            if (roundEndTime.plus({ hours: roundMax }).hours > 20
-              || roundEndTime.plus({ hours: roundMax }).hours < 5) {
-              now = DateTime.now();
-              const tomorrow = now.plus({ days: 1 });
-              const fiveamtomorrow = DateTime.fromObject({
-                year: tomorrow.year,
-                month: tomorrow.month,
-                day: tomorrow.day,
-                hour: 5,
-              });
-              msg = `The next round will begin at <t:${fiveamtomorrow.valueOf() / 1000}:F>`;
-            } else {
-              now = DateTime.now();
-              const resumeTime = Duration.fromObject({
-                hours: 1 - (now.hour % 2),
-                minutes: 60 - now.minute,
-              });
-              msg = `The next round will begin in ${resumeTime.hours > 0 ? `${resumeTime.hours}h` : ''}${resumeTime.minutes}m.`;
-            }
+            now = DateTime.now();
+            const resumeTime = Duration.fromObject({
+              hours: 1 - (now.hour % 2),
+              minutes: 60 - now.minute,
+            });
+            let msg = `The next round will begin in ${resumeTime.hours > 0 ? `${resumeTime.hours}h` : ''}${resumeTime.minutes}m.`;
             await musicChan.send(msg);
             if (testing === false) { await testMusic.send(msg); }
 
@@ -400,7 +386,9 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
               let msgMin = DateTime.now();
               let msgMax = DateTime.now();
               if (minSubTime.hours > 20 || minSubTime.hours < 5) {
-                const minNextDay = minSubTime.plus({ days: 1 });
+                const minNextDay = minSubTime.plus({
+                  days: minSubTime.hour > 20 ? 1 : 0,
+                });
                 const minFiveamNext = DateTime.fromObject({
                   year: minNextDay.year,
                   month: minNextDay.month,
@@ -411,7 +399,9 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
               } else { msgMin = minSubTime; }
 
               if (maxSubTime.hours > 20 || maxSubTime.hours < 5) {
-                const maxNextDay = maxSubTime.plus({ days: 1 });
+                const maxNextDay = maxSubTime.plus({
+                  days: maxSubTime.hour > 20 ? 1 : 0,
+                });
                 const maxFiveamNext = DateTime.fromObject({
                   year: maxNextDay.year,
                   month: maxNextDay.month,
