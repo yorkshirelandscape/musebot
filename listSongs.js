@@ -30,32 +30,41 @@ const SOURCE_CHANNELS = [
   { name: 'skynet', id: '864768873270345788' },
 ];
 
-let hist = false;
+function removeCols(array, remIndices) {
+  return array.map((arr) => arr.filter((_col, index) => !remIndices.includes(index)));
+}
+
 const MASTER_ID = '1mBjOr2bNpNbPHmRGcPmxpAi3GlF6a5WhtRcjt8TvvP0';
 const HISTORICAL_ID = '1MkRLpTvUiB5yKtRCexD7ooC0dbeUBrrQjrLyAocaT-4';
 // const TESTING_ID = '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po';
-let SPREADSHEET_ID = (hist === true ? HISTORICAL_ID : MASTER_ID);
-const READ_RANGE = 'SongsStaging!C2:G';
-const HIST_RANGE = 'Submissions!A2:E';
+let SPREADSHEET_ID = MASTER_ID;
+const READ_RANGE = 'SongsStaging!B2:G';
+const HIST_RANGE = 'Submissions!A2:F';
 const YEAR_RANGE = 'Lists!K2';
 
 client.on('interactionCreate', async (interaction) => {
+  let hist = false;
+  SPREADSHEET_ID = MASTER_ID;
   if (!interaction.isCommand()
     || !(interaction.guildId === null
       || SOURCE_CHANNELS.find(({ id }) => id === interaction.channel?.id))) return;
 
   if (interaction.commandName === 'songs') {
     const histYear = interaction.options.getString('year');
-    if (histYear !== null) hist = true;
+    const currYear = (await getValue(YEAR_RANGE, SPREADSHEET_ID)).toString();
+    const year = (histYear !== null ? histYear : currYear);
+    if (histYear !== null && histYear !== currYear) hist = true;
     SPREADSHEET_ID = (hist === true ? HISTORICAL_ID : MASTER_ID);
-    const year = (histYear !== null ? histYear : (await getValue(YEAR_RANGE)).toString());
-    const readVals = await getValue((histYear !== null ? HIST_RANGE : READ_RANGE));
+    const readVals = await getValue((
+      histYear !== null && histYear !== currYear ? HIST_RANGE : READ_RANGE
+    ), SPREADSHEET_ID);
 
-    const filtArr = readVals.filter((s) => s[2] === year
-    && (interaction.user.username.startsWith(s[1])
-    || ((typeof interaction.member?.nickname !== 'undefined' && interaction.member?.nickname !== null) ? interaction.member?.nickname.startsWith(s[1]) : false)));
-    const strArr = filtArr.map((r) => r.join('\t'));
-    const table = strArr.join('\n');
+    const filtArr = readVals.filter((s) => s[3] === year
+    && (interaction.user.username.startsWith(s[2])
+    || ((typeof interaction.member?.nickname !== 'undefined' && interaction.member?.nickname !== null) ? interaction.member?.nickname.startsWith(s[2]) : false)));
+    const thinArr = removeCols(filtArr, [2, 3]);
+    const strArr = thinArr.map((r) => r.join('\t'));
+    const table = `${interaction.user.username} : ${year}\n${strArr.join('\n')}`;
 
     if (typeof table !== 'string') {
       await interaction.reply('Could not find any submissions.');
@@ -78,7 +87,7 @@ const loadCredentials = () => {
   }
 };
 
-const getValue = async (rng) => getMsg(rng, await getAuthClient());
+const getValue = async (rng, ss) => getMsg(rng, ss, await getAuthClient());
 
 const getAuthClient = async () => authorize(loadCredentials());
 
@@ -124,11 +133,11 @@ const getNewToken = async (oAuth2Client) => {
   // there's probably a similar thing to do with oAuth2Client.getToken
 };
 
-const getMsg = async (rng, auth) => {
+const getMsg = async (rng, ss, auth) => {
   const sheets = google.sheets({ version: 'v4', auth });
   try {
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
+      spreadsheetId: ss,
       range: rng,
     });
     return response.data.values;
