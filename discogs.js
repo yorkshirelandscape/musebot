@@ -58,7 +58,7 @@ client.on('interactionCreate', async (interaction) => {
           || r.format.includes('Compilation'))
     ));
 
-    if (typeof year === 'undefined') await interaction.reply('No match.');
+    if (filtArr.length === 0) await interaction.reply('No match.');
 
     const {
       title, year, genre, style, master_url, cover_image,
