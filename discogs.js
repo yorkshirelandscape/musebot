@@ -32,24 +32,33 @@ client.on('interactionCreate', async (interaction) => {
       if (n !== 0) {
         return n;
       }
-      if (x.country !== y.country) {
-        if (x.country === 'US') { return -1; }
-        if (y.country === 'US') { return 1; }
-        if (x.country === 'UK') { return -1; }
-        if (y.country === 'UK') { return 1; }
-        return y.country.localeCompare(x.country);
-      }
+      // if (x.country !== y.country) {
+      //   // if (x.country === ('US' || 'UK') && y.country === ('US' || 'UK')) { return 0; }
+      //   if (x.country === 'US' && y.country === 'UK') { return 0; }
+      //   if (x.country === 'UK' && y.country === 'US') { return 0; }
+      //   // if (x.country === ('US' || 'UK')) { return -1; }
+      //   // if (y.country === ('US' || 'UK')) { return 1; }
+      //   // if (x.country === 'UK') { return -1; }
+      //   // if (y.country === 'UK') { return 1; }
+      //   return y.country.localeCompare(x.country);
+      // }
       return y.community.have - x.community.have;
     });
+
+    console.log(sortMap);
 
     const filtArr = sortMap.filter((r) => (
       !r.format.includes('Unofficial Release')
         && !r.format.includes('Promo')
         && !r.format.includes('EP')
         && !r.format.includes('Test Pressing')
+        // && !r.format.includes('EP')
         && (r.format.includes('Album')
-          || r.format.includes('Single'))
+          || r.format.includes('Single')
+          || r.format.includes('Compilation'))
     ));
+
+    if (typeof year === 'undefined') await interaction.reply('No match.');
 
     const {
       title, year, genre, style, master_url, cover_image,
