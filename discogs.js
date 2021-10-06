@@ -58,17 +58,15 @@ client.on('interactionCreate', async (interaction) => {
           || r.format.includes('Compilation'))
     ));
 
-    if (filtArr.length === 0) await interaction.reply('No match.');
-
-    const {
-      title, year, genre, style, master_url, cover_image,
-    } = filtArr[0];
-
     const plusArtist = searchArtist.replaceAll(/ /g, '+');
     const plusTrack = searchTrack.replaceAll(/ /g, '+');
     const searchURL = `https://www.discogs.com/search/?sort=year%2Casc&artist=${plusArtist}&track=${plusTrack}&type=release&layout=sm`;
 
-    console.log(filtArr);
+    if (filtArr.length === 0) await interaction.reply(`No match. [Discogs Search](${searchURL})`);
+
+    const {
+      title, year, genre, style, master_url, cover_image,
+    } = filtArr[0];
 
     const embed = new MessageEmbed()
       .setTitle(`${title} (${year})`)
