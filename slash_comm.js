@@ -51,14 +51,14 @@ const HISTORICAL_ID = '1MkRLpTvUiB5yKtRCexD7ooC0dbeUBrrQjrLyAocaT-4';
 const TESTING_ID = '1-xVpzfIVr76dSuJO8SO-Im55WQZd0F07IQNt-hhu_po';
 let SPREADSHEET_ID = (testing === true ? TESTING_ID : MASTER_ID);
 
-const ADDURL = [
-  { READ_RANGE: 'Dashboard!H2:H129' },
-];
-const LISTSONGS = [
-  { READ_RANGE: 'SongsStaging!B2:G' },
-  { HIST_RANGE: 'Submissions!A2:F' },
-  { YEAR_RANGE: 'Lists!K2' },
-];
+const ADDURL = {
+  READ_RANGE: 'Dashboard!H2:H129',
+};
+const LISTSONGS = {
+  READ_RANGE: 'SongsStaging!B2:G',
+  HIST_RANGE: 'Submissions!A2:F',
+  YEAR_RANGE: 'Lists!K2',
+};
 
 const ADMINS = [
   { name: 'DonaldX', id: '268846196888567810' },
@@ -150,7 +150,7 @@ client.on('interactionCreate', async (interaction) => {
   // END discogs
 
   // BEGIN addurl
-  if (interaction.commandName === 'addurl') {
+  if (interaction.commandName === 'addurl' && SOURCE_CHANNELS.find(({ id }) => id === interaction.channel?.id)) {
     const match = interaction.options.getInteger('match');
     const song = interaction.options.getInteger('song');
     const url = interaction.options.getString('url');
@@ -253,7 +253,7 @@ client.on('interactionCreate', async (interaction) => {
   // END replaceAll
 
   // BEGIN replaceurl
-  if (interaction.commandName === 'replaceurl') {
+  if (interaction.commandName === 'replaceurl' && SOURCE_CHANNELS.find(({ id }) => id === interaction.channel?.id)) {
     const match = interaction.options.getInteger('match');
     const song = interaction.options.getInteger('song');
     const url = interaction.options.getString('url');
