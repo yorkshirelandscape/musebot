@@ -24,13 +24,13 @@ overall_seeds64 = [ \
 osbysize = {128: overall_seeds128, 96: overall_seeds96, 64: overall_seeds64}
 overall_seeds = osbysize[bracketsize]
 
-#you can paste from outputsongs.txt to this string. By default it will just read from the file but maybe you wan to do this
+#you can paste from output.txt to this string. By default it will just read from the file but maybe you wan to do this
 songstxt = """
 
 """
 
 if songstxt.isspace():
-    f = open("seeding/outputsongs.txt", "r")
+    f = open("seeding/output.txt", "r")
     rawsongs = f.readlines()
     f.close()
 else:
