@@ -10,4 +10,5 @@ rules: {
   radix: ["error", "as-needed"],
   no-restricted-syntax: "off",
   import/extensions: "off"
+  indent: ["error", 4]
 }

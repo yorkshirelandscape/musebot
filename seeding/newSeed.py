@@ -14,11 +14,12 @@ class Song:
         self.submitter = submitter
         self.order = order
         self.seed = seed
-        self.badness = 0
-        # self.aDist = 0
-        # self.sDist = 0
-        # self.aCount = 0
-        # self.sCount = 0
+        self.quarter = 0
+        self.badness = float(0)
+        self.aDist = 0
+        self.sDist = 0
+        self.aCount = 0
+        self.sCount = 0
     def spreadsheetstr(self):
         #This is called "spreadsheet" but really it's for the other program
         return f"{self.order}\t{self.seed}\t{self.submitter}\t{year}\t{self.name}\t{self.artist}"
@@ -58,7 +59,7 @@ seedOrder64 = [ \
 seedOrderBySize = {128: seedOrder128, 96: seedOrder96, 64: seedOrder64}
 seedOrder = seedOrderBySize[bracketSize]
 
-hqs = [[[],[]],[[],[]]]
+# hqs = [[[],[]],[[],[]]]
 quarters = [[],[],[],[]]
 
 #the songs, divvied up by seed. The unused ones will be removed in a bit
@@ -105,11 +106,11 @@ orderDists = [ \
 [0, 0, 0, 0, 0, 0, 0]]
 lens = [0, 0, 0, 0]
 
-#probably a way to do this neater
 for i in range(4):
     for j in seedOrder[i]:
         nextSong = next((s for s in songs if s.seed == j), None)
         quarters[i].append(nextSong)
+        nextSong.quarter = i
         
 # for q in quarters:
 #     for s in q:
@@ -120,37 +121,18 @@ submitterCounts = {}
 
 for s in songs:
     if s.artist not in artistCounts.keys():
-        artistCounts[s.artist] = 1
-    else:
-        artistCounts[s.artist] += 1
+        artistCounts[s.artist] = {'total': 0, 0: 0, 1: 0, 2: 0, 3: 0}
+    artistCounts[s.artist]['total'] += 1
+    artistCounts[s.artist][s.quarter] += 1
     if s.submitter not in submitterCounts.keys():
-        submitterCounts[s.submitter] = 1
-    else:
-        submitterCounts[s.submitter] += 1
+        submitterCounts[s.submitter] = {'total': 0, 0: 0, 1: 0, 2: 0, 3: 0}
+    submitterCounts[s.submitter]['total'] += 1
+    submitterCounts[s.submitter][s.quarter] += 1    
 
-
-dd = dict(artistCounts = {}, submitterCounts = {})
-qCounts = []
-
-for i in range(4):
-    qCounts.append(dd)
-    
-i = 0
-for q in quarters:
-    for s in q:
-        if s.artist not in qCounts[i]['artistCounts'].keys():
-            qCounts[i]['artistCounts'][s.artist] = 1
-        else:
-            qCounts[i]['artistCounts'][s.artist] += 1
-        if s.submitter not in qCounts[i]['submitterCounts'].keys():
-            qCounts[i]['submitterCounts'][s.submitter] = 1
-        else:
-            qCounts[i]['submitterCounts'][s.submitter] += 1
-    i += 1
-
-print(str(qCounts))
+# print(submitterCounts)
 
 minADist = 8
+minSDist = 8
 for q in quarters:
     for s in q:
         aCount = sum(s.artist == ss.artist for ss in q)
@@ -158,9 +140,21 @@ for q in quarters:
             nextArtist = next((ss for ss in q if s.artist == ss.artist and s != ss), None)
             aDist = abs(q.index(nextArtist) - q.index(s))
             if aDist <= minADist:
-                s.badness = math.ceil(aDist / 2)
-                print(s.artist, s.name, s.badness)
+                s.badness += float(1 / aDist)
         
-        # s.sCount = sum(s.submitter == ss.submitter for ss in q)
-        # print(s.spreadsheetstr())
-        # print('Artist:', s.aCount, 'Submitter:', s.sCount)
+        sCount = sum(s.submitter == ss.submitter for ss in q)
+        if sCount > 1:
+            nextArtist = next((ss for ss in q if s.submitter == ss.submitter and s != ss), None)
+            sDist = abs(q.index(nextArtist) - q.index(s))
+            if sDist <= minSDist:
+                s.badness += float(1 / sDist)
+        print(s.artist, " - ", s.name, ": ", s.badness)
+        
+    # print(s.spreadsheetstr())
+    # print('Artist:', s.aCount, 'Submitter:', s.sCount)
+
+def swap(song, att):
+    for q in quarters:
+        sq = next((s for s in songs if s == song), None)
+        if sq == None:
+            r = next((s for s in songs if s.submitter == song.submitter and s != song), None)

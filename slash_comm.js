@@ -58,6 +58,7 @@ const LISTSONGS = {
   READ_RANGE: 'SongsStaging!B2:G',
   HIST_RANGE: 'Submissions!A2:F',
   YEAR_RANGE: 'Lists!K2',
+  ACTIVE_YEAR: 'Dashboard!B1'
 };
 
 const ADMINS = [
@@ -109,8 +110,6 @@ client.on('interactionCreate', async (interaction) => {
       }
       return y.community.have - x.community.have;
     });
-
-    console.log(sortMap);
 
     const filtArr = sortMap.filter((r) => (
       !r.format.includes('Unofficial Release')
@@ -195,12 +194,11 @@ client.on('interactionCreate', async (interaction) => {
   if (interaction.commandName === 'songs') {
     const histYear = interaction.options.getString('year');
     const currYear = (await getValue(LISTSONGS.YEAR_RANGE, SPREADSHEET_ID)).toString();
-    const year = (histYear !== null ? histYear : currYear);
-    if (histYear !== null && histYear !== currYear) hist = true;
+    const activeYear = (await getValue(LISTSONGS.ACTIVE_YEAR, SPREADSHEET_ID)).toString();
+    const year = (histYear !== null ? (histYear === activeYear ? activeYear : histYear) : currYear);
+    if (histYear !== null && histYear !== currYear && histYear !== activeYear) hist = true;
     SPREADSHEET_ID = (hist === true ? HISTORICAL_ID : MASTER_ID);
-    const readVals = await getValue((
-      histYear !== null && histYear !== currYear ? LISTSONGS.HIST_RANGE : LISTSONGS.READ_RANGE
-    ), SPREADSHEET_ID);
+    const readVals = await getValue((hist === true ? LISTSONGS.HIST_RANGE : LISTSONGS.READ_RANGE), SPREADSHEET_ID);
 
     const filtArr = readVals.filter((s) => s[3] === year
     && (interaction.user.username.startsWith(s[2])

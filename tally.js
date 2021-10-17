@@ -422,7 +422,7 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
           testMusic.send(msg);
           console.log(msg);
           console.log(roundEndTime.plus({ hours: roundMinWarn }).toFormat('M/d/yyyy HH:mm'));
-        } else {
+        } else if (now > roundEndTime.plus({ hours: roundMinWarn })) {
           // isolate the check-out messages and convert to an array
           const msgDelims = messages.filter((msg) => msg.content.includes('you have checked in and are done voting') && msg.deleted === false);
           // filter all the messages for those between the two most recent delimiters
