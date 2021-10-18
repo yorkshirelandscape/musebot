@@ -1,5 +1,7 @@
 import random, math, collections
 
+from itertools import cycle
+
 year = 1970
 bracketSize = 128
 
@@ -156,11 +158,14 @@ def calcBadness(song):
                 song.sBadness += float(1 / sDist)
     else: song.sBadness = 0
 
-def swap(song, a_s):
+def swap(song, a_s, qSkip = False):
     r = None
     qCheck = [0,0,0,0]
     while r == None and qCheck != [1,1,1,1]:
         for index, q in enumerate(quarters):
+            if qSkip == True:
+                qSkip = False
+                continue
             if index == song.quarter: 
                 qCheck[index] = 1
                 continue
@@ -185,8 +190,25 @@ def swap(song, a_s):
 for s in songs:
     calcBadness(s)
 
-while any(s.aBadness > 0.5 or s.sBadness > 0.5 for s in songs):
-    swap(s, 'a' if s.aBadness > s.sBadness else 's')
+iterSongs = cycle(songs)
+
+recent = []
+for index, s in enumerate(iterSongs):
+    if index == 0:
+            maxBadness = 0
+    if s.aBadness > 0.5 or s.sBadness > 0.5:
+        sCnt = sum(s == ss for ss in recent)
+        if sCnt == 1:
+            swap(s, 'a' if s.aBadness > s.sBadness else 's', True)
+        elif sCnt > 1:
+            break
+        else: swap(s, 'a' if s.aBadness > s.sBadness else 's', False)
+        recent.append(s)
+        if len(recent) > 8:
+            recent = recent[1 : 8]
+    maxBadness = max(maxBadness, s.aBadness, s.sBadness)
+    if index == bracketSize - 1:
+        if maxBadness < 0.5: break
 
 for i_q, q in enumerate(quarters):
     for i_s, s in enumerate(quarters[i_q]):
