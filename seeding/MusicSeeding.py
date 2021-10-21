@@ -1,7 +1,7 @@
 import random, math
 
-year = 1970
-bracketsize = 128
+year = 1963
+bracketsize = 64
 
 f = open("seeding/input.txt", "r")
 songstxt = f.readlines()
@@ -201,7 +201,7 @@ output = open("seeding/output.txt", "w")
 qbseedorder128 = [1, 32, 16, 17, 8, 25, 9, 24, 4, 29, 13, 20, 5, 28, 12, 21, 2, 31, 15, 18, 7, 26, 10, 23, 3, 30, 14, 19, 6, 27, 11, 22]
 qbseedorder96 = [1, 16, 17, 8, 9, 24, 4, 13, 20, 5, 12, 21, 2, 15, 18, 7, 10, 23, 3, 14, 19, 6, 11, 22]
 qbseedorder64 = [1, 16, 8, 9, 4, 13, 5, 12, 2, 15 ,7, 10, 3, 14, 6, 11]
-qbsbysize = {128: qbseedorder128, 96: qbseedorder96}
+qbsbysize = {128: qbseedorder128, 96: qbseedorder96, 64: qbseedorder64}
 qbseedorder = qbsbysize[bracketsize]
 
 def printandwrite(s=""):
