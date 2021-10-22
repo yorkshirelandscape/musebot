@@ -1,265 +1,240 @@
-import random, math, collections
+import collections
+import csv
+import itertools
+import math
+import operator
+import random
+import sys
 
-from itertools import cycle
 
-year = 1970
-bracketSize = 128
+YEAR = 1970
+BRACKET_SIZE = 128
+INPUT_PATH = "seeding/input.txt"
+# 'order' is the submitter's submission order
+# 'seed' is the final ranking
+INPUT_COLS = ["seed", "order", "submitter", "year", "title", "artist", "link"]
 
-f = open("seeding/input.txt", "r")
-songstxt = f.readlines()
-f.close()
+
+seed_order = {
+    128: [
+        [1, 128, 64, 65, 32, 97,  33, 96, 16, 113, 49, 80, 17, 112, 48, 81, 8, 121, 57, 72, 25, 104, 40, 89, 9,  120, 56, 73, 24, 105, 41, 88],
+        [4, 125, 61, 68, 29, 100, 36, 93, 13, 116, 52, 77, 20, 109, 45, 84, 5, 124, 60, 69, 28, 101, 37, 92, 12, 117, 53, 76, 21, 108, 44, 85],
+        [2, 127, 63, 66, 31, 98,  34, 95, 15, 114, 50, 79, 18, 111, 47, 82, 7, 122, 58, 71, 26, 103, 39, 90, 10, 119, 55, 74, 23, 106, 42, 87],
+        [3, 126, 62, 67, 30, 99,  35, 94, 14, 115, 51, 78, 19, 110, 46, 83, 6, 123, 59, 70, 27, 102, 38, 91, 11, 118, 54, 75, 22, 107, 43, 86],
+    ],
+    96: [
+        [1, 64, 65, 32, 33, 96, 16, 49, 80, 17, 48, 81, 8, 57, 72, 25, 40, 89, 9,  56, 73, 24, 41, 88],
+        [4, 61, 68, 29, 36, 93, 13, 52, 77, 20, 45, 84, 5, 60, 69, 28, 37, 92, 12, 53, 76, 21, 44, 85],
+        [2, 63, 66, 31, 34, 95, 15, 50, 79, 18, 47, 82, 7, 58, 71, 26, 39, 90, 10, 55, 74, 23, 42, 87],
+        [3, 62, 67, 30, 35, 94, 14, 51, 78, 19, 46, 83, 6, 59, 70, 27, 38, 91, 11, 54, 75, 22, 43, 86],
+    ],
+    64: [
+        [1, 64, 32, 33, 16, 49, 17, 48, 8, 57, 25, 40, 9,  56, 24, 41],
+        [4, 61, 29, 36, 13, 52, 20, 45, 5, 60, 28, 37, 12, 53, 21, 44],
+        [2, 63, 31, 34, 15, 50, 18, 47, 7, 58, 26, 39, 10, 55, 23, 42],
+        [3, 62, 30, 35, 14, 51, 19, 46, 6, 59, 27, 38, 11, 54, 22, 43],
+    ]
+}[BRACKET_SIZE]
+
 
 class Song:
-    def __init__(self, title, artist, submitter, order, seed=0):
-        self.title = title
-        self.artist = artist
-        self.submitter = submitter
-        self.order = order
-        self.seed = seed
+    def __init__(self, **kwargs):
+        for attr in INPUT_COLS:
+            setattr(self, attr, kwargs[attr])
         self.quarter = 0
-        self.aBadness = float(0)
-        self.sBadness = float(0)
+        self.artist_badness = float(0)
+        self.submitter_badness = float(0)
         self.swapped = False
-        self.aDist = 0
-        self.sDist = 0
-        # self.aCount = 0
-        # self.sCount = 0
-    def spreadsheetstr(self):
-        #Standard output format to export to the spreadsheet
-        return f"{self.order}\t{self.seed}\t{self.submitter}\t{year}\t{self.title}\t{self.artist}"
+
+    def get_row(self):
+        # Standard output format to export to the spreadsheet
+        return "\t".join(getattr(self, attr) for attr in INPUT_COLS)
+
     def __str__(self):
-        #More human-friendly, use for Challonge or things not being fed into a program
-        return f"\"{self.title}\" - {self.artist} ({self.submitter} {self.seed})"
+        # More human-friendly, use for Challonge or things not being fed into a program
+        return f'"{self.title}" - {self.artist} ({self.submitter} {self.seed})'
 
-allSongs = []
-orderCounts = [] #How many of each order there are. 'Order' is the submitter's submission order. 'Seed' is the final ranking.
-rawSongs = songstxt
-for rs in rawSongs:
-    attributes = rs.split("\t")
-    newSong = Song(attributes[4], attributes[5], attributes[2], int(attributes[1]), int(attributes[0]))
-    allSongs.append(newSong)
-    while len(orderCounts) < newSong.order + 1:
-        orderCounts.append(0)
-    orderCounts[newSong.order] += 1
 
-seedOrder128 = [ \
-[1, 128, 64, 65, 32, 97,  33, 96, 16, 113, 49, 80, 17, 112, 48, 81, 8, 121, 57, 72, 25, 104, 40, 89, 9,  120, 56, 73, 24, 105, 41, 88], \
-[4, 125, 61, 68, 29, 100, 36, 93, 13, 116, 52, 77, 20, 109, 45, 84, 5, 124, 60, 69, 28, 101, 37, 92, 12, 117, 53, 76, 21, 108, 44, 85], \
-[2, 127, 63, 66, 31, 98,  34, 95, 15, 114, 50, 79, 18, 111, 47, 82, 7, 122, 58, 71, 26, 103, 39, 90, 10, 119, 55, 74, 23, 106, 42, 87], \
-[3, 126, 62, 67, 30, 99,  35, 94, 14, 115, 51, 78, 19, 110, 46, 83, 6, 123, 59, 70, 27, 102, 38, 91, 11, 118, 54, 75, 22, 107, 43, 86]]
+# Read the input csv, create a Song instance for each row
+with open(INPUT_PATH, newline="") as csvfile:
+    reader = csv.DictReader(csvfile, delimiter="\t", fieldnames=INPUT_COLS)
+    all_songs = [Song(**row) for row in reader]
 
-seedOrder96 = [ \
-[1, 64, 65, 32, 33, 96, 16, 49, 80, 17, 48, 81, 8, 57, 72, 25, 40, 89, 9,  56, 73, 24, 41, 88], \
-[4, 61, 68, 29, 36, 93, 13, 52, 77, 20, 45, 84, 5, 60, 69, 28, 37, 92, 12, 53, 76, 21, 44, 85], \
-[2, 63, 66, 31, 34, 95, 15, 50, 79, 18, 47, 82, 7, 58, 71, 26, 39, 90, 10, 55, 74, 23, 42, 87], \
-[3, 62, 67, 30, 35, 94, 14, 51, 78, 19, 46, 83, 6, 59, 70, 27, 38, 91, 11, 54, 75, 22, 43, 86]]
 
-seedOrder64 = [ \
-[1, 64, 32, 33, 16, 49, 17, 48, 8, 57, 25, 40, 9,  56, 24, 41], \
-[4, 61, 29, 36, 13, 52, 20, 45, 5, 60, 28, 37, 12, 53, 21, 44], \
-[2, 63, 31, 34, 15, 50, 18, 47, 7, 58, 26, 39, 10, 55, 23, 42], \
-[3, 62, 30, 35, 14, 51, 19, 46, 6, 59, 27, 38, 11, 54, 22, 43]]
+# The songs, divvied up by order
+# The unused ones will be removed in a bit
+# This is a dictionary with the order as key and list of songs as value
+order_lists = collections.defaultdict(list)
+for song in all_songs:
+    order_lists[song.order].append(song)
 
-seedOrderBySize = {128: seedOrder128, 96: seedOrder96, 64: seedOrder64}
-seedOrder = seedOrderBySize[bracketSize]
-
-# hqs = [[[],[]],[[],[]]]
-quarters = [[],[],[],[]]
-
-# the songs, divvied up by seed. The unused ones will be removed in a bit
-orderLists = []
-while len(orderLists) < len(orderCounts):
-    orderLists.append([])
-
-for song in allSongs:
-    orderLists[song.order].append(song)
-
-# for l in orderLists:
-#     for s in l:
-#         print(s.spreadsheetstr())
-
-for ol in orderLists:
-    random.shuffle(ol)
 
 songs = [] # only the ones that will show up in the bracket
 extras = [] # the ones that won't
-rows = len(seedOrder)
-cols = len(seedOrder[0])
-olLen = rows * cols
+
 i = 0
-for ol in orderLists:
-    for s in ol:
+
+# Iterates over the order_lists in order by sorted key
+for order, cur_list in sorted(order_lists.items()):
+    random.shuffle(cur_list)
+    for song in cur_list:
         i += 1
-        s.seed = i
-        if i <= olLen:
-            songs.append(s)
+        song.seed = i
+        if i <= BRACKET_SIZE:
+            songs.append(song)
         else:
-            extras.append(s)
+            extras.append(song)
 
-# for s in songs:
-    # print(s.spreadsheetstr())
-# for e in extras:
-#     print(e.spreadsheetstr())
-
-
-# how many of each order there are, split up by quarter bracket
-orderDists = [ \
-[0, 0, 0, 0, 0, 0, 0], \
-[0, 0, 0, 0, 0, 0, 0], \
-[0, 0, 0, 0, 0, 0, 0], \
-[0, 0, 0, 0, 0, 0, 0]]
-lens = [0, 0, 0, 0]
-
-# not used right now, but could be in the future
-artistCounts = {}
-submitterCounts = {}
-orderCounts = {}
-
-for i in range(4):
-    for j in seedOrder[i]:
-        nextSong = next((s for s in songs if s.seed == j), None)
-        quarters[i].append(nextSong)
-        nextSong.quarter = i
-        # if s.artist not in artistCounts.keys():
-        #     artistCounts[s.artist] = {'total': 0, 0: 0, 1: 0, 2: 0, 3: 0}
-        # artistCounts[s.artist]['total'] += 1
-        # artistCounts[s.artist][s.quarter] += 1
-        if nextSong.submitter not in submitterCounts.keys():
-            submitterCounts[nextSong.submitter] = {'total': 0, 0: 0, 1: 0, 2: 0, 3: 0}
-        submitterCounts[nextSong.submitter]['total'] += 1
-        submitterCounts[nextSong.submitter][nextSong.quarter] += 1    
-        if nextSong.submitter not in orderCounts.keys():
-            orderCounts[nextSong.submitter] = {'total': 0, 'top4': 4, 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}  
-        orderCounts[nextSong.submitter]['total'] += 1
-        orderCounts[nextSong.submitter][nextSong.order] += 1
-        if nextSong.order == 0:
-            orderCounts[nextSong.submitter]['top4'] -= 1
-
-# print(submitterCounts)
+quarters = [
+    # Index within `songs` is the same as song.seed - 1
+    [songs[seed - 1] for seed in seed_order[quarter]]
+    for quarter in range(4)
+]
+for quarter in range(4):
+    for song in quarters[quarter]:
+        song.quarter = quarter
 
 
-# for q in quarters:
-#     for s in q:
-#         print(s.spreadsheetstr())
-    
+def artists_are_equal(a, b):
+    """
+    Placeholder comparison function for two artist strings
+
+    Right now just straight equality, could strip characters/change case later
+    """
+    return a == b
+
+
 # calculate how close songs by the same submitter or artist are to each other
 # only counts the distance if the songs are within the same group of $groupSize songs
 # this is either not 100% reliable or is not being performed at the right times, not sure which yet
-def calcBadness(song):
-    minADist = 4
-    minSDist = 4
-    groupSize = 8
-    q = quarters[song.quarter]
-    aCount = sum(song.artist == ss.artist for ss in q)
-    if aCount > 1:
-        nextA = next((ss for ss in q if song.artist == ss.artist and song != ss), None)
-        if nextA != None:
-            aDist = abs(q.index(nextA) - q.index(song))
-            nextGroup = math.floor(q.index(nextA) / groupSize)
-            songGroup = math.floor(q.index(song) / groupSize)
-            if aDist <= minADist and nextGroup == songGroup:
-                song.aBadness = float(1 / aDist)
-    else: song.aBadness = 0
-    
-    sCount = sum(song.submitter == ss.submitter for ss in q)
-    if sCount > 1:
-        nextS = next((ss for ss in q if song.submitter == ss.submitter and song != ss), None)
-        if nextS != None:
-            sDist = abs(q.index(nextS) - q.index(song))
-            nextGroup = math.floor(q.index(nextS) / groupSize)
-            songGroup = math.floor(q.index(song) / groupSize)
-            if sDist <= minSDist and nextGroup == songGroup:
-                song.sBadness = float(1 / sDist)
-    else: song.sBadness = 0
+def set_badness(cur_song, quarters):
+    min_artist_distance = 4
+    min_submitter_distance = 4
+    group_size = 8
+    quarter = quarters[cur_song.quarter]
+    index = quarter.index(cur_song)
+    # Index of the first song in the current song's group
+    group_start = (index // group_size) * group_size
+    group = quarter[group_start:group_start + group_size]
+
+    cur_song.artist_badness = 0
+    artist_indexes = [
+        i
+        for i, song in enumerate(group)
+        if song != cur_song and artists_are_equal(song.artist, cur_song.artist)
+    ]
+    if artist_indexes:
+        artist_distance = min(abs(i - index) for i in artist_indexes)
+        if artist_distance <= min_artist_distance:
+            cur_song.artist_badness = 1 / artist_distance
+
+    cur_song.submitter_badness = 0
+    submitter_indexes = [
+        i
+        for i, song in enumerate(group)
+        if song != cur_song and song.submitter == cur_song.submitter
+    ]
+    if submitter_indexes:
+        submitter_distance = min(abs(i - index) for i in submitter_indexes)
+        if submitter_distance <= min_submitter_distance:
+            cur_song.submitter_badness
+
 
 # this swaps the provided song for another that seems appropriate
 # a_s indicates whether it should replace based on the artist or submitter
 # qSkip is probably no longer necessary, but tells it to try another quarter if it's repeating itself
-def swap(song, a_s, qSkip = False):
-    r = None
-    qCheck = [0,0,0,0]
-    while r == None and qCheck != [1,1,1,1]:
-        for index, q in enumerate(quarters):
-            if index == song.quarter: 
-                qCheck[index] = 1
-                continue
-            if qCheck[index] == 1:
-                continue
-            if qSkip == True:
-                qSkip = False
-                continue
-            qCheck[index] = 1
-            if a_s == 'a':
-                sortSongs = sorted(songs, key=lambda s: s.aBadness, reverse=True)
-                r = next((s for s in sortSongs
-                    if s.order == song.order 
-                    and s.artist != song.artist
-                    # and s.swapped == False
-                    # and (s.aBadness > 0 or s.sBadness > 0)
-                    ), None)
-                break
-            elif a_s == 's':
-                sortSongs = sorted(songs, key=lambda s: s.aBadness, reverse=True)
-                r = next((s for s in sortSongs
-                    if s.order == song.order
-                    and s.submitter != song.submitter
-                    # and s.swapped == False
-                    # and (s.aBadness > 0 or s.sBadness > 0)
-                    ), None)        
-                break
-    if r != None:
-        quarters[r.quarter][quarters[r.quarter].index(r)], quarters[song.quarter][quarters[song.quarter].index(song)] = song, r
-        r.quarter, song.quarter = song.quarter, r.quarter
-        r.swapped = True
-        song.swapped = True
-        sCurrBad = s.aBadness if a_s == 'a' else s.sBadness
-        rCurrBad = r.aBadness if a_s == 'a' else r.sBadness
-        print(s.artist, ' - ', s.title, '(', sCurrBad, s.quarter, ') <<', a_s, '>> ', r.artist, ' - ', r.title, '(', rCurrBad, r.quarter, ')')
-        calcBadness(song)
-        calcBadness(r)
-        
+def swap_songs(cur_song, attr, quarters, qSkip=False):
+    if attr == "artist":
+        cmp = artists_are_equal
+    elif attr == "submitter":
+        cmp = lambda a, b: a.submitter == b.submitter
+    else:
+        raise ValueError(f"swap_songs called with invalid attribute `{attr}`")
+    badness_attr = f"{attr}_badness"
+    swap_song = None
+    quarters_left = set(range(4)) - {cur_song.quarter}
+    while swap_song is None and quarters_left:
+        quarter = random.choice(list(quarters_left))
+        quarters_left.remove(quarter)
+        sorted_songs = sorted(
+            quarters[quarter],
+            key=operator.attrgetter(badness_attr),
+            reverse=True,
+        )
+        swap_song = next(
+            (
+                song
+                for song in sorted_songs
+                if (
+                    song.order == cur_song.order
+                    and not cmp(getattr(cur_song, attr), getattr(song, attr))
+                )
+            ),
+            None,
+        )
+    if swap_song is None:
+        print("couldn't swap {cur_song}")
+        return
+
+    # Swap the songs in the quarters variable
+    (
+        quarters[swap_song.quarter][quarters[swap_song.quarter].index(swap_song)],
+        quarters[cur_song.quarter][quarters[cur_song.quarter].index(cur_song)],
+    ) = cur_song, swap_song
+    # Swap the quarter attributes of the two songs
+    swap_song.quarter, cur_song.quarter = cur_song.quarter, swap_song.quarter
+    swap_song.swapped = True
+    cur_song.swapped = True
+    cur_song_badness = getattr(cur_song, badness_attr)
+    swap_song_badness = getattr(swap_song, badness_attr)
+    print(
+        f"{cur_song.artist} - {cur_song.title} ({cur_song_badness:.4f} {cur_song.quarter})"
+        f" << {attr} >> "
+        f"{swap_song.artist} - {swap_song.title} ({swap_song_badness:.4f} {swap_song.quarter})"
+    )
+    set_badness(cur_song, quarters)
+    set_badness(swap_song, quarters)
+
+
 # calculate all the badnesses
-for s in songs:
-    calcBadness(s)
+for song in songs:
+    set_badness(song, quarters)
+
 
 # the maximum allowable badness
 # if all songs are below this threshold, the process will terminate
-badLimit = 0.2
+bad_limit = 0.2
 
-# create an infinite iterator of the songs
-iterSongs = cycle(songs)
 
-# loop over it, swapping songs that qualify
-# do this until all songs are below badLimit or...
+def max_badness(songs):
+    return max(max(song.artist_badness, song.submitter_badness) for song in songs)
+
+
+# loop over all songs infinitely, swapping songs that qualify
+# do this until all songs are below bad_limit or...
 # the next song already appears twice in the last 12 replacements
-recent = []
-for index, s in enumerate(iterSongs):
-    if index == 0:
-            maxBadness = 0
-    if s.aBadness > badLimit or s.sBadness > badLimit:
-        sCnt = sum(s == ss for ss in recent)
-        if sCnt == 1:
-            swap(s, 'a' if s.aBadness > s.sBadness else 's', True)
-        elif sCnt > 1:
-            break
-        else: swap(s, 'a' if s.aBadness > s.sBadness else 's', False)
-        recent.append(s)
-        if len(recent) > 12:
-            recent = recent[1 : 12]
-    maxBadness = max(maxBadness, s.aBadness, s.sBadness)
-    if index == bracketSize - 1:
-        if maxBadness < badLimit: break
+recent = collections.deque(maxlen=12)
+it = itertools.cycle(songs)
+while max_badness(songs) > bad_limit:
+    song = next(it)
+    if song.artist_badness > bad_limit or song.submitter_badness > bad_limit:
+        recent_count = recent.count(song)
+        if recent_count > 1:
+            # Too much repetition, just stop
+            # TODO Improve/avoid this scenario
+            print("This configuration not working, try again")
+            sys.exit(1)
+        attr = "artist" if song.artist_badness > song.submitter_badness else "submitter"
+        swap_songs(song, attr, quarters, bool(recent_count))
+        recent.append(song)
 
-# recalculate all the badnesses
-for s in songs:
-    calcBadness(s)
+print(f"Maximum remaining badness: {max_badness(songs)}")
 
 # print out the results
-for i_q, q in enumerate(quarters):
-    for i_s, s in enumerate(quarters[i_q]):
-        divider = '----------------' if i_s % 16 == 0 else '--------' if i_s % 8 == 0 else '----' if i_s % 4 == 0 else None
-        if i_s % 4 == 0: print(divider)
-        print(s.artist, ' - ', s.title, ' - ', s.submitter, ': ', s.aBadness, s.sBadness, s.swapped)
-        
-# print(s.spreadsheetstr())
-# print('Artist:', s.aCount, 'Submitter:', s.sCount)
+for quarter in quarters:
+    for index, song in enumerate(quarter):
+        for group in [16, 8, 4]:
+            if index % group == 0:
+                print("-" * group)
+                break
+        print(f"{song.artist} - {song.title} - {song.submitter}: {song.artist_badness:.4f} {song.submitter_badness:.4f} {song.swapped}")
