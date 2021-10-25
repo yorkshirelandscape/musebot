@@ -250,7 +250,7 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
           const rndMatches = roundMessages.filter((msg) => (
             msg.createdTimestamp < msgDelims.first(2)[0].createdTimestamp
             && msg.createdTimestamp > msgDelims.first(2)[1].createdTimestamp
-            && msg.deleted === false && msg.content.includes('Match')
+            && msg.deleted === false && msg.content.includes('Match') && !msg.content.includes('Play')
           ));
           // create an array of the reaction counts for each message
           const rndMatchesResults = [];
