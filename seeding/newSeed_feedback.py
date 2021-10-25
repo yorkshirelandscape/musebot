@@ -87,11 +87,28 @@ for order, cur_list in sorted(order_lists.items()):
         else:
             extras.append(song)
 
+# group0 = [song for song in songs if song.order == 0]
+
+# for order in range(4):
+#     next(song for song in songs if song.order == order)
+
+# quarters = [
+#     # Index within `songs` is the same as song.seed - 1
+#     [songs[seed - 1].order for seed in seed_order[quarter]]
+#     for quarter in range(4)
+#     ]
+
+# for order in range(4):
+#     for quarter in range(4):
+#         next(slot for slot in seed_order[quarter] if slot == order and type(slot) != song) = next(song for song in songs if song.order == order)
+
+
 quarters = [
     # Index within `songs` is the same as song.seed - 1
     [songs[seed - 1] for seed in seed_order[quarter]]
     for quarter in range(4)
-]
+    ]
+
 for quarter in range(4):
     for song in quarters[quarter]:
         song.quarter = quarter
@@ -190,14 +207,14 @@ def set_badness(cur_song, quarters):
         # if submitter_distance <= min_submitter_distance:
         cur_song.submitter_badness = 1 / submitter_distance
     
-    if (submitter_counts[cur_song.submitter][f'Q{cur_song.quarter}'] > submitter_counts[cur_song.submitter]['total'] // 4
+    if (submitter_counts[cur_song.submitter][f'Q{cur_song.quarter}'] > 1# submitter_counts[cur_song.submitter]['total'] // 4
     and cur_song.order <= submitter_counts[cur_song.submitter]['top4']):
             cur_song.submitter_badness = 1
 
 # this swaps the provided song for another that seems appropriate
 # attr indicates whether it should replace based on the artist or submitter
 # qSkip is probably no longer necessary, but tells it to try another quarter if it's repeating itself
-def swap_songs(cur_song, attr, quarters, skipSwapped=False):
+def swap_songs(cur_song, attr, quarters, search_quarter = None, skipSwapped=False):
     if attr == "artist":
         cmp = artists_are_equal
     elif attr == "submitter":
@@ -211,7 +228,7 @@ def swap_songs(cur_song, attr, quarters, skipSwapped=False):
         quarter = random.choice(list(quarters_left))
         quarters_left.remove(quarter)
         sorted_songs = sorted(
-            quarters[quarter],
+            search_quarter[0] if search_quarter else quarters[quarter],
             key=operator.attrgetter(badness_attr),
             reverse=True,
         )
@@ -259,6 +276,22 @@ def swap_songs(cur_song, attr, quarters, skipSwapped=False):
 for song in songs:
     set_badness(song, quarters)
 
+do_counts(False, True)
+
+for submitter in submitter_counts:
+    for quarter in range(4):
+        while submitter_counts[submitter][f'Q{quarter}'] > 1:
+            quarters_left = set(q for q in range(4) if submitter_counts[submitter][f'Q{q}'] == 0)
+            while quarters_left:
+                q = random.choice(list(quarters_left))
+                quarters_left.remove(q)
+                cur_song = next(song for song in quarters[quarter] if song.submitter == submitter 
+                    and song.order <= submitter_counts[submitter]['top4'])
+                qs = [quarters[i] for i in [q]]
+                swap_songs(cur_song, 'submitter', quarters, qs, False)
+            do_counts(False, True)
+
+do_counts(False, True)
 
 # the maximum allowable badness
 # if all songs are below this threshold, the process will terminate
@@ -294,9 +327,11 @@ def do_swaps():
             set_badness(song, quarters)
         print('\n')
         do_counts(False, True)
-        i = input('Options: Type (r)esults, press Ctrl+C to quit, or [Enter] to resume swapping:')
-        if i == 'r' or 'results':
+        i = input('Options: (r)esume swapping, (q)uit, or [Enter] to see results:')
+        if i == 'q' or 'quit':
             sys.exit(1)
+        if i == 'r' or 'resume':
+            do_swaps()
 
     print(f"Maximum remaining badness: {max_badness(songs)}")
 
