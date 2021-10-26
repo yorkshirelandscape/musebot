@@ -207,9 +207,9 @@ def set_badness(cur_song, quarters):
         # if submitter_distance <= min_submitter_distance:
         cur_song.submitter_badness = 1 / submitter_distance
     
-    if (submitter_counts[cur_song.submitter][f'Q{cur_song.quarter}'] > 1# submitter_counts[cur_song.submitter]['total'] // 4
-    and cur_song.order <= submitter_counts[cur_song.submitter]['top4']):
-            cur_song.submitter_badness = 1
+    # if (submitter_counts[cur_song.submitter][f'Q{cur_song.quarter}'] > 1# submitter_counts[cur_song.submitter]['total'] // 4
+    # and cur_song.order <= submitter_counts[cur_song.submitter]['top4']):
+    #         cur_song.submitter_badness = 1
 
 # this swaps the provided song for another that seems appropriate
 # attr indicates whether it should replace based on the artist or submitter
@@ -271,14 +271,17 @@ def swap_songs(cur_song, attr, quarters, search_quarter = None, skipSwapped=Fals
     set_badness(cur_song, quarters)
     set_badness(swap_song, quarters)
 
+    return swap_song
 
 # calculate all the badnesses
 for song in songs:
     set_badness(song, quarters)
 
-do_counts(False, True)
+artist_counts, submitter_counts = do_counts(False, True)
 
-for submitter in submitter_counts:
+submitters = list(submitter_counts.keys())
+
+for submitter in submitters:
     for quarter in range(4):
         while submitter_counts[submitter][f'Q{quarter}'] > 1:
             quarters_left = set(q for q in range(4) if submitter_counts[submitter][f'Q{q}'] == 0)
@@ -287,11 +290,13 @@ for submitter in submitter_counts:
                 quarters_left.remove(q)
                 cur_song = next(song for song in quarters[quarter] if song.submitter == submitter 
                     and song.order <= submitter_counts[submitter]['top4'])
-                qs = [quarters[i] for i in [q]]
-                swap_songs(cur_song, 'submitter', quarters, qs, False)
-            do_counts(False, True)
+                # print(submitter, quarter, q)
+                swap_song = swap_songs(cur_song, 'submitter', quarters, [quarters[q]], False)
+            if swap_song == None:
+                break
+            artist_counts, submitter_counts = do_counts(False, False)
 
-do_counts(False, True)
+artist_counts, submitter_counts = do_counts(False, True)
 
 # the maximum allowable badness
 # if all songs are below this threshold, the process will terminate
@@ -327,26 +332,26 @@ def do_swaps():
             set_badness(song, quarters)
         print('\n')
         do_counts(False, True)
-        i = input('Options: (r)esume swapping, (q)uit, or [Enter] to see results:')
-        if i == 'q' or 'quit':
-            sys.exit(1)
-        if i == 'r' or 'resume':
+        i = input('Options: (r)esume swapping, (e)nd, (q)uit (or [Enter]):')
+        if i == 'r' or i == 'resume':
             do_swaps()
+        if i == 'e' or i == 'end':
+            for song in songs:
+                set_badness(song, quarters)
+            
+            print(f"Maximum remaining badness: {max_badness(songs)}")
+            
+            # print out the results
+            for quarter in quarters:
+                for index, song in enumerate(quarter):
+                    for group in [32, 16, 8, 4]:
+                        if index % group == 0:
+                            print("-" * group)
+                            break
+                    print(f"{song.artist} - {song.title} - {song.submitter}: {song.artist_badness:.4f} {song.submitter_badness:.4f} {song.swapped}")
 
-    print(f"Maximum remaining badness: {max_badness(songs)}")
+            do_counts(True, True)
+        if i == 'q' or i == 'quit':
+            sys.exit(1)
 
 do_swaps()
-
-for song in songs:
-    set_badness(song, quarters)
-
-# print out the results
-for quarter in quarters:
-    for index, song in enumerate(quarter):
-        for group in [32, 16, 8, 4]:
-            if index % group == 0:
-                print("-" * group)
-                break
-        print(f"{song.artist} - {song.title} - {song.submitter}: {song.artist_badness:.4f} {song.submitter_badness:.4f} {song.swapped}")
-
-do_counts(True, True)
