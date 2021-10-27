@@ -2,6 +2,7 @@ import collections
 import csv
 import itertools
 import math
+import numpy
 import operator
 import random
 import sys
@@ -147,7 +148,7 @@ def do_counts(print_artists = False, print_submitters = False):
     if print_submitters == True:
         headers = ['Submitter', 'Total', 'Q0', 'Q1', 'Q2', 'Q3', 'top4', 0, 1, 2, 3, 4, 5 ,6]
         sort_list = (list(cols.values()) for cols in submitterCounts.values())
-        data = sorted(sort_list,key=itemgetter(0)) # why does this sort into two separate alphabetical groups?
+        data = [list(submitterCounts[k].values()) for k in sorted(submitterCounts, key=str.lower)]
         print(tabulate(data, headers = headers))
         print('\n')
     
@@ -232,8 +233,27 @@ def swap_songs(cur_song, attr, quarters, search_quarter = None, skipSwapped=Fals
             None,
         )
     if swap_song is None:
-        print("couldn't swap {cur_song}")
-        return
+        sorted_songs = sorted(
+            quarters[cur_song.quarter],
+            key=operator.attrgetter(badness_attr),
+            reverse=True,
+        )
+        swap_song = next(
+            (
+                song
+                for song in sorted_songs
+                if (
+                    song.order == cur_song.order
+                    and not cmp(cur_song, song)
+                    and ((skipSwapped == True and song.swapped != True)
+                    or skipSwapped == False)
+                )
+            ),
+            None,
+        )
+        if swap_song is None:
+            print("couldn't swap {cur_song}")
+            return
 
     # Swap the songs in the quarters variable
     (
@@ -273,7 +293,6 @@ for submitter in submitters:
             while submitter_counts[submitter][f'Q{quarter}'] > 1:
                 cur_song = next(song for song in quarters[quarter] if song.submitter == submitter 
                     and song.order <= submitter_counts[submitter]['top4'])
-                print(submitter, quarter, q)
                 swap_song = swap_songs(cur_song, 'submitter', quarters, [quarters[q]], False)
                 if swap_song == None:
                     break
@@ -307,34 +326,46 @@ def end():
     do_counts(True, True)
 
 
+def deque_slice(d, x, y):
+    dd = d.copy()
+    dd.rotate(-x)
+    while len(dd) > y - x:
+        dd.pop()
+    return dd
+
 # loop over all songs infinitely, swapping songs that qualify
 # do this until all songs are below bad_limit or...
 # the next song already appears twice in the last maxlen replacements
 def do_swaps():
-    recent = collections.deque(maxlen=12)
+    recent_big = collections.deque(maxlen=12)
+    recent_small = collections.deque(maxlen=3)
     it = itertools.cycle(songs)
     i = 0
     try:   
         while max_badness(songs) > bad_limit:
             song = next(it)
             if song.artist_badness > bad_limit or song.submitter_badness > bad_limit:
-                recent_count = recent.count(song)
-                if recent_count > 1:
+                recent_medium = deque_slice(recent_big, 0, 8) 
+                recent_intersection = list(set(recent_medium) & set(recent_small))
+                recent_check = numpy.array_equal(set(recent_small), set(recent_intersection))
+                if recent_check and len(recent_big) == 12:
                     # Too much repetition, just stop
                     # TODO Improve/avoid this scenario
+                    print(f"{song.artist} - {song.title}")
                     print("This configuration not working, try again")
                     # sys.exit(1)
                     end()
                     break
                 attr = "artist" if song.artist_badness > song.submitter_badness else "submitter"
                 if submitter_counts[song.submitter][f'Q{song.quarter}'] == 1:
-                    swap_song = swap_songs(song, attr, quarters, [quarters[song.quarter]], bool(recent_count))
-                else: swap_song = swap_songs(song, attr, quarters, None, bool(recent_count))
+                    swap_song = swap_songs(song, attr, quarters, [quarters[song.quarter]], recent_check)
+                else: swap_song = swap_songs(song, attr, quarters, None, recent_check)
                 if swap_song == None:
                     i += 1
                 else: 
                     i = 0
-                    recent.append(song)
+                    recent_big.append(song)
+                    recent_small.append(song)
                 if i > 4:
                     end()
                     break
