@@ -1,8 +1,7 @@
 import collections
 import csv
 import itertools
-import math
-import numpy
+import numpy as np
 import operator
 import random
 import sys
@@ -194,9 +193,9 @@ def set_badness(cur_song, quarters):
         # if submitter_distance <= min_submitter_distance:
         cur_song.submitter_badness = 1 / submitter_distance
     
-    # if (submitter_counts[cur_song.submitter][f'Q{cur_song.quarter}'] > 1# submitter_counts[cur_song.submitter]['total'] // 4
-    # and cur_song.order <= submitter_counts[cur_song.submitter]['top4']):
-    #         cur_song.submitter_badness = 1
+    if (submitter_counts[cur_song.submitter][f'Q{cur_song.quarter}'] > 1# submitter_counts[cur_song.submitter]['total'] // 4
+    and cur_song.order <= submitter_counts[cur_song.submitter]['top4']):
+            cur_song.submitter_badness = 1
 
 # this swaps the provided song for another that seems appropriate
 # attr indicates whether it should replace based on the artist or submitter
@@ -282,23 +281,26 @@ for song in songs:
 
 artist_counts, submitter_counts = do_counts(False, True)
 
-submitters = list(submitter_counts.keys())
-
-for submitter in submitters:
-    for quarter in range(4):
+def initial_swaps(submitter_counts, print_subs=False):
+    submitters = list(submitter_counts.keys())
+    for submitter in submitters:
         quarters_left = set(q for q in range(4) if submitter_counts[submitter][f'Q{q}'] == 0)
         while quarters_left:
             q = random.choice(list(quarters_left))
             quarters_left.remove(q)
-            while submitter_counts[submitter][f'Q{quarter}'] > 1:
-                cur_song = next(song for song in quarters[quarter] if song.submitter == submitter 
+            while submitter_counts[submitter][f'Q{q}'] > 1:
+                cur_song = next(song for song in quarters[q] if song.submitter == submitter 
                     and song.order <= submitter_counts[submitter]['top4'])
                 swap_song = swap_songs(cur_song, 'submitter', quarters, [quarters[q]], False)
                 if swap_song == None:
                     break
                 artist_counts, submitter_counts = do_counts(False, False)
 
-artist_counts, submitter_counts = do_counts(False, True)
+    artist_counts, submitter_counts = do_counts(False, print_subs)
+
+initial_swaps(submitter_counts, False)
+
+initial_swaps(submitter_counts, True)
 
 # the maximum allowable badness
 # if all songs are below this threshold, the process will terminate
@@ -347,19 +349,26 @@ def do_swaps():
             if song.artist_badness > bad_limit or song.submitter_badness > bad_limit:
                 recent_medium = deque_slice(recent_big, 0, 8) 
                 recent_intersection = list(set(recent_medium) & set(recent_small))
-                recent_check = numpy.array_equal(set(recent_small), set(recent_intersection))
+                recent_check = np.array_equal(set(recent_small), set(recent_intersection))
                 if recent_check and len(recent_big) == 12:
                     # Too much repetition, just stop
                     # TODO Improve/avoid this scenario
                     print(f"{song.artist} - {song.title}")
                     print("This configuration not working, try again")
                     # sys.exit(1)
-                    end()
-                    break
+                    i = input('Try again? Y or N:')
+                    if str.lower(i) in ('y', 'yes'):
+                        do_swaps()
+                        break
+                    elif str.lower(i) in ('n', 'no'):
+                        # end()
+                        break
                 attr = "artist" if song.artist_badness > song.submitter_badness else "submitter"
                 if submitter_counts[song.submitter][f'Q{song.quarter}'] == 1:
                     swap_song = swap_songs(song, attr, quarters, [quarters[song.quarter]], recent_check)
-                else: swap_song = swap_songs(song, attr, quarters, None, recent_check)
+                else: swap_song = swap_songs(song, attr, quarters, None, True)
+                if swap_song == None:
+                    swap_song = swap_songs(song, attr, quarters, None, False)
                 if swap_song == None:
                     i += 1
                 else: 
@@ -367,7 +376,7 @@ def do_swaps():
                     recent_big.append(song)
                     recent_small.append(song)
                 if i > 4:
-                    end()
+                    # end()
                     break
     except KeyboardInterrupt:
         for song in songs:
@@ -375,11 +384,18 @@ def do_swaps():
         print('\n')
         do_counts(False, True)
         i = input('Options: (r)esume swapping, (e)nd, (q)uit (or [Enter]):')
-        if i == 'r' or i == 'resume':
+        if str.lower(i) in ('r', 'resume'):
             do_swaps()
-        if i == 'e' or i == 'end':
-            end()
-        if i == 'q' or i == 'quit':
+        if str.lower(i) in ('e', 'end'):
+            # end()
+            pass
+        if str.lower(i) in ('q', 'quit'):
             sys.exit(1)
 
 do_swaps()
+
+do_counts(False, False)
+
+initial_swaps(submitter_counts, False)
+
+end()
