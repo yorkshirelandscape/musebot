@@ -57,11 +57,11 @@ class Song:
         return f'"{self.title}" - {self.artist} ({self.submitter} {self.seed})'
 
 
+
 # Read the input csv, create a Song instance for each row
 with open(INPUT_PATH, newline="") as csvfile:
     reader = csv.DictReader(csvfile, delimiter="\t", fieldnames=INPUT_COLS)
     all_songs = [Song(**row) for row in reader]
-
 
 # The songs, divvied up by order
 # The unused ones will be removed in a bit
@@ -87,15 +87,15 @@ for order, cur_list in sorted(order_lists.items()):
         else:
             extras.append(song)
 
-quarters = [
+gQuarters = [
     # Index within `songs` is the same as song.seed - 1
     [songs[seed - 1] for seed in seed_order[quarter]]
     for quarter in range(4)
     ]
 
-for quarter in range(4):
-    for song in quarters[quarter]:
-        song.quarter = quarter
+for gQuarter in range(4):
+    for song in gQuarters[gQuarter]:
+        song.quarter = gQuarter
 
 
 def artists_are_equal(a, b):
@@ -111,7 +111,7 @@ def do_counts(print_artists = False, print_submitters = False):
     artistCounts = {}
     submitterCounts = {}
 
-    for q in quarters:
+    for q in gQuarters:
         for s in q:
             if s.artist not in artistCounts.keys():
                 artistCounts[s.artist] = {'artist': s.artist, 'total': 0, 0: 0, 1: 0, 2: 0, 3: 0}
@@ -133,18 +133,18 @@ def do_counts(print_artists = False, print_submitters = False):
             s['top4'] = 3
         else: s['top4'] = 4
     
-    for q in quarters:
+    for q in gQuarters:
         for s in q:
             if s.order <= submitterCounts[s.submitter]['top4']:
                 submitterCounts[s.submitter][f'Q{s.quarter}'] += 1
     
-    if print_artists == True:
+    if print_artists is True:
         headers = ['Artist', 'Total', 'Q0', 'Q1', 'Q2', 'Q3']
         sort_list = sorted((list(cols.values()) for cols in artistCounts.values()),key=itemgetter(0))
         data = sorted(sort_list,key=itemgetter(1),reverse=True)
         print(tabulate(data, headers = headers))
         print('\n')
-    if print_submitters == True:
+    if print_submitters is True:
         headers = ['Submitter', 'Total', 'Q0', 'Q1', 'Q2', 'Q3', 'top4', 0, 1, 2, 3, 4, 5 ,6]
         sort_list = (list(cols.values()) for cols in submitterCounts.values())
         data = [list(submitterCounts[k].values()) for k in sorted(submitterCounts, key=str.lower)]
@@ -154,16 +154,15 @@ def do_counts(print_artists = False, print_submitters = False):
     return artistCounts, submitterCounts
 
 
-artist_counts, submitter_counts = do_counts()
-
-
 # calculate how close songs by the same submitter or artist are to each other
 # only counts the distance if the songs are within the same group of $groupSize songs
 # this is either not 100% reliable or is not being performed at the right times, not sure which yet
-def set_badness(cur_song, quarters):
+def set_badness(cur_song, quarters, group_size = 8):
     # min_artist_distance = 4
     # min_submitter_distance = 4
-    group_size = 8
+    
+    artist_counts, submitter_counts = do_counts()
+    
     quarter = quarters[cur_song.quarter]
     index = quarter.index(cur_song)
     # Index of the first song in the current song's group
@@ -200,7 +199,7 @@ def set_badness(cur_song, quarters):
 # this swaps the provided song for another that seems appropriate
 # attr indicates whether it should replace based on the artist or submitter
 # qSkip is probably no longer necessary, but tells it to try another quarter if it's repeating itself
-def swap_songs(cur_song, attr, quarters, search_quarter = None, skipSwapped=False):
+def swap_songs(cur_song, attr, quarters, search_quarter = None, skipSwapped=False, group_size = 8):
     if attr == "artist":
         cmp = artists_are_equal
     elif attr == "submitter":
@@ -270,41 +269,51 @@ def swap_songs(cur_song, attr, quarters, search_quarter = None, skipSwapped=Fals
         f" << {attr} >> "
         f"{swap_song.artist} - {swap_song.title} ({swap_song_badness:.4f} {swap_song.quarter})"
     )
-    set_badness(cur_song, quarters)
-    set_badness(swap_song, quarters)
+    set_badness(cur_song, quarters, group_size)
+    set_badness(swap_song, quarters, group_size)
 
     return swap_song
 
-# calculate all the badnesses
-for song in songs:
-    set_badness(song, quarters)
 
-artist_counts, submitter_counts = do_counts(False, True)
+def initial_swaps(print_attr=False, attr='b', quarters=gQuarters):
+    artist_counts, submitter_counts = do_counts(False, False)
 
-def initial_swaps(submitter_counts, print_subs=False):
-    submitters = list(submitter_counts.keys())
-    for submitter in submitters:
-        quarters_left = set(q for q in range(4) if submitter_counts[submitter][f'Q{q}'] == 0)
-        while quarters_left:
-            q = random.choice(list(quarters_left))
-            quarters_left.remove(q)
-            while submitter_counts[submitter][f'Q{q}'] > 1:
-                cur_song = next(song for song in quarters[q] if song.submitter == submitter 
-                    and song.order <= submitter_counts[submitter]['top4'])
-                swap_song = swap_songs(cur_song, 'submitter', quarters, [quarters[q]], False)
-                if swap_song == None:
-                    break
-                artist_counts, submitter_counts = do_counts(False, False)
+    if attr in ['a','b']:
+        artists = list(artist_counts.keys())
+        for artist in artists:
+            quarters_to = set(q for q in range(4) if artist_counts[artist][q] == 0)
+            quarters_from = set(q for q in range(4) if artist_counts[artist][q] > 1)
+            while quarters_from and quarters_to:
+                qt = random.choice(list(quarters_to))
+                quarters_to.remove(qt)
+                qf = random.choice(list(quarters_from))
+                quarters_from.remove(qf)
+                while artist_counts[artist][qf] > 1 and artist_counts[artist][qt] == 0:
+                    cur_song = next(song for song in quarters[qf] if song.artist == artist)
+                    swap_song = swap_songs(cur_song, 'artist', quarters, [quarters[qt]], False)
+                    if swap_song == None:
+                        break
+                    artist_counts, submitter_counts = do_counts(False, False)
 
-    artist_counts, submitter_counts = do_counts(False, print_subs)
+    if attr in ['s','b']:
+            submitters = list(submitter_counts.keys())
+            for submitter in submitters:
+                quarters_to = set(q for q in range(4) if submitter_counts[submitter][f'Q{q}'] == 0)
+                quarters_from = set(q for q in range(4) if submitter_counts[submitter][f'Q{q}'] > 1)
+                while quarters_from:
+                    qt = random.choice(list(quarters_to))
+                    quarters_to.remove(qt)
+                    qf = random.choice(list(quarters_from))
+                    quarters_from.remove(qf)
+                    while submitter_counts[submitter][f'Q{qf}'] > 1:
+                        cur_song = next(song for song in quarters[qf] if song.submitter == submitter
+                            and song.order <= submitter_counts[submitter]['top4'])
+                        swap_song = swap_songs(cur_song, 'submitter', quarters, [quarters[qt]], False)
+                        if swap_song == None:
+                            break
+                        artist_counts, submitter_counts = do_counts(False, False)
 
-initial_swaps(submitter_counts, False)
-
-initial_swaps(submitter_counts, True)
-
-# the maximum allowable badness
-# if all songs are below this threshold, the process will terminate
-bad_limit = 0.0
+    artist_counts, submitter_counts = do_counts(bool(print_attr), bool(print_attr))
 
 
 def max_badness(songs):
@@ -312,12 +321,12 @@ def max_badness(songs):
 
 def end():
     for song in songs:
-        set_badness(song, quarters)
+        set_badness(song, gQuarters)
     
     print(f"\nMaximum remaining badness: {max_badness(songs)}\n")
     
     # print out the results
-    for quarter in quarters:
+    for quarter in gQuarters:
         for index, song in enumerate(quarter):
             for group in [32, 16, 8, 4]:
                 if index % group == 0:
@@ -338,8 +347,9 @@ def deque_slice(d, x, y):
 # loop over all songs infinitely, swapping songs that qualify
 # do this until all songs are below bad_limit or...
 # the next song already appears twice in the last maxlen replacements
-def do_swaps():
-    recent_big = collections.deque(maxlen=12)
+def do_swaps(submitter_counts, quarters=gQuarters, group_size = 8):
+    recent_size = 16
+    recent_big = collections.deque(maxlen=recent_size)
     recent_small = collections.deque(maxlen=3)
     it = itertools.cycle(songs)
     i = 0
@@ -347,10 +357,10 @@ def do_swaps():
         while max_badness(songs) > bad_limit:
             song = next(it)
             if song.artist_badness > bad_limit or song.submitter_badness > bad_limit:
-                recent_medium = deque_slice(recent_big, 0, 8) 
+                recent_medium = deque_slice(recent_big, 0, recent_size-4) 
                 recent_intersection = list(set(recent_medium) & set(recent_small))
                 recent_check = np.array_equal(set(recent_small), set(recent_intersection))
-                if recent_check and len(recent_big) == 12:
+                if recent_check and len(recent_big) == recent_size:
                     # Too much repetition, just stop
                     # TODO Improve/avoid this scenario
                     print(f"{song.artist} - {song.title}")
@@ -358,18 +368,18 @@ def do_swaps():
                     # sys.exit(1)
                     i = input('Try again? Y or N:')
                     if str.lower(i) in ('y', 'yes'):
-                        do_swaps()
+                        do_swaps(submitter_counts)
                         break
                     elif str.lower(i) in ('n', 'no'):
                         # end()
                         break
                 attr = "artist" if song.artist_badness > song.submitter_badness else "submitter"
                 if submitter_counts[song.submitter][f'Q{song.quarter}'] == 1:
-                    swap_song = swap_songs(song, attr, quarters, [quarters[song.quarter]], recent_check)
-                else: swap_song = swap_songs(song, attr, quarters, None, True)
-                if swap_song == None:
-                    swap_song = swap_songs(song, attr, quarters, None, False)
-                if swap_song == None:
+                    swap_song = swap_songs(song, attr, quarters, [quarters[song.quarter]], recent_check, group_size)
+                else: swap_song = swap_songs(song, attr, quarters, None, True, group_size)
+                if swap_song is None:
+                    swap_song = swap_songs(song, attr, quarters, None, False, group_size)
+                if swap_song is None:
                     i += 1
                 else: 
                     i = 0
@@ -385,17 +395,48 @@ def do_swaps():
         do_counts(False, True)
         i = input('Options: (r)esume swapping, (e)nd, (q)uit (or [Enter]):')
         if str.lower(i) in ('r', 'resume'):
-            do_swaps()
+            do_swaps(submitter_counts)
         if str.lower(i) in ('e', 'end'):
             # end()
             pass
         if str.lower(i) in ('q', 'quit'):
             sys.exit(1)
 
-do_swaps()
+
+# calculate all the badnesses
+for song in songs:
+    set_badness(song, gQuarters)
+
+do_counts(False, True)
+
+initial_swaps(False)
+
+initial_swaps(True)
+
+gArtist_counts, gSubmitter_counts = do_counts(False, False)
+
+# the maximum allowable badness
+# if all songs are below this threshold, the process will terminate
+bad_limit = 0.0
+
+for g in [2,4,8]:
+    print(f'\nGroup size: {g}\n')
+    do_swaps(gSubmitter_counts, gQuarters, g)
+    for song in songs:
+        set_badness(song, gQuarters, g)
+    print(f'Max badness: {max_badness(songs)}')
 
 do_counts(False, False)
 
-initial_swaps(submitter_counts, False)
+initial_swaps(False)
+initial_swaps(True)
+
+response = input('Do initial swaps again? (a)rtist, (s)ubmitter, (b)oth, (n)one:')
+while str.lower(response) not in ('n', 'none'):
+    initial_swaps(True, response[:1])
+    response = input('Do initial swaps again? (a)rtist, (s)ubmitter, (b)oth, (n)one:')
+
+
+print(f'Max badness: {max_badness(songs)}')
 
 end()
