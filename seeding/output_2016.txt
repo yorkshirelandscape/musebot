@@ -1,0 +1,134 @@
+3	1	0	Bluey The Bear	2016	No Roots	Alice Merton
+5	2	0	Bluey The Bear	2016	Lazarus	David Bowie
+1	3	0	Bluey The Bear	2016	Good As Hell	Lizzo
+4	4	0	Bluey The Bear	2016	Emotions and Math	Margaret Glaspy
+9	5	0	Donald X.	2016	Shut Up, Kiss Me	Angel Olsen
+8	6	0	jsh	2016	You Want it Darker	Leonard Cohen
+6	7	0	markusin	2016	Dark Necessities	Red Hot Chili Peppers
+7	8	0	nottoobad	2016	Redbone	Childish Gambino
+10	9	0	pproteus	2016	★ (Blackstar)	David Bowie
+2	10	0	saltroza	2016	Traveling Light	Leonard Cohen
+21	11	1	aku chi	2016	Russia ~ Atomic Era (Civilization VI)	Geoff Knorr & Phill Boucher
+30	12	1	alatar224	2016	Smile More	Deap Vally
+33	13	1	bazkitcase5	2016	Sleeping Dogs	Zakk Wylde
+15	14	1	dryope	2016	霧海 Wu​-​Hai	落差草原 WWWW / Prairie WWWW
+18	15	1	jsh	2016	Beneath the Mask	Shoji Meguro
+12	16	1	Lemonspawn	2016	Party Monster	The Weeknd
+24	17	1	markusin	2016	Damnation (Doom 2016)	Mick Gordon
+26	18	1	Mollo8	2016	Soltando Fantasmas	Communion
+17	19	1	Mort	2016	Mr. Invisible	Thank you Scientist
+11	20	1	MuensterCheese	2016	Cabinet Man	Lemon Demon
+27	21	1	nottoobad	2016	Masterpiece	Big Thief
+32	22	1	S_Smart	2016	No Cash	Digitalism
+16	23	1	Shael	2016	Friend	FRND
+13	24	1	Sharur	2016	SEAGULLS! (Stop It Now)	Bad Lip Reading
+23	25	1	singletee	2016	Behind the Armory	case/lang/veirs
+31	26	1	threelinewhip	2016	Decks Dark	Radiohead
+25	27	1	tufftaeh	2016	Hard Blues Shot	Laura Cox Band
+29	28	1	Valendale	2016	Zero	Albion
+28	29	1	volfied	2016	Data & Picard	Pogo
+22	30	1	Volrath	2016	Vimm	Metsatöll
+20	31	1	wharf_rat	2016	Me & Magdalena	The Monkees
+14	32	1	Wonko	2016	Changes	Charles Bradley
+19	33	1	xyrix	2016	Frau Im Mond, Sterne Laufen	Pantha du Prince
+54	34	2	aku chi	2016	No Matter Where We Go	Whitney
+38	35	2	alatar224	2016	Fast Moving Cars	Carla dal Forno
+43	36	2	bazkitcase5	2016	Way Down We Go	Kaleo
+52	37	2	Donald X.	2016	It's Over, Isn't It	Deedee Magno Hall
+41	38	2	dryope	2016	Night Market	Burial
+55	39	2	Lemonspawn	2016	Store	Carly Rae Jepsen
+45	40	2	Mollo8	2016	La Magia	Little Jesus
+42	41	2	Mort	2016	Don't Hate Me	Steven Wilson
+46	42	2	MuensterCheese	2016	Touch-Tone Telephone	Lemon Demon
+36	43	2	nottoobad	2016	Cold Little Heart	Michael Kiwanuka
+40	44	2	pproteus	2016	Me And Your Mama	Childish Gambino
+34	45	2	S_Smart	2016	Send Them Off!	Bastille
+48	46	2	saltroza	2016	The Way You Play My Heart	Tord Gustavsen, Simin Tander, Jarle Vespestad
+49	47	2	Shael	2016	Dragonhearted	Igor Gordienko
+50	48	2	Sharur	2016	What Happened to the Love?	The Heavy
+39	49	2	singletee	2016	Blood Walk	Cabaret Nocturne
+53	50	2	threelinewhip	2016	Dead Revolution	Hammers of Misfortune
+51	51	2	tufftaeh	2016	For evigt	Volbeat feat. Johan Olsen
+47	52	2	Valendale	2016	Love Determination	Triple-Q
+57	53	2	volfied	2016	I Can't Give Everything Away	David Bowie
+56	54	2	Volrath	2016	Stranded	Gojira
+44	55	2	wharf_rat	2016	Come Down	Anderson .Paak
+37	56	2	Wonko	2016	They Live	B.o.B.
+35	57	2	xyrix	2016	Wet Bar	Body-san
+68	58	3	aku chi	2016	Edge of Town	Middle Kids
+83	59	3	alatar224	2016	Tamiditine Tarhanam (My Love, I Tell You)	Bombino
+65	60	3	bazkitcase5	2016	Bored To Death	blink-182
+75	61	3	Donald X.	2016	City of Stars	Ryan Gosling
+70	62	3	dryope	2016	Deep Down	Vacant
+58	63	3	jsh	2016	California Kids	Weezer
+80	64	3	Lemonspawn	2016	Get Back Up Again	Anna Kendrick
+69	65	3	markusin	2016	The House of Shame	Lacuna Coil
+64	66	3	Mollo8	2016	Vincent	Car Seat Headrest
+63	67	3	Mort	2016	Mountain Heart	Church of the Cosmic Skull
+61	68	3	MuensterCheese	2016	It's Gonna Get Weird	Neil Cicierega
+67	69	3	nottoobad	2016	Canyon (Live)	Joseph
+73	70	3	pproteus	2016	Runnin'	Pharrell Williams
+59	71	3	S_Smart	2016	4ware	deadmau5
+71	72	3	saltroza	2016	Big Black Car	Gregory Alan Isakov with the Colorado Symphony
+82	73	3	Shael	2016	Sparkle	Radwimps
+66	74	3	Sharur	2016	Stranger Things	Kyle Dixon & Michael Stein
+60	75	3	singletee	2016	Banshee	Santigold
+74	76	3	threelinewhip	2016	Ful Stop	Radiohead
+76	77	3	tufftaeh	2016	Let It Burn	Blackberry Swamp
+78	78	3	Valendale	2016	Graduation	Kero Kero Bonito
+62	79	3	volfied	2016	Ebony and Ivy	Esperanza Spalding
+79	80	3	Volrath	2016	You Will Never Be One Of Us	Nails
+77	81	3	wharf_rat	2016	Let Me Fall	Laura Mvula
+72	82	3	Wonko	2016	Mistake	Lake Street Dive
+81	83	3	xyrix	2016	The Lover That You Are	Bjarki
+101	84	4	aku chi	2016	Oblivius	The Strokes
+104	85	4	alatar224	2016	Hellfaced	Obake
+106	86	4	bazkitcase5	2016	Gypsy Caravan	Wolfmother
+99	87	4	Donald X.	2016	I'm Not Famous	AJR
+94	88	4	dryope	2016	4D Anxiety	Youandewan
+90	89	4	jsh	2016	Wave Goodnight To Me	Jeff Rosenstock
+98	90	4	Lemonspawn	2016	Downtown	Macklemore & Ryan lewis, Melle Mel, Grandmaster Caz, Kool Moe Dee, Eric Nally
+107	91	4	markusin	2016	The Gates of Babylon	Volbeat
+86	92	4	Mollo8	2016	Victorious	Wolfmother
+95	93	4	Mort	2016	Sirály	Thy Catafalque
+91	94	4	MuensterCheese	2016	Revolution Radio	Green Day
+105	95	4	pproteus	2016	Another Day of Sun	Justin Hurwitz
+93	96	4	S_Smart	2016	Twisted By Design	Sum 41
+84	97	4	saltroza	2016	The Last Hawk	Shovels & Rope
+89	98	4	Shael	2016	Zen Zen Zense	Radwimps
+100	99	4	Sharur	2016	Less Than Five Miles Away	Dawes
+108	100	4	singletee	2016	Suckerpunch	Delain
+88	101	4	threelinewhip	2016	Husk	Black Foxxes
+85	102	4	tufftaeh	2016	Time for Bedlam	Deep Purple
+103	103	4	Valendale	2016	Money Longer	Lil Uzi Vert
+102	104	4	volfied	2016	Mr. Wright	The Claypool Lennon Delirium
+96	105	4	Volrath	2016	Saaremaa Vägmees	Metsatöll
+92	106	4	wharf_rat	2016	Lowrider	Yussef Kamaal
+97	107	4	Wonko	2016	Side Pony	Lake Street Dive`
+87	108	4	xyrix	2016	Come	Bryce Helm
+114	110	5	alatar224	2016	人魚の檻 [Ningyo no Ori]	陰陽座 [Onmyo-za]
+111	111	5	bazkitcase5	2016	My Name Is Human	Highly Suspect
+123	112	5	Bluey The Bear	2016	It's Just a Burning Memory	The Caretaker
+118	113	5	Donald X.	2016	Instant of the Hour After	Suzanne Vega
+127	114	5	dryope	2016	Sun Ra	Mall Grab
+124	115	5	jsh	2016	Daydreaming	Radiohead
+119	116	5	Lemonspawn	2016	Sorry	Beyoncé
+126	117	5	markusin	2016	Egypt Theme: Atomic (Civilization VI)	Geoff Knorr, Phill Boucher
+121	118	5	Mollo8	2016	You Are the Sunshine of My Life	Jack White and The Electric Mayhem
+113	120	5	nottoobad	2016	Move	Saint Motel
+109	121	5	pproteus	2016	Homecoming Serf	Sidney Gish
+117	122	5	S_Smart	2016	Close Call	Justice
+116	123	5	saltroza	2016	Yesterday's On My Mind	Chris Cohen
+120	124	5	Shael	2016	Haiku	Headphone Activist
+110	125	5	Sharur	2016	Rita Mae Young	The Record Company
+122	127	5	threelinewhip	2016	Velvet Inquisition	Hammers of Misfortune
+125	128	5	tufftaeh	2016	Rockabye	Clean Bandit feat. Sean Paul & Anne-Marie
+112	129	5	Valendale	2016	We Are Number One	xDEFCONx
+128	131	5	Volrath	2016	Saturaatio	Oranssi Pazuzu
+115	132	5	wharf_rat	2016	Dean Town	Vulfpeck
+130	109	5	aku chi	2016	Get Out	Frightened Rabbit
+133	119	5	Mort	2016	Someone to Save	Structural Disorder
+132	126	5	singletee	2016	Cold Reading	Covenant
+134	130	5	volfied	2016	Identikit	Radiohead
+129	133	5	Wonko	2016	I Took a Pill in Ibiza	Mike Posner
+131	134	5	xyrix	2016	Voices	John Talabot

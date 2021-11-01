@@ -1,4 +1,5 @@
 import collections
+import copy
 import csv
 import itertools
 import numpy as np
@@ -8,7 +9,7 @@ import sys
 from tabulate import tabulate
 from operator import itemgetter
 
-YEAR = 1970
+YEAR = 2016
 BRACKET_SIZE = 128
 INPUT_PATH = "seeding/input.txt"
 # 'order' is the submitter's submission order
@@ -42,6 +43,7 @@ class Song:
     def __init__(self, **kwargs):
         for attr in INPUT_COLS:
             setattr(self, attr, kwargs[attr])
+        self.original = copy.copy(int(self.seed))
         self.order = int(self.orderStr)
         self.quarter = 0
         self.artist_badness = float(0)
@@ -56,7 +58,9 @@ class Song:
         # More human-friendly, use for Challonge or things not being fed into a program
         return f'"{self.title}" - {self.artist} ({self.submitter} {self.seed})'
 
-
+    def spreadsheetstr(self):
+        #This is called "spreadsheet" but really it's for the other program
+        return f"{self.seed}\t{self.original}\t{self.order}\t{self.submitter}\t{self.year}\t{self.title}\t{self.artist}"
 
 # Read the input csv, create a Song instance for each row
 with open(INPUT_PATH, newline="") as csvfile:
@@ -313,7 +317,8 @@ def initial_swaps(print_attr=False, attr='b', quarters=gQuarters):
                             break
                         artist_counts, submitter_counts = do_counts(False, False)
 
-    artist_counts, submitter_counts = do_counts(bool(print_attr), bool(print_attr))
+    return do_counts(bool(print_attr), bool(print_attr))
+
 
 
 def max_badness(songs):
@@ -429,14 +434,32 @@ for g in [2,4,8]:
 do_counts(False, False)
 
 initial_swaps(False)
-initial_swaps(True)
+artist_counts, submitter_counts = initial_swaps(True)
 
 response = input('Do initial swaps again? (a)rtist, (s)ubmitter, (b)oth, (n)one:')
 while str.lower(response) not in ('n', 'none'):
-    initial_swaps(True, response[:1])
+    artist_counts, submitter_counts = initial_swaps(True, response[:1])
     response = input('Do initial swaps again? (a)rtist, (s)ubmitter, (b)oth, (n)one:')
 
 
 print(f'Max badness: {max_badness(songs)}')
 
 end()
+
+output = open("seeding/output.txt", "w")
+
+for song in sorted(songs,key=operator.attrgetter('original')):
+    output.write(song.spreadsheetstr() + "\n")
+
+for song in sorted(extras,key=operator.attrgetter('original')):
+    output.write(song.spreadsheetstr() + "\n")
+
+output.close()
+
+submitters = list(submitter_counts.keys())
+for submitter in submitters:
+    for q in range(4):
+        if submitter_counts[submitter][f'Q{q}'] > 1:
+            matches = [song for song in songs if song.submitter == submitter]
+            for song in matches:
+                print(song.spreadsheetstr())
