@@ -1,7 +1,9 @@
 #! /bin/env python3
 
 import argparse
+import collections
 import csv
+import itertools
 import math
 import operator
 import os
@@ -10,11 +12,164 @@ import re
 import sys
 
 
+# Default values for these settings
+# May be modified by command line arguments
 BADNESS_MAX_ARTIST = 20
 BADNESS_MAX_SUBMITTER = 50
 BADNESS_MAX_SEED = 100
 ITERATIONS = 10000
 ATTEMPTS = 10
+ATTEMPT_ITERATIONS = 200
+
+
+def get_distance(i, j):
+    """
+    Calculates the number of rounds before two songs would meet in a match.
+
+    If the songs would meet in the first round, returns 0. To determine a more
+    human-readable (1-indexed) round number for when two songs would meet (or,
+    the maximum number of rounds), call with 0 and the maximum slot number (i.e.
+    ``len(submissions) - 1``).
+
+    :param i: The 0-based index position of the first song
+    :param j: The 0-based index position of the second song
+    :returns: Integer indicating the number of rounds until these two songs meet
+    """
+    return math.floor(math.log2(i ^ j))
+
+
+def get_analysis(seeds, submissions):
+    """
+    Constructs statistics for anomalous submitter and artist distribution.
+
+    For the given set of submissions and seed order, determines the distribution
+    of songs for each submitter for each artist, returning anything that seems
+    potentially anomalous for manual review.
+
+    The returned data structure is a dict broken down by round number, where
+    each round is a dict that may include any or all of the following keys:
+        - ``submitters`` a per-submitter dict mapping group number to the
+            specific songs submitted by that submitter within the group
+        - ``artists`` the same thing but for artists
+        - ``seeds`` for the first round only, a dict mapping match number to
+            submission pairs for any ``{0, 1}`` seeds matched up against other
+            ``{0, 1}`` seeds
+
+    If a round has nothing to report, it will be omitted from the returned dict.
+
+    :param seeds: Seed order to analyze
+    :param submissions: List of `Submission` instances to sort
+    :returns: The data structure described above, which may be an empty dict
+    """
+
+    ordered_submissions = [Submission.copy(submissions[j], slot=i) for i, j in enumerate(seeds)]
+    results = collections.defaultdict(lambda: collections.defaultdict(dict))
+    max_round = get_distance(0, len(seeds) - 1) + 1
+
+    def get_keyfunc(round):
+        return lambda x: x // (2 ** round)
+
+    for key, attr in [("submitters", "submitter_cmp"), ("artists", "artist_cmp")]:
+        vals = {getattr(submission, attr) for submission in submissions}
+        for val in vals:
+            # The positions of all the relevant songs
+            slots = [
+                i
+                for i, submission in enumerate(ordered_submissions)
+                if getattr(submission, attr) == val
+            ]
+            if len(slots) <= 1:
+                # Only one entry, nothing to meet, much less meet too early
+                continue
+            # Analyze the quartiles, octiles, or respective groupings for each round
+            # Don't analyze the finals, though, everything is allowed there
+            for round in range(1, max_round):
+                # First figure out what we should be seeing
+                num_groups = 2 ** (max_round - round)
+                allowed_sizes = {
+                    math.floor(len(slots) / num_groups),
+                    math.ceil(len(slots) / num_groups),
+                }
+                # Now split into the actual groups
+                # We do this here since we're interested in the size of the groups,
+                # otherwise we could just record while iterating through the groupby
+                groups = {
+                    # Use k + 1 to get 1-indexed numbers here for readability
+                    k + 1: tuple(g)
+                    for k, g in itertools.groupby(slots, get_keyfunc(round))
+                }
+                if all(len(g) in allowed_sizes for g in groups.values()):
+                    # Nothing to record, avoid adding empty dicts to the results
+                    continue
+                # Record any groups with invalid sizes
+                results[round][key][val] = {
+                    k: tuple(ordered_submissions[i] for i in g)
+                    for k, g in groups.items()
+                    if len(g) not in allowed_sizes
+                }
+
+    # Special case to list any {0, 1} vs. {0, 1} matches in the first round
+    # This magic grabs two elements from ordered_submissions at a time
+    it = iter(ordered_submissions)
+    match = 0
+    for submission1, submission2 in iter(lambda: tuple(itertools.islice(it, 2)), ()):
+        match += 1
+        if submission1.seed in {0, 1} and submission2.seed in {0, 1}:
+            results[1]["seeds"][match] = (submission1, submission2)
+
+    return results
+
+
+def print_analysis_results(results, total_submissions):
+    """
+    Prints the anomalous results, one issue per line.
+
+    The results object may not include enough information on its own to
+    reconstruct the total number of submissions, so this is required as an
+    argument to be able to print slightly more helpful messages.
+
+    :param results: Results dict as returned by `get_analysis`
+    :param total_submission: Integer number of total submissions
+    :returns: None
+    """
+
+    num_rounds = get_distance(0, total_submissions - 1) + 1
+    print(f"Analysis results:")
+    for round, round_results in sorted(results.items()):
+        # We only record problems, so this should never come up
+        if not round_results:
+            print(f"Round {round} / {num_rounds} | No issues found")
+            continue
+
+        if "submitters" in round_results:
+            for submitter, submission_groups in round_results["submitters"].items():
+                for group_number, group in submission_groups.items():
+                    num_groups = 2 ** (num_rounds - round)
+                    print(f"Round {round} / {num_rounds} | Submitter {submitter} | Group {group_number} / {num_groups} | {' | '.join(map(str, group))}")
+
+        if "artists" in round_results:
+            for artist, submission_groups in round_results["artists"].items():
+                for group_number, group in submission_groups.items():
+                    num_groups = 2 ** (num_rounds - round)
+                    print(f"Round {round} / {num_rounds} | Artist {artist} | Group {group_number} / {num_groups} | {' | '.join(map(str, group))}")
+
+        if "seeds" in round_results:
+            for match, submission_pair in round_results["seeds"].items():
+                num_matches = 2 ** (num_rounds - round)
+                print(f"Round {round} / {num_rounds} | Match {match} / {num_matches} | {submission_pair[0]} | {submission_pair[1]}")
+    else:
+        print(f"No problems found")
+
+
+def print_analysis(seeds, submissions):
+    """
+    Calculate and then print the distribution analysis for the given seeding.
+
+    :param seeds: Seed order to analyze
+    :param submissions: List of `Submission` instances to sort
+    :returns: None
+    """
+    print_analysis_results(get_analysis(seeds, submissions), len(submissions))
 
 
 def get_canonical_artist(artist):
@@ -32,7 +187,15 @@ def get_canonical_artist(artist):
     :returns: Canonical artist name, suitable for comparison
     """
 
-    return re.sub(r"^the ", "", re.sub(r"[\W_]+", " ", artist.lower().replace("--", " ").replace("-", "")))
+    return re.sub(
+        r"^the ",
+        "",
+        re.sub(
+            r"[\W_]+",
+            " ",
+            artist.lower().replace("--", " ").replace("-", ""),
+        ),
+    )
 
 
 class Submission:
@@ -40,7 +203,7 @@ class Submission:
     Container class for an individual submission
     """
 
-    def __init__(self, *, artist, song, submitter, seed, **kwargs):
+    def __init__(self, *, artist, song, submitter, seed, slot=None, **kwargs):
         """
         Constructor for a `Submission` instance.
         
@@ -51,7 +214,8 @@ class Submission:
             - ``seed``
         Any additional keyword arguments will be ignored.
         
-        :param artist: The string name of the artist who performed/composed the song
+        :param artist: The string name of the artist who performed/composed the
+            song
         :param song: The string title of the song
         :param submitter: The string handle of the user who submitted the song
         :param seed: The 1-indexed seed position within the submitter's list, 0
@@ -62,12 +226,27 @@ class Submission:
         self.artist_cmp = get_canonical_artist(artist)
         self.song = song
         self.submitter = submitter
-        # Ideally we would go by submitter ID, but this should be good enough for now
+        # Ideally we would go by submitter ID
+        # but this should be good enough for now
         self.submitter_cmp = submitter.lower()
         self.seed = int(seed)
+        self.slot = slot
 
     def __str__(self):
-        return f"{self.artist} - {self.song} <{self.submitter}, {self.seed}>"
+        """
+        Pretty way of converting the submission to a string.
+
+        Includes the artist, song, submitter, and submitted seed values.
+        """
+
+        slot = "" if self.slot is None else f"{self.slot} "
+        return f"{slot}{self.artist} - {self.song} <{self.submitter}, {self.seed}>"
+
+    @classmethod
+    def copy(cls, instance, **overrides):
+        kwargs = instance.__dict__.copy()
+        kwargs.update(overrides)
+        return cls(**kwargs)
 
 
 def calc_badness(i, submissions):
@@ -100,9 +279,8 @@ def calc_badness(i, submissions):
     max_distance = math.floor(math.log2(n))
     for j in range(i + 1, n):
         # Calculate the number of rounds before these two submissions would meet
-        # in a match, starting with 1 if they already are
-        # The `+ 1` is to avoid division by zero
-        distance = math.floor(math.log2(i ^ j)) + 1
+        # in a match, starting with 0 if they already are
+        distance = get_distance(i, j)
         if submissions[i].artist_cmp == submissions[j].artist_cmp:
             badness[j] += BADNESS_MAX_ARTIST * (1 - distance / max_distance)
         if submissions[i].submitter_cmp == submissions[j].submitter_cmp:
@@ -139,12 +317,19 @@ def swap(seeds, submissions, badness, use_max=True, hint=None):
     """
     Try to decrease total badness by swapping a submission
 
-    Will perform a single swap on the , re-evaluate the badness, and return the new seed
-    list if the total badness went down.
+    Will perform a single swap on the submission with the maximum badness (or a
+    random one if use_max is ``False``), re-evaluate the badness, and return the
+    new seed list if the total badness went down.
 
     :param seeds: Seed order to sort submissions by
     :param submissions: List of `Submission` instances
     :param badness: List of badness scores for submissions in seed order
+    :param use_max: Boolean indicating whether to swap the submission with the
+        maximum badness score, or just pick a random one (default True)
+    :param hint: Optional integer index to try swapping with. If not given, swap
+        with a random one instead
+    :returns: Tuple of containing the list of badness scores and the list of
+        seeds. May or may not be identical to the one originally passed in
     """
 
     if use_max:
@@ -172,12 +357,31 @@ def swap(seeds, submissions, badness, use_max=True, hint=None):
 
 
 def get_new_seeds(submissions):
+    """
+    Generate a new seeding order.
+
+    Given a list of submissions, generates a new seed ordering for the
+    submissions and calculates the initial badness for each corresponding
+    element in the seed list, returning the badness and seed lists in a tuple.
+
+    This is mostly used as an internal convenience function.
+
+    :param submissions: List of `Submission` instances
+    :returns: Tuple containing a list of badness scores and a list of seeds
+    """
     seeds = get_shuffled_range(len(submissions))
     badness = get_badness(seeds, submissions)
     return badness, seeds
 
 
 def get_shuffled_range(n):
+    """
+    Utility function to generate a random ordering of the integers in [0, n)
+
+    :param n: The length of the returned list
+    :returns: A list of the numbers from 0 to n-1, inclusive, shuffled
+    """
+
     return random.sample(list(range(n)), k=n)
 
 
@@ -216,7 +420,7 @@ def get_seed_order(data):
             prev_total = total_badness
             prev_i = i
             hints = get_shuffled_range(n)
-        if i - prev_i > 200:
+        if i - prev_i > ATTEMPT_ITERATIONS:
             attempts += 1
             if total_badness < best_badness:
                 best_badness = total_badness
@@ -239,6 +443,7 @@ def get_seed_order(data):
     print(f"Done trying, best badness {best_badness:.0f}")
     badness = get_badness(best_seeds, submissions)
     [print(f"{i:2} {badness[i]:3.0f} {submissions[best_seeds[i]]}") for i in range(n)]
+    print_analysis(best_seeds, submissions)
     return best_seeds
 
 
@@ -249,18 +454,12 @@ def get_parser():
     :returns: Instantiated and fully configured instance of ArgumentParser
     """
 
-    parser = argparse.ArgumentParser(description="create a seeding order for input CSV")
-    parser.add_argument(
-        "--force",
-        "-f",
-        help=(
-            "force output to the given file path, overwriting contents if the "
-            "file already exists and creating any intermediate directories, if "
-            "necessary"
-        ),
-        action="store_true",
-        default=False,
+    parser = argparse.ArgumentParser(
+        description="create a seeding order for input CSV",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        usage=f"{os.path.basename(__file__ or 'seed.py')} [OPTIONS] INPUT [OUTPUT]",
     )
+
     parser.add_argument(
         "INPUT",
         help=(
@@ -278,6 +477,65 @@ def get_parser():
         ),
         nargs="?",
     )
+    parser.add_argument(
+        "--force",
+        "-f",
+        help=(
+            "force output to the given file path, overwriting contents if the "
+            "file already exists and creating any intermediate directories, if "
+            "necessary"
+        ),
+        action="store_true",
+        default=False,
+    )
+
+    group = parser.add_argument_group(
+        title="behavioral arguments",
+        description=(
+            "The following arguments configure how many iterations to try and "
+            "how to calculate the badness score"
+        ),
+    )
+    group.add_argument(
+        "--badness-artist",
+        help="how much to weigh duplicate artists when calculating badness",
+        default=BADNESS_MAX_ARTIST,
+        type=int,
+    )
+    group.add_argument(
+        "--badness-submitter",
+        help="how much to weigh duplicate submitters when calculating badness",
+        default=BADNESS_MAX_SUBMITTER,
+        type=int,
+    )
+    group.add_argument(
+        "--badness-seed",
+        help="how much to weigh first round seed matchups when calculating badness",
+        default=BADNESS_MAX_SEED,
+        type=int,
+    )
+    group.add_argument(
+        "--iterations",
+        help="total number of iterations to run",
+        default=ITERATIONS,
+        type=int,
+    )
+    group.add_argument(
+        "--attempts",
+        help="maximum number of attempts to reshuffle",
+        default=ATTEMPTS,
+        type=int,
+    )
+    group.add_argument(
+        "--attempt-iterations",
+        help=(
+            "number of iterations without a decrease in badness before starting "
+            "a new attempt"
+        ),
+        default=ATTEMPT_ITERATIONS,
+        type=int,
+    )
+
     return parser
 
 
@@ -335,10 +593,15 @@ def choose_submissions(data):
     new_data = data.copy()
     while len(new_data) > target_size:
         target_seed = max(row["seed"] for row in data)
-        to_remove = random.choice([row for row in data if row["seed"] == target_seed])
+        to_remove = random.choice(
+            [row for row in data if row["seed"] == target_seed]
+        )
         print(f"Eliminating submission {Submission(**to_remove)}")
         new_data.remove(to_remove)
-    print(f"Eliminated {len(data) - len(new_data)} submissions for a {len(new_data)} bracket")
+    print(
+        f"Eliminated {len(data) - len(new_data)} submissions for a "
+        f"{len(new_data)} bracket"
+    )
     return new_data
 
 
@@ -419,4 +682,13 @@ if __name__ == "__main__":
     input_csv_path = args.INPUT
     output_csv_path = args.OUTPUT
     force_output = args.force
+
+    # Reset variables with anything passed in on the command line
+    BADNESS_MAX_ARTIST = args.badness_artist
+    BADNESS_MAX_SUBMITTER = args.badness_submitter
+    BADNESS_MAX_SEED = args.badness_seed
+    ITERATIONS = args.iterations
+    ATTEMPTS = args.attempts
+    ATTEMPT_ITERATIONS = args.attempt_iterations
+
     main(input_csv_path, output_csv_path, force_output)
