@@ -27,3 +27,4 @@
 - ~~clear results for when year ends~~
 - ~~inform submitters when their song dupes~~
 - ~~unpin messages~~
+- genre set, announce, and API call

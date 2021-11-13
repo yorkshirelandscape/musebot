@@ -31,3 +31,4 @@ credentials.json
 token.json
 *.log
 temp.js
+.vscode

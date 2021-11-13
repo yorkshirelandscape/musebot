@@ -308,7 +308,7 @@ const loadCredentials = () => {
 const getValue = async (rng, ss = SPREADSHEET_ID) => getMsg(rng, ss, await getAuthClient());
 
 // eslint-disable-next-line max-len
-const setValue = async (rng, ss = SPREADSHEET_ID, val) => setMsg(rng, ss, val, await getAuthClient());
+const setValue = async (rng, val, ss = SPREADSHEET_ID) => setMsg(rng, ss, val, await getAuthClient());
 
 const getAuthClient = async () => authorize(loadCredentials());
 
