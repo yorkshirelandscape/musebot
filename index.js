@@ -219,8 +219,12 @@ const nextMatch = async (matches) => {
         || (size === 32 && rndVal === 2)
       )
   ) {
-    const pins = await channel.messages.fetchPinned();
-    const delPins = pins.filter((p) => p.author.bot);
+    let pins = await channel.messages.fetchPinned();
+    let delPins = pins.filter((p) => p.author.bot);
+    delPins.each((p) => { p.unpin(); });
+
+    pins = await testChan.messages.fetchPinned();
+    delPins = pins.filter((p) => p.author.bot);
     delPins.each((p) => { p.unpin(); });
 
     testMusic.send('Beginning next year.');
@@ -245,8 +249,12 @@ const nextMatch = async (matches) => {
 
   if (song === 1) {
     testMusic.send('Beginning next round.');
-    const pins = await channel.messages.fetchPinned();
-    const delPins = pins.filter((p) => p.author.bot && !p.content.includes('🎵'));
+    let pins = await channel.messages.fetchPinned();
+    let delPins = pins.filter((p) => p.author.bot && !p.content.includes('🎵'));
+    delPins.each((p) => { p.unpin(); });
+
+    pins = await testChan.messages.fetchPinned();
+    delPins = pins.filter((p) => p.author.bot && !p.content.includes('🎵'));
     delPins.each((p) => { p.unpin(); });
   }
 
