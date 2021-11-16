@@ -32,7 +32,7 @@ const REFS = {
 
 // let skipstat = false;
 let testing = false;
-let once = false;
+let once = true;
 
 process.argv.forEach((val) => {
   // if (val === '-s') { skipstat = true; }
@@ -80,21 +80,27 @@ const dupes = async () => {
     } else if (listKR === -1 && listRep !== 'X') {
       msg = `Hello, ${username}! Your #${row[5]} seed, ${row[2]}, has duped. If you wish to make a direct substitution, please contact an admin with your replacement. Otherwise, your submitted replacements will be promoted in its place.`;
     } else if (listKR === 1) {
-      const tiedUserRow = dupeList.filter((tieRow) => tieRow[1].localeCompare(row[1],undefined, {sensitivity: base}) === 0
-        && tieRow[2].localeCompare(row[2], undefined, {sensitivity: base}) === 0
-        && tieRow[3].localeCompare(row[3], undefined, {sensitivity: base}) === 0 
-        && tieRow[0].localeCompare(row[0], undefined, {sensitivity: base}) !== 0);
+      const tiedUserRow = dupeList.filter((tieRow) => tieRow[1].localeCompare(row[1],undefined, {sensitivity: 'base'}) === 0
+        && tieRow[2].localeCompare(row[2], undefined, {sensitivity: 'base'}) === 0
+        && tieRow[3].localeCompare(row[3], undefined, {sensitivity: 'base'}) === 0 
+        && tieRow[0].localeCompare(row[0], undefined, {sensitivity: 'base'}) !== 0);
       const tiedUser = tiedUserRow[0][0];
       msg = `Hello, ${username}! You and ${tiedUser} both submitted ${row[2]} as your ${row[5]} seed. Please determine between you who will keep and replace. Whoever replaces should inform an admin and, if they have not done so already, submit a replacement using https://docs.google.com/forms/d/e/1FAIpQLScu6rcO8nyxyneyYzAnCUmVO6N7m4o4O78KS31SgPUY1Lt8RA/viewform.`;
     }
-    const user = guild.members.cache.find((u) => u.user.username === row[0]
-      || u.nickname === row[0] || u.user.username.startsWith(row[0])
-      || (u.nickname || '').startsWith(row[0]));
-    user.send(msg);
-    console.log(msg);
-    if (user !== volfied) { volfied.send(msg); }
-    const toldRange = `Dupes!I${row[14] + 2}`;
-    setValue(toldRange, 'X');
+    const user = guild.members.cache.find((u) => u.user.username.toLowerCase() === row[0].toLowerCase()
+      || (u.nickname || '').toLowerCase() === row[0].toLowerCase()
+      || u.user.username.toLowerCase().startsWith(row[0].toLowerCase())
+      || (u.nickname || '').toLowerCase().startsWith(row[0].toLowerCase()));
+    try {
+      user.send(msg);
+      if (user !== volfied) { volfied.send(msg); }
+      const toldRange = `Dupes!I${row[14] + 2}`;
+      setValue(toldRange, 'X');
+      console.log(msg);
+    } catch(err) {
+      volfied.send(`Failed to send: "${msg}"`)
+      console.log(`Failed to send: "${msg}"`);
+    }
   });
 };
 
