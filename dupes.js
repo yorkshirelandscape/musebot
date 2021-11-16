@@ -32,7 +32,7 @@ const REFS = {
 
 // let skipstat = false;
 let testing = false;
-let once = true;
+let once = false;
 
 process.argv.forEach((val) => {
   // if (val === '-s') { skipstat = true; }
