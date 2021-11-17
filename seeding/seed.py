@@ -10,7 +10,7 @@ import os
 import random
 import re
 import sys
-
+import uuid
 
 # Default values for these settings
 # May be modified by command line arguments
@@ -138,15 +138,67 @@ def get_analysis(seeds, submissions):
                 }
 
     # Special case to list any {0, 1} vs. {0, 1} matches in the first round
-    # This magic grabs two elements from ordered_submissions at a time
-    it = iter(ordered_submissions)
     match = 0
-    for submission1, submission2 in iter(lambda: tuple(itertools.islice(it, 2)), ()):
+    for submission1, submission2 in chunk(ordered_submissions, 2):
         match += 1
         if submission1.seed in {0, 1} and submission2.seed in {0, 1}:
             results[1]["seeds"][match] = (submission1, submission2)
 
+    # If we have any byes, make sure they match against the lowest possible seeds
+    # Also make sure they are in the expected slots
+    if submissions[-1].is_bye:
+        allowed_seeds = [
+            submission.seed
+            for submission in sorted(submissions, key=operator.attrgetter("seed"))
+        ][:int(len(submissions) / 4)]
+        max_allowed_seed = max(allowed_seeds)
+        match = 0
+        for submission1, submission2 in chunk(ordered_submissions, 2):
+            match += 1
+            # Only the second submission of even numbered matches can be a bye,
+            # and it *must* be a bye
+            if submission1.is_bye or submission2.is_bye is bool(match % 2):
+                results[1]["byes"][match] = (submission1, submission2)
+                # Incorrect layout is all that needs to be reported
+                continue
+            if match % 2:
+                # Odd numbered matches have no bye
+                continue
+            # The layout is correct and we're in a match with a bye
+            # Now make sure the seeds are good
+            if submission1.seed > max_allowed_seed:
+                results[1]["byes"][match] = (submission1, submission2)
+        # If we haven't seen any issues yet, verify that the number of each seed
+        # matched against a bye is exactly what we expect
+        if 1 not in results or "byes" not in results[1]:
+            actual_seeds = sorted(ordered_submissions[i].seed for i in range(2, len(submissions), 4))
+            if allowed_seeds != actual_seeds:
+                # We have a problem, count up each seed and record any disparities
+                allowed_counts = collections.Counter(allowed_seeds)
+                actual_counts = collections.Counter(actual_seeds)
+                results[1]["byes"]["totals"] = {}
+                for k in set(allowed_counts) | set(actual_counts):
+                    if allowed_counts[k] != actual_counts[k]:
+                        results[1]["byes"]["totals"][k] = (allowed_counts[k], actual_counts[k])
+
     return results
+
+
+# https://stackoverflow.com/a/22045226
+def chunk(lst, n):
+    """
+    Returns successive tuples of length n from input iterator.
+
+    The last tuple may be shorter than n if it reaches the end of the iterator
+    early.
+
+    :param lst: Input iterator to chunk
+    :param n: Desired length of output tuples
+    :returns: Iterator of tuples of length n (except, possibly, the last tuple)
+    """
+
+    it = iter(lst)
+    return iter(lambda: tuple(itertools.islice(it, n)), ())
 
 
 def print_analysis_results(results, total_submissions):
@@ -186,7 +238,20 @@ def print_analysis_results(results, total_submissions):
             for match, submission_pair in round_results["seeds"].items():
                 num_matches = 2 ** (num_rounds - round)
                 print(f"Round {round} / {num_rounds} | Match {match} / {num_matches} | {submission_pair[0]} | {submission_pair[1]}")
-    else:
+
+        if "byes" in round_results:
+            for match, submission_pair in round_results["byes"].items():
+                if match == "totals":
+                    # In this case, we have recorded information about total
+                    # numbers of seeds in a dict so "submission_pair" isn't
+                    # accurate
+                    for seed, counts in submission_pair.items():
+                        print(f"Round {round} / {num_rounds} | Bye Totals | Seed {seed} | Expected {counts[0]} | Actual {counts[1]}")
+                else:
+                    num_matches = 2 ** (num_rounds - round)
+                    print(f"Round {round} / {num_rounds} | Bye Match {match} / {num_matches} | {submission_pair[0]} | {submission_pair[1]}")
+
+    if not results:
         print(f"No problems found")
 
 
@@ -232,7 +297,7 @@ class Submission:
     Container class for an individual submission
     """
 
-    def __init__(self, *, artist, song, submitter, seed, slot=None, **kwargs):
+    def __init__(self, *, artist, song, submitter, seed, slot=None, is_bye=False, **kwargs):
         """
         Constructor for a `Submission` instance.
         
@@ -251,6 +316,7 @@ class Submission:
             indicates a song was submitted by other users as well
         """
 
+        self.is_bye = is_bye
         self.artist = artist
         self.artist_cmp = get_canonical_artist(artist)
         self.song = song
@@ -269,7 +335,29 @@ class Submission:
         """
 
         slot = "" if self.slot is None else f"{self.slot} "
-        return f"{slot}{self.artist} - {self.song} <{self.submitter}, {self.seed}>"
+        if self.is_bye:
+            return f"{slot}Bye"
+        else:
+            return f"{slot}{self.artist} - {self.song} <{self.submitter}, {self.seed}>"
+
+    @classmethod
+    def Bye(cls, *, slot=None, **kwargs):
+        """
+        Returns a dummy instance indicating that a slot's opponent gets a bye.
+        """
+
+        # Use UUID for artist and submitter as a hack so they won't count
+        # against us during analysis
+        bye = cls(
+            artist=uuid.uuid4().hex,
+            song="",
+            submitter=uuid.uuid4().hex,
+            seed=6,
+            slot=slot,
+            is_bye=True,
+            **kwargs,
+        )
+        return bye
 
     @classmethod
     def copy(cls, instance, **overrides):
@@ -297,13 +385,26 @@ def calc_badness(i, submissions):
     if i == n - 1:
         return badness
 
+    # Byes don't generate any badness on their own
+    # Only real submissions matched against a bye should generate badness here
+    if submissions[i].is_bye:
+        return badness
+
     # Include some badness for matching low seeds to other low
     # seeds in the first round only
     if i % 2 == 0:
-        badness[i + 1] += (
-            abs(3 - 0.5 * (submissions[i].seed + submissions[i + 1].seed))
-            * (13 - submissions[i].seed - submissions[i + 1].seed)
-        ) * BADNESS_MAX_SEED / 39
+        if submissions[i + 1].is_bye:
+            # We want the lowest (closest to 0) seeds possible to get byes
+            # We use sqrt here so that it gets badder faster as you get farther
+            # away from 0
+            badness[i + 1] += math.sqrt(
+                submissions[i].seed / submissions[i + 1].seed
+            ) * BADNESS_MAX_SEED
+        else:
+            badness[i + 1] += (
+                abs(3 - 0.5 * (submissions[i].seed + submissions[i + 1].seed))
+                * (13 - submissions[i].seed - submissions[i + 1].seed)
+            ) * BADNESS_MAX_SEED / 39
 
     max_distance = math.floor(math.log2(n))
     for j in range(i + 1, n):
@@ -342,7 +443,37 @@ def get_badness(seeds, submissions):
     ]
 
 
-def swap(seeds, submissions, badness, use_max=True, hint=None):
+def get_rand_index(n, exclude=None, has_byes=False):
+    """
+    Return a random integer in range(n), given constraints.
+    
+    The ``exclude`` parameter excludes a single integer value. The ``has_byes``
+    parameter indicates that every fourth integer should be skipped as those are
+    occupied by bye slots.
+    
+    :param n: Integer max value to return (exclusive)
+    :param exclude: Optional integer value to specifically exclude from output
+    :param has_byes: Optional Boolean value indicating that every fourth integer
+        should be disallowed
+    :returns: Random integer that meets all the constraints specified
+    """
+
+    if has_byes:
+        n *= 0.75
+    if exclude is not None:
+        n -= 1
+    i = random.randrange(n)
+    if exclude is not None:
+        if has_byes:
+            exclude -= exclude // 4
+        if i >= exclude:
+            i += 1
+    if has_byes:
+        i += i // 3
+    return i
+
+
+def swap(seeds, submissions, badness, use_max=True, hint=None, has_byes=False):
     """
     Try to decrease total badness by swapping a submission
 
@@ -361,21 +492,26 @@ def swap(seeds, submissions, badness, use_max=True, hint=None):
         seeds. May or may not be identical to the one originally passed in
     """
 
+    n = len(submissions)
+
     if use_max:
+        if has_byes:
+            # Byes are in a fixed position, cannot be swapped
+            # Give them 0 badness so they won't be picked with use_max
+            valid_badness = [b if (i + 1) % 4 else 0 for i, b in enumerate(badness)]
+        else:
+            valid_badness = badness
         # Index within seeds of submission with the highest badness score
-        i = badness.index(max(badness))
+        i = valid_badness.index(max(valid_badness))
     else:
         # Hit a wall, use random starting point
-        i = random.randrange(0, len(submissions))
-    if hint and hint != i:
+        i = get_rand_index(n, has_byes=has_byes)
+    if hint is not None and hint != i and (not has_byes or (hint + 1) % 4):
         j = hint
     else:
         # Random choice to swap with
-        # Use a smaller range so that...
-        j = random.randrange(0, len(submissions) - 1)
-        # ...we make sure we don't pick i
-        if j >= i:
-            j += 1
+        j = get_rand_index(n, exclude=i, has_byes=has_byes)
+
     seeds[i], seeds[j] = seeds[j], seeds[i]
     new_badness = get_badness(seeds, submissions)
     if sum(new_badness) < sum(badness):
@@ -398,7 +534,22 @@ def get_new_seeds(submissions):
     :param submissions: List of `Submission` instances
     :returns: Tuple containing a list of badness scores and a list of seeds
     """
-    seeds = get_shuffled_range(len(submissions))
+
+    if submissions[-1].is_bye:
+        # Ignore byes when shuffling, we'll insert them all afterward
+        n = len([submission for submission in submissions if not submission.is_bye])
+    else:
+        n = len(submissions)
+    seeds = get_shuffled_range(n)
+    if submissions[-1].is_bye:
+        # Every fourth submission should be a bye
+        # The bye submissions are all at the end, so adding n to a 0-based index
+        # will give a bye submission index
+        seeds = list(
+            itertools.chain.from_iterable(
+                trio + (i + n,) for i, trio in enumerate(chunk(seeds, 3))
+            )
+        )
     badness = get_badness(seeds, submissions)
     return badness, seeds
 
@@ -414,6 +565,14 @@ def get_shuffled_range(n):
     return random.sample(list(range(n)), k=n)
 
 
+def get_hints(n, skip_byes=False):
+    hints = get_shuffled_range(n)
+    if skip_byes:
+        return [j for i, j in enumerate(hints) if i % 4]
+    else:
+        return hints
+
+
 def get_seed_order(data):
     """
     Given parsed CSV data, returns the seed slot of corresponding songs.
@@ -425,15 +584,24 @@ def get_seed_order(data):
     """
 
     submissions = [Submission(**row) for row in data]
-    n = len(submissions)
+    has_byes = False
+
+    if len(data) in {48, 96}:
+        has_byes = True
+        # Make dummy submissions at the end until we have an even power of two
+        submissions += [
+            Submission.Bye() for i in range(2 ** (math.floor(math.log2(len(data))) - 1))
+        ]
+
     # Start completely randomly
     badness, seeds = get_new_seeds(submissions)
+    n = len(submissions)
     prev_total = sum(badness)
     prev_i = 0
     attempts = 0
     best_badness = prev_total
     best_seeds = seeds.copy()
-    hints = get_shuffled_range(n)
+    hints = get_hints(n, has_byes)
     for i in range(ITERATIONS):
         if hints:
             use_max = True
@@ -441,14 +609,14 @@ def get_seed_order(data):
         else:
             use_max = False
             hint = None
-        badness, seeds = swap(seeds, submissions, badness, use_max=use_max, hint=hint)
+        badness, seeds = swap(seeds, submissions, badness, use_max=use_max, hint=hint, has_byes=has_byes)
         total_badness = sum(badness)
         if i % 100 == 0:
             print(f"Iteration {i} total badness {total_badness:.0f}")
         if total_badness < prev_total:
             prev_total = total_badness
             prev_i = i
-            hints = get_shuffled_range(n)
+            hints = get_hints(n, has_byes)
         if i - prev_i > ATTEMPT_ITERATIONS:
             attempts += 1
             if total_badness < best_badness:
@@ -462,17 +630,24 @@ def get_seed_order(data):
             badness, seeds = get_new_seeds(submissions)
             prev_total = sum(badness)
             prev_i = i
-            hints = get_shuffled_range(n)
+            hints = get_hints(n, has_byes)
             print(f"Iteration {i} new attempt, new badness {prev_total:.0f}")
             continue
     else:
         if total_badness < best_badness:
             best_badness = total_badness
             best_seeds = seeds.copy()
+
     print(f"Done trying, best badness {best_badness:.0f}")
     badness = get_badness(best_seeds, submissions)
     [print(f"{i:2} {badness[i]:3.0f} {submissions[best_seeds[i]]}") for i in range(n)]
+
     print_analysis(best_seeds, submissions)
+
+    if submissions[-1].is_bye:
+        # Now we need to drop the byes before returning
+        best_seeds = [i for i in best_seeds if i < len(data)]
+
     return best_seeds
 
 
@@ -641,7 +816,6 @@ def read_csv_from_file(file):
         # parse that row
         data.pop(0)
         headers = row
-    print(headers)
     return list(csv.DictReader(data, fieldnames=headers, delimiter=delimiter))
 
 
@@ -672,11 +846,21 @@ def choose_submissions(data):
     seed numbers, randomly eliminates them until the length of the list is an
     even power of two.
 
+    As a special case, if there are 96 or more songs but not enough for a 128
+    bracket, it'll return 96 submissions. When creating the seeds, every fourth
+    submissions will need to be populated with dummy bye submissions. Similarly,
+    it will return 48 submissions if there are not enough for a 64 bracket.
+
     :param data: List of dicts from the input CSV
     :returns: New list with a number of elements that is a power of two
     """
 
-    target_size = 2 ** math.floor(math.log2(len(data)))
+    if 96 <= len(data) < 128:
+        target_size = 96
+    elif 48 <= len(data) < 64:
+        target_size = 48
+    else:
+        target_size = 2 ** math.floor(math.log2(len(data)))
     new_data = data.copy()
     while len(new_data) > target_size:
         target_seed = max(row["seed"] for row in new_data)
