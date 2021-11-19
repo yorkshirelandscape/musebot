@@ -274,8 +274,8 @@ def get_canonical_artist(artist):
     This performs the following operations, in order:
         - lowercases the input string
         - replaces double hyphens with a space
-        - strips remaining hyphens
-        - replaces all other sequences of non-alphanumeric characters with spaces
+        - strips diacritics and many other miscellaneous marks (like ``&``)
+        - collapses multiple spaces in a row to a single space
         - strips leading "The"
 
     :param artist: String artist name
