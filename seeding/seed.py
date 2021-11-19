@@ -10,6 +10,7 @@ import os
 import random
 import re
 import sys
+import unicodedata
 import uuid
 
 # Default values for these settings
@@ -281,13 +282,24 @@ def get_canonical_artist(artist):
     :returns: Canonical artist name, suitable for comparison
     """
 
+    def should_keep(c):
+        return unicodedata.category(c)[0] in {"L", "N", "S", "Z"}
+
     return re.sub(
         r"^the ",
         "",
         re.sub(
-            r"[\W_]+",
+            r"\s+",
             " ",
-            artist.lower().replace("--", " ").replace("-", ""),
+            "".join(
+                filter(
+                    should_keep,
+                    unicodedata.normalize(
+                        "NFKD",
+                        artist.lower().replace("--", " "),
+                    ),
+                ),
+            ),
         ),
     )
 
