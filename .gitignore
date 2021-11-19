@@ -32,3 +32,4 @@ token.json
 *.log
 temp.js
 .vscode
+__pycache__
