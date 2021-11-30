@@ -283,8 +283,17 @@ client.on('interactionCreate', async (interaction) => {
   // BEGIN tzstamp
   if (interaction.commandName === 'tzstamp') {
     const msg = interaction.options.getString('msg');
+    const offset = interaction.options.getString('offset');
     const raw = interaction.options.getBoolean('raw');
-    const replacer = (match) => `${raw ? '`' : ''}<t:${DateTime.fromFormat(match, 'yyyy/MM/dd HH:mm').valueOf() / 1000}:F>${raw ? '`' : ''}`;
+    const replacer = (match) => {
+      let dt = DateTime.fromFormat(match, 'yyyy/MM/dd HH:mm')
+      if (offset === null) {
+        dt = dt.setZone('UTC+0', {keepLocalTime: true})
+      } else {
+        dt = dt.setZone(offset, {keepLocalTime: true})
+      }
+      return `${raw ? '`' : ''}<t:${dt.valueOf() / 1000}:F>${raw ? '`' : ''}`;
+    }
     const newMsg = msg.replaceAll(/((\d{4})\/(\d{2})\/(\d{2}) (\d{2}):?(\d{2}))/g, replacer);
     if (newMsg === msg) {
       await interaction.reply('Could not find a suitable timestamp. Use yyyy/MM/dd HH:mm.');
