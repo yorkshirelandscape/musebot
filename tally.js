@@ -152,13 +152,16 @@ const checkRound = async () => {
     fetchMany(channel, 200).then(async (messages) => {
       // of those, find the most recent messages that begin and end a round
       const roundStart = await messages.find((msg) => msg.content.includes('Begins————'));
+      console.log(roundStart);
       const roundEnd = await messages.find((msg) => msg.content.includes('you have checked in and are done voting'));
-
+      console.log(roundEnd);
       // if the most recent round is complete,
       // fetch the reactions from the check-in and check-out messages
       if (roundStart.createdTimestamp < roundEnd.createdTimestamp) {
         const checkIns = await getChecks(channel, `if you plan on voting in the ${year}`);
+        console.log(checkIns);
         const checkOuts = await getChecks(channel, 'you have checked in and are done voting');
+        console.log(checkOuts);
 
         // find the check-ins without check-outs and vice versa, then calculate the pct checked in
         const missing = checkIns.filter((x) => !checkOuts.map((u) => u.user).includes(x.user));
