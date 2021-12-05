@@ -277,6 +277,12 @@ def get_canonical_artist(artist):
         - strips diacritics and many other miscellaneous marks (like ``&``)
         - collapses multiple spaces in a row to a single space
         - strips leading "The"
+        - drops featured artists from the end of the artist name by looking for:
+            - ``ft``, ``feat``, or ``featuring``
+            - optional period after the two abbreviations
+            - optional parentheses around the whole thing
+            - must have something following the "featuring" introduction, strips
+              to the end of the artist name
 
     :param artist: String artist name
     :returns: Canonical artist name, suitable for comparison
@@ -286,17 +292,21 @@ def get_canonical_artist(artist):
         return unicodedata.category(c)[0] in {"L", "N", "S", "Z"}
 
     return re.sub(
-        r"^the ",
+        r" (\()?(?:f(?:ea)?t\.?|featuring) .+(?(1)\))$",
         "",
         re.sub(
-            r"\s+",
-            " ",
-            "".join(
-                filter(
-                    should_keep,
-                    unicodedata.normalize(
-                        "NFKD",
-                        artist.lower().replace("--", " "),
+            r"^the ",
+            "",
+            re.sub(
+                r"\s+",
+                " ",
+                "".join(
+                    filter(
+                        should_keep,
+                        unicodedata.normalize(
+                            "NFKD",
+                            artist.lower().replace("--", " "),
+                        ),
                     ),
                 ),
             ),
