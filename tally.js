@@ -179,7 +179,7 @@ const checkRound = async () => {
         let roundMin = 12;
         let roundMax = 24;
         if (lastRound === 0
-          || (lastRound === 1 && (size === 64 || size === 48))
+          || (lastRound === 1 && (size === 64 || size === 48 || size === 96))
           || (lastRound === 2 && size < 64)) {
           roundMin = 24;
           roundMax = 36;
