@@ -145,6 +145,21 @@ def get_analysis(seeds, submissions):
         if submission1.seed in {0, 1} and submission2.seed in {0, 1}:
             results[1]["seeds"][match] = (submission1, submission2)
 
+    # Special case to list any {0, 1} vs. {0, 1} matches in the second round
+    match = 0
+    for submissions_chunk in chunk(ordered_submissions, 4):
+        match += 1
+        if (
+            {submissions_chunk[0].seed, submissions_chunk[1].seed} & {0, 1}
+            and {submissions_chunk[2].seed, submissions_chunk[3].seed} & {0, 1}
+        ):
+            # Pick the first {0,1}-seed in each pair to represent something Bad
+            # There may be multiple Bad things here, but just mention the first
+            # one we find
+            submission1 = next(s for s in submissions_chunk[:2] if s.seed in {0, 1})
+            submission2 = next(s for s in submissions_chunk[2:] if s.seed in {0, 1})
+            results[2]["seeds"][match] = (submission1, submission2)
+
     # If we have any byes, make sure they match against the lowest possible seeds
     # Also make sure they are in the expected slots
     if submissions[-1].is_bye:
@@ -427,6 +442,17 @@ def calc_badness(i, submissions):
                 abs(3 - 0.5 * (submissions[i].seed + submissions[i + 1].seed))
                 * (13 - submissions[i].seed - submissions[i + 1].seed)
             ) * BADNESS_MAX_SEED / 39
+
+    # We'd also like to not have 0 or 1 seeds meet up r2, give a little badness there
+    if (i // 2) % 2 == 0 and submissions[i].seed in {0, 1}:
+        j_start = i + 2 - (i % 2)
+        for j in range(j_start, j_start + 2):
+            if submissions[j].seed in {0, 1}:
+                # A 0-seed here with two 0-seeds in the next couple slots would
+                # give us half BADNESS_MAX_SEED total. More likely we'll only
+                # add one quarter of BADNESS_MAX_SEED at the most. A 1-seed vs a
+                # 1-seed here earns one eighth of BADNESS_MAX_SEED.
+                badness[j] += (4 - submissions[i].seed - submissions[j].seed) * BADNESS_MAX_SEED / 16
 
     max_distance = math.floor(math.log2(n))
     for j in range(i + 1, n):
