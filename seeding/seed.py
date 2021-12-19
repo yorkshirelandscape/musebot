@@ -747,14 +747,14 @@ def get_parser():
     )
     group.add_argument(
         "--output-csv-tabs",
-        help="Use a tab delimiter when outputting the CSV data",
+        help="use a tab delimiter when outputting the CSV data",
         action="store_true",
         default=False,
     )
     group.add_argument(
         "--output-order",
         help=(
-            "The order to sort and/or transform the output seeding by. For "
+            "the order to sort and/or transform the output seeding by. For "
             "`sorted`, submissions are sorted by the new seeding order. For "
             "`original`, submissions retain their original positioning within "
             "the input data. For `bracket`, the generated seeding order is "
@@ -764,6 +764,16 @@ def get_parser():
         ),
         choices=["sorted", "original", "bracket"],
         default="sorted",
+    )
+    group.add_argument(
+        "--output-dropped",
+        help=(
+            "include dropped songs in the output CSV data. Dropped rows will "
+            "have an empty value for the new seed position. In `sorted` output "
+            "order, dropped submissions will be at the end."
+        ),
+        action="store_true",
+        default=False,
     )
 
     group = parser.add_argument_group(
@@ -899,10 +909,17 @@ def choose_submissions(data):
     submissions will need to be populated with dummy bye submissions. Similarly,
     it will return 48 submissions if there are not enough for a 64 bracket.
 
+    Returns a tuple containing both the new data and a list of what was removed.
+    The dropped list contains tuple with the index of the dropped data in the
+    original list as well as the data itself.
+
     :param data: List of dicts from the input CSV
-    :returns: New list with a number of elements that is a power of two
+    :returns: A tuple with a new list with a number of elements that is a power
+        of two and another list containing tuples with the original index and
+        the dropped data for all removed rows
     """
 
+    dropped = []
     if 96 <= len(data) < 128:
         target_size = 96
     elif 48 <= len(data) < 64:
@@ -917,14 +934,16 @@ def choose_submissions(data):
         )
         print(f"Eliminating submission {Submission(**to_remove)}")
         new_data.remove(to_remove)
+        dropped.append((data.index(to_remove), to_remove))
     print(
         f"Eliminated {len(data) - len(new_data)} submissions for a "
         f"{len(new_data)} bracket"
     )
-    return new_data
+    # Sort `dropped` list by original index (the first element in each tuple)
+    return new_data, sorted(dropped)
 
 
-def output_seeded_csv(file, seeds, data, use_tabs, order):
+def output_seeded_csv(file, seeds, data, use_tabs, order, dropped):
     """
     Given an open file, seed list, and input CSV data, writes data as a CSV.
 
@@ -974,7 +993,7 @@ def output_seeded_csv(file, seeds, data, use_tabs, order):
         original_seeds = [None] * len(seeds)
         for i, j in enumerate(seeds):
             original_seeds[j] = i
-        # Now transform these values so fit the traversal order hardcoded into
+        # Now transform these values to fit the traversal order hardcoded into
         # the spreadsheet
         bracket_order = ORDERS[len(seeds)]
         ordered_data = (
@@ -982,10 +1001,28 @@ def output_seeded_csv(file, seeds, data, use_tabs, order):
             for i, row in enumerate(data)
         )
 
+    if dropped is not None:
+        if order == "sorted":
+            # Put the dropped stuff at the end, in original index order
+            ordered_data = itertools.chain(ordered_data, ([""] + list(row.values()) for i, row in dropped))
+        else:
+            # Interleave the dropped rows into the rest of the data
+            # Cast to a list so we can slice
+            seeded_data = list(ordered_data)
+            # Start this over and rebuild the list from scratch
+            ordered_data = []
+            prev_i = 0
+            for i, row in dropped:
+                ordered_data += seeded_data[prev_i:i] + [[""] + list(row.values())]
+                prev_i = i
+            else:
+                # `i` will still be whatever the last value was
+                ordered_data += seeded_data[i:]
+
     writer.writerows(ordered_data)
 
 
-def write_csv_data(csv_path, force, seeds, data, use_tabs, use_bracket_order):
+def write_csv_data(csv_path, force, seeds, data, use_tabs, use_bracket_order, dropped):
     """
     Given an output path and force flag, sorts data by seeds and writes it.
 
@@ -1001,7 +1038,7 @@ def write_csv_data(csv_path, force, seeds, data, use_tabs, use_bracket_order):
     """
 
     if csv_path is None:
-        return output_seeded_csv(sys.stdout, seeds, data, use_tabs, use_bracket_order)
+        return output_seeded_csv(sys.stdout, seeds, data, use_tabs, use_bracket_order, dropped)
 
     if force:
         dirs = os.path.dirname(csv_path)
@@ -1011,7 +1048,7 @@ def write_csv_data(csv_path, force, seeds, data, use_tabs, use_bracket_order):
     mode = "w" if force else "x"
 
     with open(csv_path, mode, newline="") as csv_file:
-        return output_seeded_csv(csv_file, seeds, data, use_tabs, use_bracket_order)
+        return output_seeded_csv(csv_file, seeds, data, use_tabs, use_bracket_order, dropped)
 
 
 def main(
@@ -1020,6 +1057,7 @@ def main(
     force_output,
     output_csv_tabs,
     output_bracket_order,
+    output_dropped,
 ):
     """
     Main entry point for the script.
@@ -1035,7 +1073,7 @@ def main(
     """
 
     data = get_csv_data(input_csv_path)
-    data = choose_submissions(data)
+    data, dropped = choose_submissions(data)
     seeds = get_seed_order(data)
     write_csv_data(
         output_csv_path,
@@ -1044,6 +1082,7 @@ def main(
         data,
         output_csv_tabs,
         output_bracket_order,
+        dropped if output_dropped else None,
     )
 
 
@@ -1056,6 +1095,7 @@ if __name__ == "__main__":
 
     output_csv_tabs = args.output_csv_tabs
     output_order = args.output_order
+    output_dropped = args.output_dropped
 
     # Reset variables with anything passed in on the command line
     BADNESS_MAX_ARTIST = args.badness_artist
@@ -1071,4 +1111,5 @@ if __name__ == "__main__":
         force_output,
         output_csv_tabs,
         output_order,
+        output_dropped,
     )
