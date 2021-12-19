@@ -10,6 +10,7 @@ import os
 import random
 import re
 import sys
+import unicodedata
 import uuid
 
 # Default values for these settings
@@ -273,21 +274,42 @@ def get_canonical_artist(artist):
     This performs the following operations, in order:
         - lowercases the input string
         - replaces double hyphens with a space
-        - strips remaining hyphens
-        - replaces all other sequences of non-alphanumeric characters with spaces
+        - strips diacritics and many other miscellaneous marks (like ``&``)
+        - collapses multiple spaces in a row to a single space
         - strips leading "The"
+        - drops featured artists from the end of the artist name by looking for:
+            - ``ft``, ``feat``, or ``featuring``
+            - optional period after the two abbreviations
+            - optional parentheses around the whole thing
+            - must have something following the "featuring" introduction, strips
+              to the end of the artist name
 
     :param artist: String artist name
     :returns: Canonical artist name, suitable for comparison
     """
 
+    def should_keep(c):
+        return unicodedata.category(c)[0] in {"L", "N", "S", "Z"}
+
     return re.sub(
-        r"^the ",
+        r" (\()?(?:f(?:ea)?t\.?|featuring) .+(?(1)\))$",
         "",
         re.sub(
-            r"[\W_]+",
-            " ",
-            artist.lower().replace("--", " ").replace("-", ""),
+            r"^the ",
+            "",
+            re.sub(
+                r"\s+",
+                " ",
+                "".join(
+                    filter(
+                        should_keep,
+                        unicodedata.normalize(
+                            "NFKD",
+                            artist.lower().replace("--", " "),
+                        ),
+                    ),
+                ),
+            ),
         ),
     )
 
