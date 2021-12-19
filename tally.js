@@ -306,6 +306,9 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
           } else {
             const pushArray = [];
             resultsArray.forEach((r) => {
+              if (lastRound === 0 && size === (96 || 48 )) { 
+                pushArray.push['','',''];
+              };
               pushArray.push([r.c1, r.c2, r.tie]);
             });
 
