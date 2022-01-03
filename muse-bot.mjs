@@ -1,5 +1,6 @@
 import MuseDiscord from './discord/muse-discord.mjs';
 import MuseGoogle from './google/muse-google.mjs';
+import tzstamp from './commands/tzstamp.mjs';
 
 const START_TIME = 5;
 const END_TIME = 21;
@@ -129,6 +130,11 @@ export default class MuseBot {
       case 'testEmoji':
         this.logger.info('Test finding emoji');
         await this.discordClient.findRecentEmoji();
+        break;
+      case 'tzstamp':
+        this.logger.info('Running tzstamp.');
+        const output = tzstamp('2022/01/03 16:50');
+        this.logger.info(output);
         break;
       default:
         this.logger.error(`Unknown action: "${action}"`);
