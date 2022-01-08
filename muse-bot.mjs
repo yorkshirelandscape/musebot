@@ -133,8 +133,7 @@ export default class MuseBot {
         break;
       case 'tzstamp':
         this.logger.info('Running tzstamp.');
-        const output = tzstamp('2022/01/03 16:50');
-        this.logger.info(output);
+        this.logger.info(tzstamp('2022/01/03 16:50'));
         break;
       default:
         this.logger.error(`Unknown action: "${action}"`);
