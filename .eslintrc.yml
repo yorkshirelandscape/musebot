@@ -6,9 +6,7 @@ extends:
   - airbnb-base
 parserOptions:
   ecmaVersion: 12
-rules: {
-  radix: ["error", "as-needed"],
-  no-restricted-syntax: "off",
+rules:
+  radix: ["error", "as-needed"]
+  no-restricted-syntax: "off"
   import/extensions: "off"
-  indent: ["error", 4]
-}
