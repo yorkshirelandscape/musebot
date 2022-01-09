@@ -19,6 +19,14 @@ export default class MuseDiscord {
       ],
     });
     this.initialized = false;
+    this._initPromise = new Promise((resolve, reject) => {
+      this.client.once('error', reject);
+      this.client.once('ready', () => {
+        this.logger.info('Discord client ready');
+        this.client.off('error', reject);
+        resolve();
+      });
+    });
   }
 
   /**
@@ -28,18 +36,15 @@ export default class MuseDiscord {
    */
   async init() {
     await this.client.login(process.env.TOKEN);
-    await new Promise((resolve, reject) => {
-      this.client.once('error', reject);
-      this.client.once('ready', () => {
-        this.logger.info('Discord client ready');
-        this.client.off('error', reject);
-        resolve();
-      });
-    });
+    await this._initPromise;
     this.guild = this.client.guilds.cache.get(process.env.GUILD_ID);
     this.infoChannel = this.client.channels.cache.get(process.env.INFO_CHANNEL_ID);
     this.voteChannel = this.client.channels.cache.get(process.env.VOTE_CHANNEL_ID);
     this.initialized = true;
+  }
+
+  async ready() {
+    return this._initPromise;
   }
 
   /**
@@ -201,5 +206,13 @@ export default class MuseDiscord {
     emojis.forEach((emoji) => {
       this.logger.debug(`Found emoji: ${emoji}`);
     });
+  }
+
+  async postMessage(channel, message) {
+    this.requireInit();
+    this.logger.info(`Posting message to channel ${channel.id}`);
+    this.logger.debug({ channelId: channel.id, message }, `Posting to channel ${channel.id} message ${message}`);
+    await channel.send(message);
+    this.logger.info('Message successfully posted');
   }
 }

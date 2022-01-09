@@ -1,6 +1,6 @@
 import MuseDiscord from './discord/muse-discord.mjs';
 import MuseGoogle from './google/muse-google.mjs';
-import tzstamp from './commands/tzstamp.mjs';
+import SlashCommander from './commands/slash-commander.mjs';
 
 const START_TIME = 5;
 const END_TIME = 21;
@@ -9,6 +9,18 @@ const END_TIME = 21;
  * MuseBot class for initializing and running the Discord bot.
  */
 export default class MuseBot {
+  static get ACTIONS() {
+    return [
+      'match',
+      'start',
+      'status',
+      'testGoogle',
+      'testDiscord',
+      'testEmoji',
+      'slash',
+    ];
+  }
+
   constructor(logger, options) {
     this.logger = logger.child({ class: 'MuseBot' });
     this.options = options;
@@ -16,6 +28,8 @@ export default class MuseBot {
     this.endTime = null;
     this.initialized = false;
     this.discordClient = null;
+    this.googleClient = null;
+    this.slashCommander = null;
     this.destroyClient = true;
   }
 
@@ -27,9 +41,11 @@ export default class MuseBot {
     this.logger.info('Initializing Discord client');
     this.discordClient = new MuseDiscord(this.logger);
     this.googleClient = new MuseGoogle(this.logger);
+    this.slashCommander = new SlashCommander(this.logger, this.discordClient);
     await Promise.all([
       this.discordClient.init(),
       this.googleClient.init(),
+      this.slashCommander.init(),
     ]);
     this.initialized = true;
   }
@@ -62,6 +78,8 @@ export default class MuseBot {
    * Iterates through the command line arguments to perform the requested
    * actions.
    *
+   * Destroys the input array.
+   *
    * Requires the bot to have been initialized first.
    *
    * Though async, this function waits for each action to fully complete before
@@ -69,14 +87,19 @@ export default class MuseBot {
    *
    * See handleAction method for information about allowed actions.
    *
-   * @param {string[]} actions - Array of actions to perform
+   * @param {string[]} actions - Array of actions to perform. Destroyed during
+   *   processing
    */
   async process(actions) {
     this.requireInit();
-    for (const action of actions) {
-      // Use for...of so we can await each action in sequence
+    while (actions.length) {
+      if (!MuseBot.ACTIONS.includes(actions[0])) {
+        throw new Error(`Invalid action ${actions[0]}`);
+      }
+      const i = actions.slice(1).findIndex((element) => MuseBot.ACTIONS.includes(element));
+      const toHandle = i === -1 ? actions.splice(0) : actions.splice(0, i + 1);
       // eslint-disable-next-line no-await-in-loop
-      await this.handleAction(action);
+      await this.handleAction(toHandle[0], toHandle.slice(1));
     }
   }
 
@@ -93,8 +116,10 @@ export default class MuseBot {
    *
    * @param {string} action - The name of the action to perform, as described
    *   above.
+   * @param {array} args - Optional list of string arguments to pass to the
+   *   action handler.
    */
-  async handleAction(action) {
+  async handleAction(action, args = []) {
     this.requireInit();
     this.logger.debug(`Processing argument "${action}"`);
     switch (action) {
@@ -131,9 +156,15 @@ export default class MuseBot {
         this.logger.info('Test finding emoji');
         await this.discordClient.findRecentEmoji();
         break;
-      case 'tzstamp':
-        this.logger.info('Running tzstamp.');
-        this.logger.info(tzstamp('2022/01/03 16:50'));
+      case 'slash':
+        if (!args.length) {
+          this.logger.error('`slash` action requires command name argument');
+          break;
+        }
+        this.logger.info(`Testing slash command ${args[0]}`);
+        this.logger.debug({ command: args[0], args: args.slice(1) }, 'Testing slash command with given arguments');
+        await this.slashCommander.dispatch(args[0], args.slice(1), true);
+        this.logger.debug({ command: args[0], args: args.slice(1) }, 'Slash command completed');
         break;
       default:
         this.logger.error(`Unknown action: "${action}"`);
