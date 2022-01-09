@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-export default function timestamp(msg, offset = 'UTC+0', raw = false) {
+export default function tzstamp(msg, offset = 'UTC+0', raw = false) {
   const replacer = (match) => {
     let dt = DateTime.fromFormat(match, 'yyyy/MM/dd HH:mm');
     dt = dt.setZone(offset, { keepLocalTime: true });
