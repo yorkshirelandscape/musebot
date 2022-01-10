@@ -10,3 +10,4 @@ rules:
   radix: ["error", "as-needed"]
   no-restricted-syntax: "off"
   import/extensions: "off"
+  no-prototype-builtins: "off"

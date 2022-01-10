@@ -17,7 +17,9 @@ export default class MuseBot {
       'testGoogle',
       'testDiscord',
       'testEmoji',
-      'slash',
+      'slashTest',
+      'slashStart',
+      'slashCreate',
     ];
   }
 
@@ -92,6 +94,10 @@ export default class MuseBot {
    */
   async process(actions) {
     this.requireInit();
+    // this.logger.info(this.discordClient.client.application, 'application')
+    // this.logger.info(this.discordClient.client.application.commands, 'application.commands')
+    // this.logger.info(this.discordClient.guild, 'guild')
+    // this.logger.info(this.discordClient.guild.commands, 'guild.commands')
     while (actions.length) {
       if (!MuseBot.ACTIONS.includes(actions[0])) {
         throw new Error(`Invalid action ${actions[0]}`);
@@ -116,7 +122,7 @@ export default class MuseBot {
    *
    * @param {string} action - The name of the action to perform, as described
    *   above.
-   * @param {array} args - Optional list of string arguments to pass to the
+   * @param {string[]} args - Optional list of string arguments to pass to the
    *   action handler.
    */
   async handleAction(action, args = []) {
@@ -156,15 +162,28 @@ export default class MuseBot {
         this.logger.info('Test finding emoji');
         await this.discordClient.findRecentEmoji();
         break;
-      case 'slash':
+      case 'slashTest':
         if (!args.length) {
           this.logger.error('`slash` action requires command name argument');
           break;
         }
         this.logger.info(`Testing slash command ${args[0]}`);
         this.logger.debug({ command: args[0], args: args.slice(1) }, 'Testing slash command with given arguments');
-        await this.slashCommander.dispatch(args[0], args.slice(1), true);
+        await this.slashCommander.dispatch(args[0], args.slice(1));
         this.logger.debug({ command: args[0], args: args.slice(1) }, 'Slash command completed');
+        break;
+      case 'slashStart':
+        this.logger.info('Registering SlashCommander as slash command handler');
+        if (args.length) {
+          this.logger.info(`Only registering the following commands: '${args.join("', '")}'`);
+        }
+        await this.slashCommander.start(args);
+        this.destroyClient = false;
+        break;
+      case 'slashCreate':
+        this.logger.info({ args }, '(Re)creating slash commands');
+        this.slashCommander.createCommands(args);
+        this.logger.info({ args }, 'Slash command creation complete');
         break;
       default:
         this.logger.error(`Unknown action: "${action}"`);
