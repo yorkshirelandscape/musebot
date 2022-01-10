@@ -19,7 +19,7 @@ export default class MuseDiscord {
       ],
     });
     this.initialized = false;
-    this._initPromise = new Promise((resolve, reject) => {
+    this.initPromise = new Promise((resolve, reject) => {
       this.client.once('error', reject);
       this.client.once('ready', () => {
         this.logger.info('Discord client ready');
@@ -36,7 +36,7 @@ export default class MuseDiscord {
    */
   async init() {
     await this.client.login(process.env.TOKEN);
-    await this._initPromise;
+    await this.initPromise;
     this.guild = this.client.guilds.cache.get(process.env.GUILD_ID);
     this.infoChannel = this.client.channels.cache.get(process.env.INFO_CHANNEL_ID);
     this.voteChannel = this.client.channels.cache.get(process.env.VOTE_CHANNEL_ID);
@@ -44,7 +44,7 @@ export default class MuseDiscord {
   }
 
   async ready() {
-    return this._initPromise;
+    return this.initPromise;
   }
 
   /**
