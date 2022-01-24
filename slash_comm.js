@@ -54,12 +54,18 @@ let SPREADSHEET_ID = (testing === true ? TESTING_ID : MASTER_ID);
 const ADDURL = {
   READ_RANGE: 'Dashboard!H2:H129',
 };
+
 const LISTSONGS = {
   READ_RANGE: 'SongsStaging!B2:G',
   HIST_RANGE: 'Submissions!A2:F',
   YEAR_RANGE: 'Lists!K2',
   ACTIVE_YEAR: 'Dashboard!B1'
 };
+
+const REMATCH = {
+  ROUND_RANGE: 'Dashboard!B2',
+  MATCH_RANGE: 'Dashboard!B3'
+}
 
 const ADMINS = [
   { name: 'DonaldX', id: '268846196888567810' },
@@ -302,6 +308,26 @@ client.on('interactionCreate', async (interaction) => {
     }
   }
   // END tzstamp
+
+  // BEGIN rematch
+  if (interaction.commandName === 'rematch') {
+    if (ADMINS.includes(interaction.user.id)) {
+      const match = interaction.options.getInteger('match');
+      const round = parseInt(getValue(REMATCH.ROUND_RANGE).substring(1));
+      const currMatch = getValue(REMATCH.MATCH_RANGE);
+      const roundMatch = match - (128-2^(Math.log2(128)-round));
+      const channel = client.channels.cache.get(CHANNEL_ID);
+      await channel.messages.fetch({ limit: 100 });
+      const msg = await channel.messages.cache.find((m) => m.content.includes(`Match ${match}`));
+      await msg.delete();
+      await setValue(REMATCH.MATCH_RANGE, roundMatch);
+      // post match here
+      await setValue(REMATCH.MATCH_RANGE, currMatch);
+      await interaction.reply('Match replaced.');
+    } else { await interaction.reply('User not authorized.')}
+  }
+
+  // END rematch
 });
 
 const loadCredentials = () => {
