@@ -23,8 +23,8 @@ const Discogs = require('disconnect').Client;
 const disc = new Discogs('MuseBot/1.0', { userToken: process.env.DISCOGS }).database();
 
 const RANGES = {
-    READ_RANGE: 'Discogs!E2:F',
-    WRITE_RANGE: 'Discogs!G2:H',
+    READ_RANGE: 'Discogs!E2:M',
+    WRITE_RANGE: 'Discogs!H2:I',
     COPY_RANGE: 'Discogs!D2:D'
 };
 
@@ -41,11 +41,7 @@ const loadCredentials = () => {
   
 const clearRanges = async (rng) => clearRngs(rng, await getAuthClient());
 
-const getValue = async (rng) => getMsg(rng, await getAuthClient());
-
 const getValues = async (rng) => getMsgs(rng, await getAuthClient());
-
-const setValue = async (rng, val) => setMsg(rng, val, await getAuthClient());
 
 const setValues = async (rng, val) => setMsgs(rng, val, await getAuthClient());
 
@@ -107,20 +103,6 @@ try {
 }
 };
 
-const getMsg = async (rng, auth) => {
-const sheets = google.sheets({ version: 'v4', auth });
-try {
-    const response = await sheets.spreadsheets.values.get({
-    spreadsheetId: SPREADSHEET_ID,
-    range: rng,
-    });
-    return response.data.values[0][0];
-} catch (err) {
-    console.log(`getMsg API returned an error for range "${rng}"`, err);
-    throw err;
-}
-};
-
 const getMsgs = async (rng, auth) => {
 const sheets = google.sheets({ version: 'v4', auth });
 try {
@@ -131,25 +113,6 @@ try {
     return response.data.valueRanges;
 } catch (err) {
     console.log(`getMsgs API returned an error for range "${rng}"`, err);
-    throw err;
-}
-};
-
-const setMsg = async (rng, val, auth) => {
-const sheets = google.sheets({ version: 'v4', auth });
-try {
-    const confirm = await sheets.spreadsheets.values.update({
-    spreadsheetId: SPREADSHEET_ID,
-    range: rng,
-    valueInputOption: 'USER_ENTERED',
-    resource: {
-        majorDimension: 'ROWS',
-        values: [[val]],
-    },
-    });
-    return confirm.config.data.values[0];
-} catch (err) {
-    console.log(`setMsg API returned an error for range "${rng}" and value "${val}"`, err);
     throw err;
 }
 };
@@ -176,60 +139,38 @@ const setMsgs = async (rng, val, auth) => {
 const sleep = async (interval) => new Promise((r) => setTimeout(r, interval));
 
 const genreCall = async () => {
-    const releases = await getValues(RANGES.READ_RANGE);
+    const dataSet = await getValues(RANGES.READ_RANGE);
 
     await clearRanges(RANGES.COPY_RANGE);
     
-    await setValues(RANGES.COPY_RANGE, releases[0].values.map( row => [row[0]]));
+    await setValues(RANGES.COPY_RANGE, dataSet[0].values.map( row => [row[0]]));
 
-    const results = [];
-
-    for (const r of Object.values(releases[0].values)) {
-        console.log(r[1], r[0]);
-        const data = await disc.search({artist: r[1], track: r[0], type: 'release', sort: 'year', sort_order: 'asc'});
-
-        const sortMap = data.results.sort((x, y) => {
-            // const n = x.year - y.year;
-            // if (n !== 0) {
-            //   return n;
-            // }
-            return y.community.have - x.community.have;
-        });
+    for (const r of Object.values(dataSet[0].values)) {
+        if (typeof r[8] === 'undefined') {
+            console.log(r[1], r[0]);
+            const data = await disc.search({artist: r[1], track: r[0], type: 'release'});
+    
+            const sortMap = data.results.sort((x, y) => {
+                return y.community.have - x.community.have;
+            });
+    
+            if (sortMap.length === 0) {
+                console.log('No match.');
+            } else {
+                const {
+                    title, year, genre, style, master_url, cover_image,
+                  } = sortMap[0];
           
-        // const filtArr = sortMap.filter((r) => (
-        // !r.format.includes('Unofficial Release')
-        //     && !r.format.includes('Promo')
-        //     && !r.format.includes('EP')
-        //     && !r.format.includes('Test Pressing')
-        //     // && !r.format.includes('EP')
-        //     && (r.format.includes('Album')
-        //     || r.format.includes('Single')
-        //     || r.format.includes('Compilation'))
-        // ));
-
-        // console.log(filtArr[0]);
-
-        if (sortMap.length === 0) {
-            console.log('No match.');
-            results.push([r[1], 0, '', '']);
-        } else {
-            const {
-                // eslint-disable-next-line camelcase
-                title, year, genre, style, master_url, cover_image,
-              } = sortMap[0];
-      
-              // console.log(`${title}\n${year}\n${genre}\n${style}`);
-      
-              results.push([title, year, genre.join(';'), style.join(';')]);
+                  r[3] = genre.join(';');
+                  r[4] = style.join(';');
+            }   
+            await sleep(1000);
         }
-        
-        await sleep(1000);
     };
 
-    const write_results = results.map( row => [row[2],row[3]]);
+    const write_results = dataSet[0].values.map( row => [row[3],row[4]]);
 
     await setValues(RANGES.WRITE_RANGE, write_results);    
-
 }
 
 genreCall();
