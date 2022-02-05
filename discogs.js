@@ -280,7 +280,7 @@ const yearCheck = async () => {
         const song = r[1];
         const artist = r[2];
         const year = r[4];
-        if (typeof r[5] === 'undefined' && r[4] !== activeYear) {
+        if (typeof r[5] === 'undefined' && typeof r[4] !== 'undefined' && r[4] !== activeYear) {
             msg = `Hello, ${username}! Discogs thinks that your submission, ${song} by ${artist}, belongs in the year ${year}. Please check the year and let volfied know your replacement song or why the original submission belongs in ${activeYear}.`;
 
             const user = guild.members.cache.find((u) => u.user.username.toLowerCase() === username.toLowerCase()
