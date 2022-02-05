@@ -122,7 +122,6 @@ client.on('interactionCreate', async (interaction) => {
         && !r.format.includes('Promo')
         && !r.format.includes('EP')
         && !r.format.includes('Test Pressing')
-        // && !r.format.includes('EP')
         && (r.format.includes('Album')
           || r.format.includes('Single')
           || r.format.includes('Compilation'))
