@@ -388,7 +388,7 @@ const loadCredentials = () => {
 
 const clearRanges = async (rng) => clearRngs(rng, await getAuthClient());
 
-
+const getValue = async (rng) => getMsg(rng, await getAuthClient());
 
 const getValues = async (rng) => getMsgs(rng, await getAuthClient());
 

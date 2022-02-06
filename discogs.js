@@ -129,7 +129,7 @@ const yearCall = async () => {
         const track = song.replaceAll(/['.]/g, '');
         const yearCheck = r[3];
         if (typeof yearCheck === 'undefined') {
-            console.log(artist, year);
+            console.log(artist, song);
             try {
                 const data = await disc.search({artist: artist, track: track, type: 'release', sort: 'year', sort_order: 'asc'});
                 
@@ -159,7 +159,7 @@ const yearCall = async () => {
                         title, year, genre, style, master_url, cover_image,
                       } = filtArr[0];
               
-                      yearCheck = year
+                      r[3] = year
                 }
                 await sleep(1000);
             } catch (err) {
@@ -235,7 +235,7 @@ client.on('ready', async () => {
     //     // client.destroy();
     } else {
         // run genreCall at half past odd hours
-        let nowG = DateTime.nowG();
+        let nowG = DateTime.now();
         let countdownGenre = Duration.fromObject({
             hours: nowG.minute > 30 ? (nowG.hour + 1) % 2 : nowG.hour % 2,
             minutes: nowG.minute > 30 ? 60 - (nowG.minute - 30) : 30 - nowG.minute,
@@ -248,7 +248,7 @@ client.on('ready', async () => {
         }, countdownGenre.toMillis());
 
         // run yearCall at half past even hours
-        let nowY = DateTime.nowY();
+        let nowY = DateTime.now();
         let countdownYear = Duration.fromObject({
             hours: nowY.minute > 30 ? 1 - ((nowY.hour + 1) % 2) : 1 - (nowY.hour % 2),
             minutes: nowY.minute > 30 ? 60 - (nowY.minute - 30) : 30 - nowY.minute,
@@ -261,7 +261,7 @@ client.on('ready', async () => {
         }, countdownYear.toMillis());
 
         // // run yearCheck at quarter past even hours
-        // let nowC = DateTime.nowC();
+        // let nowC = DateTime.now();
         // let countdownCheck = Duration.fromObject({
         //     hours: nowC.minute > 15 ? 1- ((nowC.hour + 1) % 2) : 1 - (nowC.hour % 2),
         //     minutes: nowC.minute > 15 ? 60 - (nowC.minute - 15) : 15 - nowC.minute,
