@@ -104,9 +104,10 @@ client.on('interactionCreate', async (interaction) => {
   if (interaction.commandName === 'disc') {
     const searchArtist = interaction.options.getString('artist');
     const searchTrack = interaction.options.getString('title');
+    const cleanTrack = searchTrack.replaceAll(/['.]/g, '');
 
     const data = await disc.search({
-      artist: searchArtist, track: searchTrack, type: 'release', sort: 'year', sort_order: 'asc',
+      artist: searchArtist, track: cleanTrack, type: 'release', sort: 'year', sort_order: 'asc',
     });
 
     const sortMap = data.results.sort((x, y) => {
@@ -124,7 +125,8 @@ client.on('interactionCreate', async (interaction) => {
         && !r.format.includes('Test Pressing')
         && (r.format.includes('Album')
           || r.format.includes('Single')
-          || r.format.includes('Compilation'))
+          || r.format.includes('Compilation')
+          || r.format.includes('LP'))
     ));
 
     const plusArtist = searchArtist.replaceAll(/ /g, '+');
