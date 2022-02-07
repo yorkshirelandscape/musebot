@@ -151,7 +151,7 @@ const yearCall = async () => {
                 ));
         
                 if (filtArr.length === 0) {
-                    console.log('No match.');
+                    console.log(`No match: ${artist} ${track}`);
                 } else {
                     const {
                         title, year, genre, style, master_url, cover_image,
