@@ -84,7 +84,6 @@ const genreCall = async () => {
 
     for (const r of Object.values(dataSet[0].values)) {
         if (typeof r[8] === 'undefined') {
-            console.log(r[1], r[0]);
             try {
                 const data = await disc.search({artist: r[1], track: r[0], type: 'release'});
     
@@ -129,7 +128,6 @@ const yearCall = async () => {
         const track = song.replaceAll(/['.]/g, '');
         const yearCheck = r[3];
         if (typeof yearCheck === 'undefined') {
-            console.log(artist, song);
             try {
                 const data = await disc.search({artist: artist, track: track, type: 'release', sort: 'year', sort_order: 'asc'});
                 
