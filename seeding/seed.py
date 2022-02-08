@@ -1001,7 +1001,7 @@ def output_seeded_csv(file, seeds, data, use_tabs, order, dropped):
             for i, row in enumerate(data)
         )
 
-    if dropped is not None:
+    if dropped:
         if order == "sorted":
             # Put the dropped stuff at the end, in original index order
             ordered_data = itertools.chain(ordered_data, ([""] + list(row.values()) for i, row in dropped))
