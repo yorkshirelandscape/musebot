@@ -55,7 +55,7 @@ const CHANNEL_ID = (testing === true ? TEST_VOTES : DOM_VOTES);
 const MUSIC_ID = (testing === true ? SKYNET : DOM_MUSIC);
 
 const GENRE_RANGES = {
-    READ_RANGE: 'Discogs!E2:M',
+    READ_RANGE: 'Discogs!E2:O',
     WRITE_RANGE: 'Discogs!H2:I',
     COPY_RANGE: 'Discogs!D2:D',
 };
@@ -83,7 +83,7 @@ const genreCall = async () => {
     await setValues(GENRE_RANGES.COPY_RANGE, dataSet[0].values.map( row => [row[0]]));
 
     for (const r of Object.values(dataSet[0].values)) {
-        if (typeof r[8] === 'undefined') {
+        if (typeof r[10] === 'undefined') {
             try {
                 const data = await disc.search({artist: r[1], track: r[0], type: 'release'});
     
@@ -92,6 +92,7 @@ const genreCall = async () => {
                 });
         
                 if (sortMap.length === 0) {
+                    console.log(r[1], '-', r[0]);
                     console.log('No match.');
                 } else {
                     const {
@@ -100,6 +101,8 @@ const genreCall = async () => {
               
                       r[3] = genre.join(';');
                       r[4] = style.join(';');
+                      console.log(r[1], '-', r[0]);
+                      console.log(r[3], '|', r[4]);
                 }   
                 await sleep(1000);
             } catch (err) {
