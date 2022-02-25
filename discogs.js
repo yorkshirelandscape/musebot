@@ -164,7 +164,7 @@ const yearCall = async () => {
                       const plusTrack = track.replaceAll(/ /g, '+');
                       const searchURL = `https://www.discogs.com/search/?sort=year%2Casc&artist=${plusArtist}&track=${plusTrack}&type=release&layout=sm`;
 
-                      r[3] = `=HYPERLINK(${searchURL}, ${year})`
+                      r[3] = `=HYPERLINK("${searchURL}", ${year})`
                 }
                 await sleep(1000);
             } catch (err) {
