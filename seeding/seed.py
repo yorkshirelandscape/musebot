@@ -933,8 +933,8 @@ def choose_submissions(data):
             [row for row in new_data if row["seed"] == target_seed]
         )
         print(f"Eliminating submission {Submission(**to_remove)}")
+        dropped.append((data.index(to_remove), len(new_data), to_remove))
         new_data.remove(to_remove)
-        dropped.append((data.index(to_remove), to_remove))
     print(
         f"Eliminated {len(data) - len(new_data)} submissions for a "
         f"{len(new_data)} bracket"
@@ -1004,7 +1004,7 @@ def output_seeded_csv(file, seeds, data, use_tabs, order, dropped):
     if dropped:
         if order == "sorted":
             # Put the dropped stuff at the end, in original index order
-            ordered_data = itertools.chain(ordered_data, ([""] + list(row.values()) for i, row in dropped))
+            ordered_data = itertools.chain(ordered_data, ([seed] + list(row.values()) for i, seed, row in dropped))
         else:
             # Interleave the dropped rows into the rest of the data
             # Cast to a list so we can slice
@@ -1012,8 +1012,8 @@ def output_seeded_csv(file, seeds, data, use_tabs, order, dropped):
             # Start this over and rebuild the list from scratch
             ordered_data = []
             prev_i = 0
-            for i, row in dropped:
-                ordered_data += seeded_data[prev_i:i] + [[""] + list(row.values())]
+            for i, seed, row in dropped:
+                ordered_data += seeded_data[prev_i:i] + [[seed] + list(row.values())]
                 prev_i = i
             else:
                 # `i` will still be whatever the last value was
