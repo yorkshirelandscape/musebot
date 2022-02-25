@@ -160,7 +160,11 @@ const yearCall = async () => {
                         title, year, genre, style, master_url, cover_image,
                       } = filtArr[0];
               
-                      r[3] = year
+                      const plusArtist = artist.replaceAll(/ /g, '+');
+                      const plusTrack = track.replaceAll(/ /g, '+');
+                      const searchURL = `https://www.discogs.com/search/?sort=year%2Casc&artist=${plusArtist}&track=${plusTrack}&type=release&layout=sm`;
+
+                      r[3] = `=HYPERLINK(${searchURL}, ${year})`
                 }
                 await sleep(1000);
             } catch (err) {
