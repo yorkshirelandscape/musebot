@@ -91,6 +91,15 @@ function replaceOccurrence(string, regex, n, replace) {
   });
 }
 
+function toTitleCase(str) {
+  return str.replace(
+    /\w\S*/g,
+    function(txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    }
+  );
+}
+
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()
   || (!(interaction.commandName === 'tzstamp') && !(interaction.guildId === null
@@ -142,7 +151,7 @@ client.on('interactionCreate', async (interaction) => {
 
     const embed = new MessageEmbed()
       .setTitle(`${title} (${year})`)
-      .setDescription(`${genre.join(', ')} (${style.join(', ')})`)
+      .setDescription(`${toTitleCase(searchTrack)}\n\n${genre.join(', ')} (${style.join(', ')})`)
       .setImage(cover_image)
       .setURL(master_url)
       .addField('\u200B', `[Discogs Search](${searchURL})`);
