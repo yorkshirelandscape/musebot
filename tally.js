@@ -227,9 +227,10 @@ const checkRound = async () => {
         // if 80% are checked in and the round is half over OR
         // the round has one hour left to go, issue the 1-hour warning
         now = DateTime.now();
-        if ((pctCheckedIn >= 0.8
+        if (((pctCheckedIn >= 0.8
             && now > roundEndTime.plus({ hours: roundMinWarn }).minus({ minutes: 30 }))
-            || now > roundEndTime.plus({ hours: roundMaxWarn }).minus({ minutes: 30 })) {
+            || now > roundEndTime.plus({ hours: roundMaxWarn }).minus({ minutes: 30 }))
+            || force === true) {
           if (pctCheckedIn < 1 && force === false) {
             const msg = `One-Hour Warning
 ${(pctCheckedIn * 100).toFixed(1)}% checked in.
