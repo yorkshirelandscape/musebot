@@ -14,9 +14,12 @@ const client = new Client({
 
 client.on('ready', async () => {
   console.log('Ready!');
-  const command = await client.guilds.cache.get('782213860337647636').commands.fetch();
-  console.log(command);
-  await client.guilds.cache.get('782213860337647636').commands.cache.get('872965086128537620').delete();
+  const commandsGuild = await client.guilds.cache.get('782213860337647636').commands.fetch();
+  const commandsClient = await client.application.commands.fetch();
+  console.log(commandsGuild);
+  console.log(commandsClient);
+  // await client.guilds.cache.get('782213860337647636').commands.cache.get('872965086128537620').delete();
+  // await client.application.commands.cache.get('929942856284655646').delete();
   console.log('complete');
 });
 
