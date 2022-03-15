@@ -417,16 +417,29 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
                 });
                 msgMax = maxFiveamNext;
               } else { msgMax = maxSubTime; }
-              msg = `Submissions for ${nextYear} are due between approximately <t:${Math.round(msgMin.valueOf() / 1000)}:F> and <t:${Math.round(msgMax.valueOf() / 1000)}:F>.`;
-
+              
               let pins = await channel.messages.fetchPinned();
               let delPins = pins.filter((p) => p.content.includes('are due between'));
-              delPins.each((p) => { p.unpin(); });
+              delPins.each((p) => { 
+                try {
+                  p.unpin(); 
+                } catch (err) {
+                  console.log('No messages to unpin.', err);
+                }
+              });
 
               pins = await testChan.messages.fetchPinned();
               delPins = pins.filter((p) => p.content.includes('are due between'));
-              delPins.each((p) => { p.unpin(); });
+              delPins.each((p) => { 
+                try {
+                  p.unpin(); 
+                } catch (err) {
+                  console.log('No messages to unpin.', err);
+                }
+              });
               
+              msg = `Submissions for ${nextYear} are due between approximately <t:${Math.round(msgMin.valueOf() / 1000)}:F> and <t:${Math.round(msgMax.valueOf() / 1000)}:F>.`;
+
               const sent = await musicChan.send(msg);
               await sent.pin();
               if (testing === false) { await testMusic.send(msg); }
