@@ -12,6 +12,8 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-console */
 /* eslint-disable no-use-before-define */
+/* eslint-disable no-nested-ternary */
+
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -35,7 +37,7 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // time.
 const TOKEN_PATH = 'token.json';
 
-const { DateTime } = require('luxon');
+// const { DateTime } = require('luxon');
 
 const testing = false;
 
@@ -59,13 +61,13 @@ const LISTSONGS = {
   READ_RANGE: 'SongsStaging!B2:J',
   HIST_RANGE: 'Submissions!A2:F',
   YEAR_RANGE: 'Lists!K2',
-  ACTIVE_YEAR: 'Dashboard!B1'
+  ACTIVE_YEAR: 'Dashboard!B1',
 };
 
 const REMATCH = {
   ROUND_RANGE: 'Dashboard!B2',
-  MATCH_RANGE: 'Dashboard!B3'
-}
+  MATCH_RANGE: 'Dashboard!B3',
+};
 
 const ADMINS = [
   { name: 'DonaldX', id: '268846196888567810' },
@@ -94,9 +96,7 @@ function replaceOccurrence(string, regex, n, replace) {
 function toTitleCase(str) {
   return str.replace(
     /\w\S*/g,
-    function(txt) {
-      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-    }
+    (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
   );
 }
 
@@ -214,6 +214,7 @@ client.on('interactionCreate', async (interaction) => {
     const year = (histYear !== null ? (histYear === activeYear ? activeYear : histYear) : currYear);
     if (histYear !== null && histYear !== currYear && histYear !== activeYear) hist = true;
     SPREADSHEET_ID = (hist === true ? HISTORICAL_ID : MASTER_ID);
+    // eslint-disable-next-line max-len
     const readVals = await getValue((hist === true ? LISTSONGS.HIST_RANGE : LISTSONGS.READ_RANGE), SPREADSHEET_ID);
 
     const filtArr = readVals.filter((s) => s[3] === year
@@ -296,28 +297,28 @@ client.on('interactionCreate', async (interaction) => {
   }
   // END replaceurl
 
-  // BEGIN tzstamp
-  if (interaction.commandName === 'tzstamp') {
-    const msg = interaction.options.getString('msg');
-    const offset = interaction.options.getString('offset');
-    const raw = interaction.options.getBoolean('raw');
-    const replacer = (match) => {
-      let dt = DateTime.fromFormat(match, 'yyyy/MM/dd HH:mm')
-      if (offset === null) {
-        dt = dt.setZone('UTC+0', {keepLocalTime: true})
-      } else {
-        dt = dt.setZone(offset, {keepLocalTime: true})
-      }
-      return `${raw ? '`' : ''}<t:${dt.valueOf() / 1000}:F>${raw ? '`' : ''}`;
-    }
-    const newMsg = msg.replaceAll(/((\d{4})\/(\d{2})\/(\d{2}) (\d{2}):?(\d{2}))/g, replacer);
-    if (newMsg === msg) {
-      await interaction.reply('Could not find a suitable timestamp. Use yyyy/MM/dd HH:mm.');
-    } else {
-      await interaction.reply(newMsg);
-    }
-  }
-  // END tzstamp
+  // // BEGIN tzstamp
+  // if (interaction.commandName === 'tzstamp') {
+  //   const msg = interaction.options.getString('msg');
+  //   const offset = interaction.options.getString('offset');
+  //   const raw = interaction.options.getBoolean('raw');
+  //   const replacer = (match) => {
+  //     let dt = DateTime.fromFormat(match, 'yyyy/MM/dd HH:mm')
+  //     if (offset === null) {
+  //       dt = dt.setZone('UTC+0', {keepLocalTime: true})
+  //     } else {
+  //       dt = dt.setZone(offset, {keepLocalTime: true})
+  //     }
+  //     return `${raw ? '`' : ''}<t:${dt.valueOf() / 1000}:F>${raw ? '`' : ''}`;
+  //   }
+  //   const newMsg = msg.replaceAll(/((\d{4})\/(\d{2})\/(\d{2}) (\d{2}):?(\d{2}))/g, replacer);
+  //   if (newMsg === msg) {
+  //     await interaction.reply('Could not find a suitable timestamp. Use yyyy/MM/dd HH:mm.');
+  //   } else {
+  //     await interaction.reply(newMsg);
+  //   }
+  // }
+  // // END tzstamp
 
   // BEGIN rematch
   if (interaction.commandName === 'rematch') {
@@ -325,8 +326,7 @@ client.on('interactionCreate', async (interaction) => {
       const match = interaction.options.getInteger('match');
       const round = parseInt(getValue(REMATCH.ROUND_RANGE).substring(1));
       const currMatch = getValue(REMATCH.MATCH_RANGE);
-      const roundMatch = match - (128-2^(Math.log2(128)-round));
-      const channel = client.channels.cache.get(CHANNEL_ID);
+      const roundMatch = match - (128 - 2 ** (Math.log2(128) - round));
       await channel.messages.fetch({ limit: 100 });
       const msg = await channel.messages.cache.find((m) => m.content.includes(`Match ${match}`));
       await msg.delete();
@@ -334,7 +334,7 @@ client.on('interactionCreate', async (interaction) => {
       // post match here
       await setValue(REMATCH.MATCH_RANGE, currMatch);
       await interaction.reply('Match replaced.');
-    } else { await interaction.reply('User not authorized.')}
+    } else { await interaction.reply('User not authorized.'); }
   }
 
   // END rematch
