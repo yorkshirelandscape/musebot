@@ -38,6 +38,8 @@ export default class MuseBot {
   /**
    * Initializes the bot. This includes the following:
    * - Initializes the Discord client
+   * - Initializes the Google OAuth client
+   * - Initializes SlashCommander for managing slash commands
    */
   async init() {
     this.logger.info('Initializing Discord client');
@@ -46,7 +48,7 @@ export default class MuseBot {
     this.slashCommander = new SlashCommander(this.logger, this.discordClient);
     await Promise.all([
       this.discordClient.init(),
-      this.googleClient.init(),
+      // this.googleClient.init(),
       this.slashCommander.init(),
     ]);
     this.initialized = true;
@@ -164,7 +166,7 @@ export default class MuseBot {
         break;
       case 'slashTest':
         if (!args.length) {
-          this.logger.error('`slash` action requires command name argument');
+          this.logger.error('`slashTest` action requires command name argument');
           break;
         }
         this.logger.info(`Testing slash command ${args[0]}`);
