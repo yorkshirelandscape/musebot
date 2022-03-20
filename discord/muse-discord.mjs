@@ -19,6 +19,14 @@ export default class MuseDiscord {
       ],
     });
     this.initialized = false;
+    this.initPromise = new Promise((resolve, reject) => {
+      this.client.once('error', reject);
+      this.client.once('ready', () => {
+        this.logger.info('Discord client ready');
+        this.client.off('error', reject);
+        resolve();
+      });
+    });
   }
 
   /**
@@ -28,18 +36,15 @@ export default class MuseDiscord {
    */
   async init() {
     await this.client.login(process.env.TOKEN);
-    await new Promise((resolve, reject) => {
-      this.client.once('error', reject);
-      this.client.once('ready', () => {
-        this.logger.info('Discord client ready');
-        this.client.off('error', reject);
-        resolve();
-      });
-    });
+    await this.initPromise;
     this.guild = this.client.guilds.cache.get(process.env.GUILD_ID);
     this.infoChannel = this.client.channels.cache.get(process.env.INFO_CHANNEL_ID);
     this.voteChannel = this.client.channels.cache.get(process.env.VOTE_CHANNEL_ID);
     this.initialized = true;
+  }
+
+  async ready() {
+    return this.initPromise;
   }
 
   /**
@@ -76,6 +81,7 @@ export default class MuseDiscord {
    * @returns {Emoji[]} Array of Emoji instances describing each emoji found
    */
   async findEmojis(text) {
+    this.requireInit();
     return Promise.all(
       Array.from(
         text.matchAll(/(?<=\u200b):?([^:\n]+):?(?=\u200b)/g),
@@ -96,6 +102,7 @@ export default class MuseDiscord {
    *   emoji as it exists in the client's current guild.
    */
   async getEmoji(match) {
+    this.requireInit();
     const [text, name] = match;
     const matchFunc = (ident) => ident.name === name;
 
@@ -149,6 +156,7 @@ export default class MuseDiscord {
    * @param emojis {Emoji[]} - Array of emojis to react with
    */
   async react(message, emojis) {
+    this.requireInit();
     for (const emoji of emojis) {
       if (typeof emoji.id !== 'undefined') {
         // eslint-disable-next-line no-await-in-loop
@@ -163,6 +171,7 @@ export default class MuseDiscord {
   }
 
   async getLastMessage(channel) {
+    this.requireInit();
     const messages = await channel.messages.fetch({ limit: 1 });
     if (messages.size !== 1) {
       throw new Error('No messages found in specified channel');
@@ -183,7 +192,7 @@ export default class MuseDiscord {
       this.logger.error(err, 'Unable to access messages');
       throw err;
     }
-    this.logger.info('Successfully Discord messages');
+    this.logger.info('Successfully accessed Discord messages');
     return true;
   }
 
@@ -197,5 +206,13 @@ export default class MuseDiscord {
     emojis.forEach((emoji) => {
       this.logger.debug(`Found emoji: ${emoji}`);
     });
+  }
+
+  async postMessage(channel, message) {
+    this.requireInit();
+    this.logger.info(`Posting message to channel ${channel.id}`);
+    this.logger.debug({ channelId: channel.id, message }, `Posting to channel ${channel.id} message ${message}`);
+    await channel.send(message);
+    this.logger.info('Message successfully posted');
   }
 }
