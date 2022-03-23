@@ -132,7 +132,7 @@ const checkRound = async () => {
   const botState = await getValue(BOT_STATE_REF);
   const channel = client.channels.cache.get(CHANNEL_ID);
   const musicChan = client.channels.cache.get(MUSIC_ID);
-  // const testChan = client.channels.cache.get(TEST_VOTES);
+  const testChan = client.channels.cache.get(TEST_VOTES);
   const testMusic = client.channels.cache.get(SKYNET);
 
   const recentSkynet = await testMusic.messages.fetch({ limit: 1 });
@@ -307,9 +307,9 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
           } else {
             const pushArray = [];
             resultsArray.forEach((r) => {
-              if (lastRound === 0 && size === (96 || 48 )) { 
-                pushArray.push['','',''];
-              };
+              if (lastRound === 0 && size === (96 || 48)) {
+                pushArray.push(['', '', '']);
+              }
               pushArray.push([r.c1, r.c2, r.tie]);
             });
 
@@ -417,12 +417,12 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
                 });
                 msgMax = maxFiveamNext;
               } else { msgMax = maxSubTime; }
-              
+
               let pins = await channel.messages.fetchPinned();
               let delPins = pins.filter((p) => p.content.includes('are due between'));
-              delPins.each((p) => { 
+              delPins.each((p) => {
                 try {
-                  p.unpin(); 
+                  p.unpin();
                 } catch (err) {
                   console.log('No messages to unpin.', err);
                 }
@@ -430,14 +430,14 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
 
               pins = await testChan.messages.fetchPinned();
               delPins = pins.filter((p) => p.content.includes('are due between'));
-              delPins.each((p) => { 
+              delPins.each((p) => {
                 try {
-                  p.unpin(); 
+                  p.unpin();
                 } catch (err) {
                   console.log('No messages to unpin.', err);
                 }
               });
-              
+
               msg = `Submissions for ${nextYear} are due between approximately <t:${Math.round(msgMin.valueOf() / 1000)}:F> and <t:${Math.round(msgMax.valueOf() / 1000)}:F>.`;
 
               const sent = await musicChan.send(msg);
