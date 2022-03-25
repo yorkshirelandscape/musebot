@@ -191,7 +191,7 @@ const checkRound = async () => {
         let roundMinWarn = roundMin - 1;
         let roundMaxWarn = roundMax - 1;
 
-        console.log(roundEndTime.plus({ hours: roundMinWarn }).hour);
+        // console.log(roundEndTime.plus({ hours: roundMinWarn }).hour);
 
         if (roundEndTime.plus({ hours: roundMin }).hour > 20
           || roundEndTime.plus({ hours: roundMin }).hour < 5) {
@@ -206,7 +206,7 @@ const checkRound = async () => {
             hour: 5,
           });
           roundMinWarn += Math.round(delayStart.diff(roundEndTime.plus({ hours: roundMinWarn }), 'hours').hours);
-          console.log(delayStart.hour);
+          // console.log(delayStart.hour);
         }
 
         if (roundEndTime.plus({ hours: roundMax }).hour > 20
@@ -254,7 +254,7 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
           const rndMatches = roundMessages.filter((msg) => (
             msg.createdTimestamp < msgDelims.first(2)[0].createdTimestamp
             && msg.createdTimestamp > msgDelims.first(2)[1].createdTimestamp
-            && msg.deleted === false && msg.content.includes('Match') && !msg.content.includes('Play')
+            && msg.deleted === false && msg.content.includes('Match') // && !msg.content.includes('Play')
           ));
           // create an array of the reaction counts for each message
           const rndMatchesResults = [];
@@ -445,12 +445,12 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
               if (testing === false) { await testMusic.send(msg); }
             }
           }
-        } else if (now < roundEndTime.plus({ hours: roundMinWarn })) {
+        } else if (now < roundEndTime.plus({ hours: roundMinWarn }).minus({ minutes: 30 })) {
           const msg = 'Awaiting minimum time elapsed.';
           testMusic.send(msg);
-          console.log(msg);
-          console.log(roundEndTime.plus({ hours: roundMinWarn }).toFormat('M/d/yyyy HH:mm'));
-        } else if (now > roundEndTime.plus({ hours: roundMinWarn })) {
+          // console.log(msg);
+          // console.log(roundEndTime.plus({ hours: roundMinWarn }).toFormat('M/d/yyyy HH:mm'));
+        } else if (now > roundEndTime.plus({ hours: roundMinWarn }).minus({ minutes: 30 })) {
           // isolate the check-out messages and convert to an array
           const msgDelims = messages.filter((msg) => msg.content.includes('you have checked in and are done voting') && msg.deleted === false);
           // filter all the messages for those between the two most recent delimiters
@@ -477,12 +477,20 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
             const arr = m.filter((u) => missing.map((mu) => mu.user).includes(u));
             missingVoted.push(arr);
           });
+
+          console.log(missingVoted);
+
           // see whether they have checked out
           const checkOutCheck = missing.map((m) => (
             { user: m.user, id: m.id, missing: missingVoted.every((mv) => mv.includes(m.user)) }
           ));
+
+          console.log(checkOutCheck);
+
           const missingCheckOut = checkOutCheck.filter((u) => u.missing);
+
           console.log(missingCheckOut.toString());
+
           const deadbeatTagList = missingCheckOut.map((u) => `<@!${u.id}>`).join(', ');
           let msg = `Missing Check-Outs: ${deadbeatTagList}`;
           if (missingCheckOut.length > 0) {
@@ -492,7 +500,7 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
 
           msg = 'Awaiting 80%.';
           testMusic.send(msg);
-          console.log(msg);
+          // console.log(msg);
           console.log(`${(pctCheckedIn * 100).toFixed(1)}%`);
           console.log('MaxWarn:', roundEndTime.plus({ hours: roundMaxWarn }).toFormat('M/d/yyyy HH:mm'));
           console.log('Missing:', missingList);
