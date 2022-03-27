@@ -460,41 +460,24 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
             && msg.deleted === false && msg.content.includes('Match')
           ));
 
-          // create an array of the reaction counts for each message
-          const rndMatchesResults = [];
-          rndMatches.each((rm) => {
-            const matchReacts = [];
-            rm.reactions.cache.each(async (r) => {
+          // create an array of the reacted users for each message
+          const rndMatchesResults = await Promise.all(rndMatches.map((rm) => {
+            const matchReacts = rm.reactions.cache.map(async (r) => {
               await r.users.fetch();
-              r.users.cache.each((u) => matchReacts.push(u.username));
+              return r.users.cache.map((u) => u.username);
             });
-            rndMatchesResults.push(matchReacts);
-          });
+            return Promise.all(matchReacts);
+          }));
 
-          // list users who have voted on each round
-          const missingVoted = [];
-          rndMatchesResults.forEach((m) => {
-            const arr = m.filter((u) => missing.map((mu) => mu.user).includes(u));
-            missingVoted.push(arr);
-          });
-
-          console.log(missingVoted);
-
-          // see whether they have checked out
-          const checkOutCheck = missing.map((m) => (
-            { user: m.user, id: m.id, missing: missingVoted.every((mv) => mv.includes(m.user)) }
-          ));
-
-          console.log(checkOutCheck);
-
-          const missingCheckOut = checkOutCheck.filter((u) => u.missing);
-
-          console.log(missingCheckOut.toString());
-
-          const deadbeatTagList = missingCheckOut.map((u) => `<@!${u.id}>`).join(', ');
+          const rmrMerged = rndMatchesResults.map((mr) => mr[0].concat(mr[1]));
+          // eslint-disable-next-line max-len
+          const missingVoted = await missing.filter((m) => rmrMerged.every((r) => r.includes(m.user)));
+          console.log('Missing Voted:', missingVoted);
+          const deadbeatTagList = await missingVoted.map((u) => `<@!${u.id}>`).join(', ');
           let msg = `Missing Check-Outs: ${deadbeatTagList}`;
-          if (missingCheckOut.length > 0) {
-            await channel.send(msg);
+
+          if (missingVoted.length > 0) {
+            await musicChan.send(msg);
             if (testing === false) { await testMusic.send(msg); }
           }
 

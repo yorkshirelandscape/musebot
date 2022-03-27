@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-unreachable */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
@@ -24,9 +25,12 @@ process.argv.forEach((val) => {
   if (val === '-t') { testing = true; }
 });
 
+const SKYNET = '864768873270345788';
 const TEST_VOTES = '876135378346733628';
+const DOM_MUSIC = '246342398123311104';
 const DOM_VOTES = '751893730117812225';
 const CHANNEL_ID = (testing === true ? TEST_VOTES : DOM_VOTES);
+const MUSIC_ID = (testing === true ? SKYNET : DOM_MUSIC);
 
 // function to fetch more than the limit of 100 messages
 async function fetchMany(channel, limit = 250) {
@@ -76,70 +80,52 @@ const getChecks = (channel, search) => new Promise((resolve) => {
 // function that pulls it all together
 const checkRound = async () => {
   const channel = client.channels.cache.get(CHANNEL_ID);
+  const musicChan = client.channels.cache.get(MUSIC_ID);
+  const testMusic = client.channels.cache.get(SKYNET);
 
   // fetch the last 200 messages (this should cover even the longest rounds)
-  fetchMany(channel, 200).then(async (messages) => {
-    // if the most recent round is complete,
-    // fetch the reactions from the check-in and check-out messages
+  const messages = await fetchMany(channel, 200);
+  // if the most recent round is complete,
+  // fetch the reactions from the check-in and check-out messages
 
-    const checkIns = await getChecks(channel, 'if you plan on voting in the');
-    console.log(checkIns);
-    const checkOuts = await getChecks(channel, 'you have checked in and are done voting');
-    console.log(checkOuts);
+  const checkIns = await getChecks(channel, 'if you plan on voting in the');
+  console.log('CheckIns:', checkIns);
+  const checkOuts = await getChecks(channel, 'you have checked in and are done voting');
+  console.log('CheckOuts:', checkOuts);
 
-    // find the check-ins without check-outs and vice versa, then calculate the pct checked in
-    const missing = checkIns.filter((x) => !checkOuts.map((u) => u.user).includes(x.user));
+  // find the check-ins without check-outs and vice versa, then calculate the pct checked in
+  const missing = await checkIns.filter((x) => !checkOuts.map((u) => u.user).includes(x.user));
 
-    console.log(missing);
+  console.log('Missing:', missing);
 
-    // isolate the check-out messages and convert to an array
-    const msgDelims = messages.filter((msg) => msg.content.includes('you have checked in and are done voting') && msg.deleted === false);
-    // filter all the messages for those between the two most recent delimiters
-    const rndMatches = messages.filter((msg) => (
-      msg.createdTimestamp < msgDelims.first(2)[0].createdTimestamp
-        && msg.createdTimestamp > msgDelims.first(2)[1].createdTimestamp
-        && msg.deleted === false && msg.content.includes('Match')
-    ));
+  // isolate the check-out messages and convert to an array
+  const msgDelims = await messages.filter((msg) => msg.content.includes('you have checked in and are done voting') && msg.deleted === false);
+  // filter all the messages for those between the two most recent delimiters
+  const rndMatches = await messages.filter((msg) => (
+    msg.createdTimestamp < msgDelims.first(2)[0].createdTimestamp
+      && msg.createdTimestamp > msgDelims.first(2)[1].createdTimestamp
+      && msg.deleted === false && msg.content.includes('Match')
+  ));
 
-    // create an array of the reaction counts for each message
-    const rndMatchesResults = [];
-    rndMatches.each((rm) => {
-      const matchReacts = [];
-      rm.reactions.cache.each(async (r) => {
-        await r.users.fetch();
-        r.users.cache.each((u) => matchReacts.push(u.username));
-      });
-      rndMatchesResults.push(matchReacts);
+  // create an array of the reacted users for each message
+  const rndMatchesResults = await Promise.all(rndMatches.map((rm) => {
+    const matchReacts = rm.reactions.cache.map(async (r) => {
+      await r.users.fetch();
+      return r.users.cache.map((u) => u.username);
     });
+    return Promise.all(matchReacts);
+  }));
 
-    // list users who have voted on each round
-    const missingVoted = [];
-    rndMatchesResults.forEach((m) => {
-      const arr = m.filter((u) => missing.map((mu) => mu.user).includes(u));
-      missingVoted.push(arr);
-    });
+  const rmrMerged = rndMatchesResults.map((mr) => mr[0].concat(mr[1]));
+  const missingVoted = await missing.filter((m) => rmrMerged.every((r) => r.includes(m.user)));
+  console.log('Missing Voted:', missingVoted);
+  const deadbeatTagList = await missingVoted.map((u) => `<@!${u.id}>`).join(', ');
+  const msg = `Missing Check-Outs: ${deadbeatTagList}`;
 
-    console.log(missingVoted);
-
-    // see whether they have checked out
-    const checkOutCheck = missing.map((m) => (
-      { user: m.user, id: m.id, missing: missingVoted.every((mv) => mv.includes(m.user)) }
-    ));
-
-    console.log(checkOutCheck);
-
-    const missingCheckOut = checkOutCheck.filter((u) => u.missing);
-
-    console.log(missingCheckOut.toString());
-
-    const deadbeatTagList = missingCheckOut.map((u) => `<@!${u.id}>`).join(', ');
-    const msg = `Missing Check-Outs: ${deadbeatTagList}`;
-    console.log(msg);
-  });
-  //   if (missingCheckOut.length > 0) {
-//     await channel.send(msg);
-//     if (testing === false) { await testMusic.send(msg); }
-//   }
+  if (missingVoted.length > 0) {
+    await musicChan.send(msg);
+    if (testing === false) { await testMusic.send(msg); }
+  }
 };
 
 client.once('ready', () => {
