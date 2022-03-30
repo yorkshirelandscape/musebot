@@ -1,6 +1,6 @@
 import MuseDiscord from '../discord/muse-discord.mjs';
 
-const CHANNEL_ID = '751893730117812225';
+const discord = new MuseDiscord(?????);
 
 const compare = (a, b) => {
   if (a.match < b.match) {
@@ -13,16 +13,14 @@ const compare = (a, b) => {
 };
 
 // function that pulls it all together
-const checkRound = async (tightest) => {
-  const channel = MuseDiscord.client.channels.cache.get(CHANNEL_ID);
-
+const checkRound = async (channel, tightest) => {
   // fetch the last 200 messages (this should cover even the longest rounds)
-  const messages = await MuseDiscord.fetchMany(channel, 200);
+  const messages = await discord.fetchMany(channel, 200);
 
   // if the most recent round is complete,
   // fetch the reactions from the check-in and check-out messages
-  const checkIns = await MuseDiscord.getChecks(channel, 'if you plan on voting in the');
-  const checkOuts = await MuseDiscord.getChecks(channel, 'you have checked in and are done voting');
+  const checkIns = await discord.getChecks(channel, 'if you plan on voting in the');
+  const checkOuts = await discord.getChecks(channel, 'you have checked in and are done voting');
 
   // find the check-ins without check-outs and vice versa, then calculate the pct checked in
   const missing = checkIns.filter((x) => !checkOuts.map((u) => u.user).includes(x.user));
@@ -99,5 +97,5 @@ const checkRound = async (tightest) => {
 };
 
 export default async function tight(tightest) {
-  return checkRound(tightest);
+  return checkRound(discord.voteChannel, tightest);
 }
