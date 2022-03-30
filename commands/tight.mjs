@@ -1,7 +1,3 @@
-import MuseDiscord from '../discord/muse-discord.mjs';
-
-const discord = new MuseDiscord(?????);
-
 const compare = (a, b) => {
   if (a.match < b.match) {
     return -1;
@@ -13,14 +9,14 @@ const compare = (a, b) => {
 };
 
 // function that pulls it all together
-const checkRound = async (channel, tightest) => {
+const checkRound = async (client, tightest) => {
   // fetch the last 200 messages (this should cover even the longest rounds)
-  const messages = await discord.fetchMany(channel, 200);
+  const messages = await client.fetchMany(client.voteChannel, 200);
 
   // if the most recent round is complete,
   // fetch the reactions from the check-in and check-out messages
-  const checkIns = await discord.getChecks(channel, 'if you plan on voting in the');
-  const checkOuts = await discord.getChecks(channel, 'you have checked in and are done voting');
+  const checkIns = await client.getChecks(client.voteChannel, 'if you plan on voting in the');
+  const checkOuts = await client.getChecks(client.voteChannel, 'you have checked in and are done voting');
 
   // find the check-ins without check-outs and vice versa, then calculate the pct checked in
   const missing = checkIns.filter((x) => !checkOuts.map((u) => u.user).includes(x.user));
@@ -74,7 +70,7 @@ const checkRound = async (channel, tightest) => {
   // eslint-disable-next-line max-len
   const flipArray = resultsArray.filter((m) => (tightest === true ? m.closeOne : m.flippable) === 1);
 
-  let msg = 'Flippable Matches:';
+  let msg = 'Tight Matches:';
   for (const flip of flipArray) {
     const cArr = ['', flip.c1, '', flip.c2];
     const message = rndMatches.find((rm) => parseInt(rm.content.slice(8, rm.content.indexOf(':'))) === parseInt(flip.match));
@@ -88,7 +84,7 @@ const checkRound = async (channel, tightest) => {
     msg = `${msg}\n\n${msgB}`;
   }
 
-  if (msg === 'Flippable Matches:') {
+  if (msg === 'Tight Matches:') {
     return 'None.';
   }
   // console.log(msg);
@@ -96,6 +92,6 @@ const checkRound = async (channel, tightest) => {
   return msg;
 };
 
-export default async function tight(tightest) {
-  return checkRound(discord.voteChannel, tightest);
+export default async function tight(client, tightest) {
+  return checkRound(client, tightest);
 }

@@ -282,7 +282,7 @@ export default class SlashCommander {
       this.logger.debug({ args }, 'Handling tight command.');
       let response = '';
       try {
-        response = await tight(...args);
+        response = await tight(this.client, ...args);
       } catch (e) {
         response = e.message;
       }
