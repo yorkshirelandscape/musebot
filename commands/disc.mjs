@@ -14,14 +14,14 @@ function isValidRelease(release) {
   return required.some((type) => format.includes(type)) && !forbidden.some((type) => format.includes(type));
 }
 
-function formatResult(result, title, url) {
+function formatResult(result, track, url) {
   if (!result || !result.year) {
-    throw Error(`No match. [Discogs Search](${url.href})`);
+    throw Error(`No match. [Discogs Search](${url})`);
   }
 
   return {
     title: `${result.title} (${result.year})`,
-    description: `${title}\n\n${(result.genre || []).join(', ')} (${(result.style || []).join(', ')})`,
+    description: `${track}\n\n${(result.genre || []).join(', ')} (${(result.style || []).join(', ')})`,
     image: { url: result.cover_image },
     url: getMasterUrl(result.master_id),
     fields: [{ name: '\u200b', value: `[Discogs Search](${url})` }],
@@ -30,13 +30,13 @@ function formatResult(result, title, url) {
 
 const getMasterUrl = (master_id) => `https://www.discogs.com/master/${master_id}`;
 
-export default async function disc(artist, title) {
+export default async function disc(artist, track) {
   const disc = getDiscogsClient();
 
   const url = new URL('https://www.discogs.com/search/');
   url.search = new URLSearchParams({
     artist,
-    title,
+    track,
     type: 'release',
     sort: 'year,asc',
     layout: 'sm',
@@ -46,12 +46,12 @@ export default async function disc(artist, title) {
 
   const data = await disc.search({
     artist,
-    title,
+    track,
     type: 'release',
     sort: 'year',
     sort_order: 'asc',
   });
 
   const results = data.results.sort(sortFn).filter(isValidRelease);
-  return formatResult(results[0], title, url.href);
+  return formatResult(results[0], track, url.href);
 }
