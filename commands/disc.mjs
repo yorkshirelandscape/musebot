@@ -7,15 +7,20 @@ function getDiscogsClient(userAgent = CLIENT_USER_AGENT) {
 }
 
 function isValidRelease(release) {
-  const format = release.format;
+  const { format } = release;
   const required = ['Album', 'Single', 'Compilation', 'LP', 'EP', 'Shellac'];
-  const forbidden = ['Unofficial Release', 'Promo', 'Test Pressing', 'TP', 'Jukebox']
+  const forbidden = ['Unofficial Release', 'Promo', 'Test Pressing', 'TP', 'Jukebox'];
 
-  return required.some((type) => format.includes(type)) && !forbidden.some((type) => format.includes(type));
+  return (
+    required.some((type) => format.includes(type))
+    && !forbidden.some((type) => format.includes(type))
+  );
 }
 
+const getMasterUrl = (masterId) => `https://www.discogs.com/master/${masterId}`;
+
 function formatResult(result, track, url) {
-  if (!result || !result.year) {
+  if (!result?.year) {
     throw Error(`No match. [Discogs Search](${url})`);
   }
 
@@ -28,10 +33,8 @@ function formatResult(result, track, url) {
   };
 }
 
-const getMasterUrl = (master_id) => `https://www.discogs.com/master/${master_id}`;
-
 export default async function disc(artist, track) {
-  const disc = getDiscogsClient();
+  const discogs = getDiscogsClient();
 
   const url = new URL('https://www.discogs.com/search/');
   url.search = new URLSearchParams({
@@ -40,11 +43,11 @@ export default async function disc(artist, track) {
     type: 'release',
     sort: 'year,asc',
     layout: 'sm',
-  })
+  });
 
   const sortFn = (x, y) => x.year - y.year || y.community.have - x.community.have;
 
-  const data = await disc.search({
+  const data = await discogs.search({
     artist,
     track,
     type: 'release',
