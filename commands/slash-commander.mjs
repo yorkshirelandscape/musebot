@@ -116,7 +116,9 @@ export default class SlashCommander {
       return false;
     }
     return config.channels.some(
-      (channelName) => this.client.client.channels.cache.get(interaction.channel.id).name === channelName,
+      (channelName) => (
+        this.client.client.channels.cache.get(interaction.channel.id).name === channelName
+      ),
     );
   }
 
@@ -237,14 +239,14 @@ export default class SlashCommander {
   async disc(interaction, args) {
     if (interaction) {
       this.logger.debug({ args }, 'Handling disc command.');
-      let response = "";
+      let response = '';
       try {
         response = await disc(...args);
       } catch (e) {
         response = e.message;
       }
       this.logger.debug({ args, response }, 'Replying to disc command.');
-      await interaction.reply({embeds: [response]});
+      await interaction.reply({ embeds: [response] });
     } else {
       this.logger.info({ args }, 'Testing disc.');
       if (args.length === 2) {
