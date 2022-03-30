@@ -35,7 +35,7 @@ export default class SlashCommander {
       },
       disc: {
         handler: 'disc',
-        global: false,
+        global: true,
         channels: ['music', 'music-meta', 'skynet'],
         name: 'disc',
         description: 'Returns the earliest year of the specified track according to Discogs.',
@@ -102,7 +102,12 @@ export default class SlashCommander {
     if (typeof config === 'undefined') {
       throw new Error(`Unknown command '${command}'`);
     }
-    if (config.global || !config.channels) {
+    if (config.global && !interaction.guildId) {
+      // Interaction from a DM
+      // Always allowed for global commands
+      return true;
+    }
+    if (!config.channels) {
       // All channels allowed
       return true;
     }
