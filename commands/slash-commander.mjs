@@ -1,5 +1,6 @@
 import tzstamp from './tzstamp.mjs';
 import disc from './disc.mjs';
+import tight from './tight.mjs';
 
 export default class SlashCommander {
   static get CONFIG() {
@@ -51,6 +52,21 @@ export default class SlashCommander {
             type: 'STRING',
             description: 'The track to search for.',
             required: true,
+          },
+        ],
+      },
+      tight: {
+        handler: 'tight',
+        global: true,
+        channels: ['music', 'music-meta', 'skynet'],
+        name: 'tight',
+        description: 'Returns a list of matches that are closer than the number of outstanding votes.',
+        options: [
+          {
+            name: 'tightest',
+            type: 'BOOLEAN',
+            description: 'Return only matches within one vote.',
+            required: false,
           },
         ],
       },
@@ -258,6 +274,22 @@ export default class SlashCommander {
       } else {
         this.logger.error('Incorrect number of arguments given. Artist and title are required.');
       }
+    }
+  }
+
+  async tight(interaction, args) {
+    if (interaction) {
+      this.logger.debug({ args }, 'Handling tight command.');
+      let response = '';
+      try {
+        response = await tight(...args);
+      } catch (e) {
+        response = e.message;
+      }
+      this.logger.debug({ args, response }, 'Replying to tight command.');
+      await interaction.reply({ embeds: [response] });
+    } else {
+      this.logger.info({ args }, 'Testing tight.');
     }
   }
 

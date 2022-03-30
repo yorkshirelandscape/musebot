@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 
-import { Client, Intents } from 'discord.js';
+import { Client, Intents, Collection } from 'discord.js';
 
 import Emoji from './emoji.mjs';
 
@@ -16,6 +16,7 @@ export default class MuseDiscord {
         Intents.FLAGS.GUILDS,
         Intents.FLAGS.GUILD_MESSAGES,
         Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+        Intents.FLAGS.GUILD_MEMBERS,
       ],
     });
     this.initialized = false;
@@ -214,5 +215,53 @@ export default class MuseDiscord {
     this.logger.debug({ channelId: channel.id, message }, `Posting to channel ${channel.id} message ${message}`);
     await channel.send(message);
     this.logger.info('Message successfully posted');
+  }
+
+  // function to fetch more than the limit of 100 messages
+  async fetchMany(channel, limit = 250) {
+    this.requireInit();
+    this.logger.info(`Fetching ${limit} messages from channel ${channel.id}`);
+    this.logger.debug({ channelId: channel.id }, `Fetching ${limit} messages from channel ${channel.id}`);
+
+    if (!channel) {
+      throw new Error(`Expected channel, got ${typeof channel}.`);
+    }
+    if (limit <= 100) {
+      return channel.messages.fetch({ limit });
+    }
+
+    let collection = new Collection();
+    let lastId = null;
+    const options = {};
+    let remaining = limit;
+    while (remaining > 0) {
+      options.limit = remaining > 100 ? 100 : remaining;
+      remaining = remaining > 100 ? remaining - 100 : 0;
+      if (lastId) {
+        options.before = lastId;
+      }
+      // eslint-disable-next-line no-await-in-loop
+      const messages = await channel.messages.fetch(options);
+      if (!messages.last()) {
+        break;
+      }
+      collection = collection.concat(messages);
+      lastId = messages.last().id;
+    }
+    this.logger.info('Messages fetched.');
+    return collection;
+  }
+
+  // function to fetch the reactions to the most recent message with the specified content
+  async getChecks(channel, search) {
+    this.requireInit();
+    this.logger.info(`Getting most recent set of checks from channel ${channel.id}`);
+    this.logger.debug({ channelId: channel.id }, `Getting most recent set of checks from channel ${channel.id}`);
+    const checkMsg = channel.messages.cache.find((m) => m.content.includes(search));
+    const checksReturn = checkMsg.reactions.cache.first().users.fetch().then((p) => {
+      const checks = p.filter((u) => !u.bot).map((user) => ({ user: user.username, id: user.id }));
+      return checks;
+    });
+    return checksReturn;
   }
 }
