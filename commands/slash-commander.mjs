@@ -1,4 +1,5 @@
 import tzstamp from './tzstamp.mjs';
+import disc from './disc.mjs';
 
 export default class SlashCommander {
   static get CONFIG() {
@@ -29,6 +30,27 @@ export default class SlashCommander {
             description: 'Return the timestamp code in a codeblock.',
             required: false,
             defaultValue: false,
+          },
+        ],
+      },
+      disc: {
+        handler: 'disc',
+        global: true,
+        channels: ['music', 'music-meta', 'skynet'],
+        name: 'disc',
+        description: 'Returns the earliest year of the specified track according to Discogs.',
+        options: [
+          {
+            name: 'artist',
+            type: 'STRING',
+            description: 'The artist to search for.',
+            required: true,
+          },
+          {
+            name: 'title',
+            type: 'STRING',
+            description: 'The track to search for.',
+            required: true,
           },
         ],
       },
@@ -75,11 +97,17 @@ export default class SlashCommander {
   }
 
   isValidChannel(command, interaction) {
+    this.logger.debug({ command, interaction }, 'Testing for valid channel');
     const config = SlashCommander.CONFIG[command];
     if (typeof config === 'undefined') {
       throw new Error(`Unknown command '${command}'`);
     }
-    if (config.global || !config.channels) {
+    if (config.global && !interaction.guildId) {
+      // Interaction from a DM
+      // Always allowed for global commands
+      return true;
+    }
+    if (!config.channels) {
       // All channels allowed
       return true;
     }
@@ -88,7 +116,7 @@ export default class SlashCommander {
       return false;
     }
     return config.channels.some(
-      (channelName) => this.client[channelName].id === interaction.channel.id,
+      (channelName) => this.client.client.channels.cache.get(interaction.channel.id).name === channelName,
     );
   }
 
@@ -157,7 +185,7 @@ export default class SlashCommander {
         this.logger.debug(`Not handling command '${interaction.commandName}'`);
         return;
       }
-      if (!this.isValidChannel(interaction.commandName, interaction.channel)) {
+      if (!this.isValidChannel(interaction.commandName, interaction)) {
         this.logger.debug(`Not handling command '${interaction.commandName}' in channel ${interaction.channel?.id}`);
         return;
       }
@@ -203,6 +231,31 @@ export default class SlashCommander {
         args = ['2022/01/03 16:50'];
       }
       this.logger.info(tzstamp(...args));
+    }
+  }
+
+  async disc(interaction, args) {
+    if (interaction) {
+      this.logger.debug({ args }, 'Handling disc command.');
+      let response = "";
+      try {
+        response = await disc(...args);
+      } catch (e) {
+        response = e.message;
+      }
+      this.logger.debug({ args, response }, 'Replying to disc command.');
+      await interaction.reply({embeds: [response]});
+    } else {
+      this.logger.info({ args }, 'Testing disc.');
+      if (args.length === 2) {
+        try {
+          this.logger.info(await disc(...args));
+        } catch (e) {
+          this.logger.info(e.message);
+        }
+      } else {
+        this.logger.error('Incorrect number of arguments given. Artist and title are required.');
+      }
     }
   }
 
