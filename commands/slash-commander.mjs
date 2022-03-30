@@ -287,7 +287,7 @@ export default class SlashCommander {
         response = e.message;
       }
       this.logger.debug({ args, response }, 'Replying to tight command.');
-      await interaction.reply({ embeds: [response] });
+      await interaction.reply(response);
     } else {
       this.logger.info({ args }, 'Testing tight.');
     }
