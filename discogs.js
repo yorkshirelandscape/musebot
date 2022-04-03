@@ -66,6 +66,8 @@ const YEAR_RANGES = {
   READ_RANGE: 'TestBracket!G2:J',
   WRITE_RANGE: 'TestBracket!J2:J',
   COPY_RANGE: 'TestBracket!I2:I',
+  ACTIVE_YEAR: 'Lists!L2',
+  TEST_YEAR: 'Lists!L8',
 };
 
 // const CHECK_RANGES = {
@@ -142,16 +144,16 @@ const clearRngs = async (rng, auth) => {
   }
 };
 
-const getMsgs = async (rng, auth) => {
+const getMsgs = async (rng, cell, ss, auth) => {
   const sheets = google.sheets({ version: 'v4', auth });
   try {
-    const response = await sheets.spreadsheets.values.batchGet({
-      spreadsheetId: SPREADSHEET_ID,
-      ranges: rng,
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: ss,
+      range: rng,
     });
-    return response.data.valueRanges;
+    return cell === true ? response.data.values[0][0] : response.data.values;
   } catch (err) {
-    console.log(`getMsgs API returned an error for range "${rng}"`, err);
+    console.log(`getMsg API returned an error for range "${rng}"`, err);
     throw err;
   }
 };
@@ -176,7 +178,7 @@ const setMsgs = async (rng, val, auth) => {
 };
 
 const clearRanges = async (rng) => clearRngs(rng, await getAuthClient());
-const getValues = async (rng) => getMsgs(rng, await getAuthClient());
+const getValues = async (rng, cell = false, ss = SPREADSHEET_ID) => getMsgs(rng, cell, ss, await getAuthClient());
 const setValues = async (rng, val) => setMsgs(rng, val, await getAuthClient());
 
 const sleep = async (interval) => new Promise((r) => setTimeout(r, interval));
@@ -229,6 +231,17 @@ const yearCall = async () => {
   await clearRanges(YEAR_RANGES.COPY_RANGE);
 
   await setValues(YEAR_RANGES.COPY_RANGE, dataSet[0].values.map((row) => [row[0]]));
+
+  const activeYear = await getValues(YEAR_RANGES.ACTIVE_YEAR, true);
+  const testYear = await getValues(YEAR_RANGES.TEST_YEAR, true);
+
+  if (activeYear !== testYear) {
+    const oldData = await getValues(YEAR_RANGES.WRITE_RANGE);
+    const isUpdated = oldData.map((y) => y[0]).includes(testYear);
+    if (!isUpdated) {
+      await clearRanges(YEAR_RANGES.WRITE_RANGE);
+    }
+  }
 
   for (const r of Object.values(dataSet[0].values)) {
     const artist = r[1];
