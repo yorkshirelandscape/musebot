@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@y-ota/lda-ts": "github:y-ota/LDA-ts",
     "async": "^3.2.0",
     "disconnect": "^1.2.2",
     "discord-emoji": "^2.0.1",
