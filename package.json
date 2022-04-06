@@ -7,7 +7,10 @@
     "dotenv": "^10.0.0",
     "emoji-name-map": "^1.2.9",
     "googleapis": "^84.0.0",
+    "jquery": "^3.6.0",
+    "lda": "^0.2.0",
     "luxon": "^2.0.2",
+    "node-fetch": "^3.2.3",
     "node-getopt": "^0.3.2",
     "pino": "^6.13.0"
   },
