@@ -5,15 +5,18 @@ import lda from 'lda';
 // import MuseDiscord from './discord/muse-discord.mjs';
 
 const appendJSON = (file, data) => {
-  let jFileA = fs.readFileSync(file);
-  let jFileB = [];
+  let jFile = fs.readFileSync(file);
+  let jFileTemp = [];
   try {
-    jFileB = JSON.parse(jFileA);
+    jFileTemp = JSON.parse(jFile);
   } catch (ignore) {
   }
-  jFileB.push(data);
-  jFileA = JSON.stringify(jFileB, null, 2);
-  fs.writeFileSync(file, jFileA);
+  const cNum = data.num;
+  if (!jFileTemp.map((c) => c.num).includes(cNum)) {
+    jFileTemp.push(data);
+    jFile = JSON.stringify(jFileTemp, null, 2);
+    fs.writeFileSync(file, jFile);
+  }
 };
 
 const getComic = async (i) => {
@@ -21,13 +24,38 @@ const getComic = async (i) => {
   return response.json();
 };
 
+const getSummary = (comic) => {
+  const text = comic.transcript;
+  const documents = text.match(/[^.!?]+[.!?]+/g);
+  return lda(documents, 1, 3);
+};
+
+// const summarize = (file, n) => {
+//   let jFile = fs.readFileSync(file);
+//   jFile = JSON.parse(jFile);
+//   const comic = jFile.find((c) => c.num === n);
+//   if (!comic.hasOwnProperty('summary')) {
+//     return getSummary(comic);
+//   }
+//   return comic.summary;
+// };
+
 const getComics = async (x, n = 1) => {
   for (let i = x; i < x + n; i++) {
+    let comic = null;
     try {
-      const comic = await getComic(i);
-      appendJSON('xkcd.json', comic);
+      comic = await getComic(i);
     } catch (err) {
       console.log(`No comic #${i}.`);
+      break;
+    }
+
+    comic.summary = getSummary(comic);
+
+    try {
+      appendJSON('xkcd.json', comic);
+    } catch (err) {
+      console.log(`Comic #${i} already imported.`);
       break;
     }
   }
@@ -41,18 +69,27 @@ const getMaxComic = (file) => {
   )[0].num;
 };
 
+// const addSummary = (file, n) => {
+//   let jFile = fs.readFileSync(file);
+//   jFile = JSON.parse(jFile);
+//   const comic = jFile.find((c) => c.num === n);
+//   if (!comic.hasOwnProperty('summary')) {
+//     const summary = getSummary(comic);
+//     comic.summary = summary;
+//     jFile = JSON.stringify(jFile, null, 2);
+//     fs.writeFileSync(file, jFile);
+//     console.log(`Added to Comic #${n}:\n${summary.toString()}`);
+//   } else { console.log(`Comic #${n} already summarized.`); }
+// };
+
+// const summary = summarize('xkcd.json', 2);
+
+// console.log(summary);
+
+// addSummary('xkcd.json', 1);
+
 const mc = getMaxComic('xkcd.json');
 
-// getComics(mc + 1);
+getComics(mc + 1);
 
-const summarize = (file, n) => {
-  let jFile = fs.readFileSync(file);
-  jFile = JSON.parse(jFile);
-  const text = jFile.find((c) => c.num === n).transcript;
-  const documents = text.match(/[^.!?]+[.!?]+/g);
-  return lda(documents, 1, 3);
-};
-
-const summary = summarize('xkcd.json', 2);
-
-console.log(summary);
+// getComics(1, 2);
