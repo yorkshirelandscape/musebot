@@ -1,0 +1,117 @@
+/* eslint-disable max-len */
+import fetch from 'node-fetch';
+import fs from 'fs';
+import lda from 'lda';
+import tf from '@tensorflow/tfjs';
+import use from '@tensorflow-models/universal-sentence-encoder';
+
+const summarize = (input) => {
+  const text = input.transcript;
+  const documents = text.match(/[^.!?]+[.!?]+/g);
+  return lda(documents, 1, 3);
+};
+
+const getMessages = (client, lines) => {
+  const messages = client.fetchMany(client.channel, lines);
+  const text = { transcript: messages.map((m) => m.content).join(' ') };
+  return summarize(text);
+};
+
+const appendJSON = (file, data) => {
+  let jFile = fs.readFileSync(file);
+  let jFileTemp = [];
+  try {
+    jFileTemp = JSON.parse(jFile);
+  } catch (ignore) { }
+  const cNum = data.num;
+  if (!jFileTemp.map((c) => c.num).includes(cNum)) {
+    jFileTemp.push(data);
+    jFile = JSON.stringify(jFileTemp, null, 2);
+    fs.writeFileSync(file, jFile);
+  }
+};
+
+const getComic = async (i) => {
+  const response = await fetch(`https://xkcd.com/${i}/info.0.json`);
+  return response.json();
+};
+
+const getSummary = (file, n) => {
+  let jFile = fs.readFileSync(file);
+  jFile = JSON.parse(jFile);
+  const comic = jFile.find((c) => c.num === n);
+  if (!comic.hasOwnProperty('summary')) {
+    return summarize(comic);
+  }
+  return comic.summary;
+};
+
+const getComics = async (x, n = 1) => {
+  for (let i = x; i < x + n; i++) {
+    let comic = null;
+    try {
+      comic = await getComic(i);
+    } catch (err) {
+      console.log(`No comic #${i}.`);
+      break;
+    }
+
+    comic.summary = summarize(comic);
+
+    try {
+      appendJSON('xkcd.json', comic);
+    } catch (err) {
+      console.log(`Comic #${i} already imported.`);
+      break;
+    }
+  }
+};
+
+// const getMaxComic = (file) => {
+//   let jFile = fs.readFileSync(file);
+//   jFile = JSON.parse(jFile);
+//   return jFile.sort(
+//     (a, b) => parseFloat(b.num) - parseFloat(a.num),
+//   )[0].num;
+// };
+
+// const addSummary = (file, n) => {
+//   let jFile = fs.readFileSync(file);
+//   jFile = JSON.parse(jFile);
+//   const comic = jFile.find((c) => c.num === n);
+//   if (!comic.hasOwnProperty('summary')) {
+//     const summary = summarize(comic);
+//     comic.summary = summary;
+//     jFile = JSON.stringify(jFile, null, 2);
+//     fs.writeFileSync(file, jFile);
+//     console.log(`Added to Comic #${n}:\n${summary.toString()}`);
+//   } else { console.log(`Comic #${n} already summarized.`); }
+// };
+
+// const summary = getSummary('xkcd.json', 1);
+
+// console.log(summary);
+
+// addSummary('xkcd.json', 1);
+
+// const mc = getMaxComic('xkcd.json');
+
+// getComics(mc + 1);
+
+// getComics(1, 2);
+
+const getEmbeddings = (sentences) => use.load().then((model) => model.embed(sentences));
+
+const getTranscript = (file, n) => {
+  let jFile = fs.readFileSync(file);
+  jFile = JSON.parse(jFile);
+  const comic = jFile.find((c) => c.num === n);
+  return comic.transcript;
+};
+
+const test = async (file, n) => {
+  const embeddings = await getEmbeddings(getTranscript(file, n));
+  console.log(embeddings);
+};
+
+test('./commands/xkcd.json', 1);
