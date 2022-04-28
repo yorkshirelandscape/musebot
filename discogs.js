@@ -66,6 +66,7 @@ const YEAR_RANGES = {
   READ_RANGE: 'TestBracket!G2:J',
   WRITE_RANGE: 'TestBracket!J2:J',
   COPY_RANGE: 'TestBracket!I2:I',
+  SUBMITTERS: 'TestBracket!F2:F',
   ACTIVE_YEAR: 'Lists!L2',
   TEST_YEAR: 'Lists!L8',
 };
@@ -190,9 +191,9 @@ const genreCall = async () => {
 
   await clearRanges(GENRE_RANGES.COPY_RANGE);
 
-  await setValues(GENRE_RANGES.COPY_RANGE, dataSet[0].values.map((row) => [row[0]]));
+  await setValues(GENRE_RANGES.COPY_RANGE, dataSet.map((row) => [row[0]]));
 
-  for (const r of Object.values(dataSet[0].values)) {
+  for (const r of dataSet) {
     if (typeof r[10] === 'undefined') {
       try {
         const data = await disc.search({ artist: r[1], track: r[0], type: 'release' });
@@ -200,6 +201,7 @@ const genreCall = async () => {
         const sortMap = data.results.sort((x, y) => y.community.have - x.community.have);
 
         if (sortMap.length === 0) {
+          r[3] = 'No Match';
           console.log(r[1], '-', r[0]);
           console.log('No match.');
         } else {
@@ -219,7 +221,7 @@ const genreCall = async () => {
     }
   }
 
-  const writeResults = dataSet[0].values.map((row) => [row[3], row[4]]);
+  const writeResults = dataSet.map((row) => [row[3], row[4]]);
 
   await setValues(GENRE_RANGES.WRITE_RANGE, writeResults);
 };
@@ -230,20 +232,28 @@ const yearCall = async () => {
 
   await clearRanges(YEAR_RANGES.COPY_RANGE);
 
-  await setValues(YEAR_RANGES.COPY_RANGE, dataSet[0].values.map((row) => [row[0]]));
+  await setValues(YEAR_RANGES.COPY_RANGE, dataSet.map((row) => [row[0]]));
 
   const activeYear = await getValues(YEAR_RANGES.ACTIVE_YEAR, true);
   const testYear = await getValues(YEAR_RANGES.TEST_YEAR, true);
 
   if (activeYear !== testYear) {
     const oldData = await getValues(YEAR_RANGES.WRITE_RANGE);
-    const isUpdated = oldData.map((y) => y[0]).includes(testYear);
+    const submitters = await getValues(YEAR_RANGES.SUBMITTERS);
+    const subCount = new Set(submitters).size;
+    const counts = {};
+
+    for (const year of oldData) {
+      counts[year] = counts[year] ? counts[year] + 1 : 1;
+    }
+
+    const isUpdated = (counts[testYear] >= subCount);
     if (!isUpdated) {
       await clearRanges(YEAR_RANGES.WRITE_RANGE);
     }
   }
 
-  for (const r of Object.values(dataSet[0].values)) {
+  for (const r of dataSet) {
     const artist = r[1];
     const song = r[0];
     const track = song.replaceAll(/['.]/g, '');
@@ -293,7 +303,7 @@ const yearCall = async () => {
     }
   }
 
-  const writeResults = dataSet[0].values.map((row) => [row[3]]);
+  const writeResults = dataSet.map((row) => [row[3]]);
 
   await setValues(YEAR_RANGES.WRITE_RANGE, writeResults);
 };
