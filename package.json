@@ -16,7 +16,9 @@
     "luxon": "^2.0.2",
     "node-fetch": "^3.2.3",
     "node-getopt": "^0.3.2",
-    "pino": "^6.13.0"
+    "pino": "^6.13.0",
+    "sentence-similarity": "^3.0.2",
+    "similarity-score": "^1.0.0"
   },
   "devDependencies": {
     "eslint": "^7.32.0",

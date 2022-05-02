@@ -2,12 +2,14 @@
 import fetch from 'node-fetch';
 import fs from 'fs';
 import lda from 'lda';
-import tf from '@tensorflow/tfjs';
-import use from '@tensorflow-models/universal-sentence-encoder';
+import similarity from 'sentence-similarity';
+import simScore from 'similarity-score';
+// import tf from '@tensorflow/tfjs';
+// import use from '@tensorflow-models/universal-sentence-encoder';
 
 const summarize = (input) => {
   const text = input.transcript;
-  const documents = text.match(/[^.!?]+[.!?]+/g);
+  const documents = text.match(/[^.!?\n]+[.!?\]}]+/g);
   return lda(documents, 1, 3);
 };
 
@@ -18,11 +20,14 @@ const getMessages = (client, lines) => {
 };
 
 const appendJSON = (file, data) => {
-  let jFile = fs.readFileSync(file);
+  let jFile;
   let jFileTemp = [];
+
   try {
+    jFile = fs.readFileSync(file);
     jFileTemp = JSON.parse(jFile);
   } catch (ignore) { }
+
   const cNum = data.num;
   if (!jFileTemp.map((c) => c.num).includes(cNum)) {
     jFileTemp.push(data);
@@ -46,6 +51,13 @@ const getSummary = (file, n) => {
   return comic.summary;
 };
 
+const getStoredComic = (file, n) => {
+  let jFile = fs.readFileSync(file);
+  jFile = JSON.parse(jFile);
+  const comic = jFile.find((c) => c.num === n);
+  return comic;
+};
+
 const getComics = async (x, n = 1) => {
   for (let i = x; i < x + n; i++) {
     let comic = null;
@@ -59,10 +71,9 @@ const getComics = async (x, n = 1) => {
     comic.summary = summarize(comic);
 
     try {
-      appendJSON('xkcd.json', comic);
+      appendJSON('./commands/xkcd.json', comic);
     } catch (err) {
       console.log(`Comic #${i} already imported.`);
-      break;
     }
   }
 };
@@ -100,7 +111,7 @@ const getComics = async (x, n = 1) => {
 
 // getComics(1, 2);
 
-const getEmbeddings = (sentences) => use.load().then((model) => model.embed(sentences));
+// const getEmbeddings = (sentences) => use.load().then((model) => model.embed(sentences));
 
 const getTranscript = (file, n) => {
   let jFile = fs.readFileSync(file);
@@ -109,9 +120,31 @@ const getTranscript = (file, n) => {
   return comic.transcript;
 };
 
-const test = async (file, n) => {
-  const embeddings = await getEmbeddings(getTranscript(file, n));
-  console.log(embeddings);
+// const test = async (file, n) => {
+//   const embeddings = await getEmbeddings(getTranscript(file, n));
+//   console.log(embeddings);
+// };
+
+// test('./commands/xkcd.json', 1);
+
+const getSummaries = (file, n = null, x = 1) => {
+  let jFile = fs.readFileSync(file);
+  jFile = JSON.parse(jFile);
+  let summaries = [];
+  if (n !== null) {
+    jFile = jFile.filter((c) => c.num >= x && c.num <= x + n);
+    summaries = jFile;
+  }
+  summaries = jFile.map((c) => c.summary.map((s) => s.map((t) => t.term)));
+  return summaries;
 };
 
-test('./commands/xkcd.json', 1);
+// getComics(1, 20);
+
+const input = getSummary('./commands/xkcd.json', 1).map((s) => s.map((t) => t.term))[0];
+const corpus = getSummaries('./commands/xkcd.json');
+
+const winkOpts = { f: simScore.winklerMetaphone, options: { threshold: 0 } };
+
+const scores = corpus.map((c) => similarity(input, c[0], winkOpts));
+console.log(scores);
