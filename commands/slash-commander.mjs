@@ -1,6 +1,7 @@
 import tzstamp from './tzstamp.mjs';
 import disc from './disc.mjs';
 import tight from './tight.mjs';
+import xkcd from './xkcd.mjs';
 
 export default class SlashCommander {
   static get CONFIG() {
@@ -66,6 +67,27 @@ export default class SlashCommander {
             name: 'tightest',
             type: 'BOOLEAN',
             description: 'Return only matches within one vote.',
+            required: false,
+          },
+        ],
+      },
+      xkcd: {
+        handler: 'xkcd',
+        global: true,
+        channels: false,
+        name: 'xkcd',
+        description: 'Returns a the best match xkcd comic for the specified number of lines of conversation, or returns the specific comic.',
+        options: [
+          {
+            name: 'num',
+            type: 'INTEGER',
+            description: 'The number of lines of conversation to parse or the comic to fetch.',
+            required: true,
+          },
+          {
+            name: 'get',
+            type: 'BOOLEAN',
+            description: 'Return the specified comic.',
             required: false,
           },
         ],
@@ -290,6 +312,22 @@ export default class SlashCommander {
       await interaction.reply(response);
     } else {
       this.logger.info({ args }, 'Testing tight.');
+    }
+  }
+
+  async xkcd(interaction, args) {
+    if (interaction) {
+      this.logger.debug({ args }, 'Handling xkcd command.');
+      let response = '';
+      try {
+        response = await xkcd(this.client, ...args);
+      } catch (e) {
+        response = e.message;
+      }
+      this.logger.debug({ args, response }, 'Replying to xkcd command.');
+      await interaction.reply(response);
+    } else {
+      this.logger.info({ args }, 'Testing xkcd.');
     }
   }
 
