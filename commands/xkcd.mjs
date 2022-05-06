@@ -29,9 +29,9 @@ const getSummaries = (file, n = null, x = 1) => {
   return summaries;
 };
 
-const bestComic = async (client, num) => {
+const bestComic = async (client, channel, num) => {
   const limit = Math.min(10, num);
-  const messages = await client.channel.messages.fetch({ limit });
+  const messages = await channel.messages.fetch({ limit });
   const msgString = messages.map((msg) => msg.content).join(' ');
   const input = summarize(msgString);
   const corpus = getSummaries('./commands/xkcd.json');
@@ -50,14 +50,14 @@ const showComic = async (client, num) => {
   return msg;
 };
 
-const getxkcd = async (client, num, get = false) => {
+const getxkcd = async (client, channel, num, get = false) => {
   let number;
   if (!get) {
-    number = bestComic(client, num);
+    number = bestComic(client, channel, num);
   } else { number = num; }
   return showComic(client, number);
 };
 
-export default async function xkcd(client, num, get = false) {
-  return getxkcd(client, num, get);
+export default async function xkcd(client, channel, num, get = false) {
+  return getxkcd(client, channel, num, get);
 }

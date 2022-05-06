@@ -328,6 +328,8 @@ export default class SlashCommander {
       await interaction.reply(response);
     } else {
       this.logger.info({ args }, 'Testing xkcd.');
+      const response = await xkcd(this.client, interaction.channel, ...args);
+      this.logger.info({ args }, response);
     }
   }
 
