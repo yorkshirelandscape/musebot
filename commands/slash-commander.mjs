@@ -73,8 +73,8 @@ export default class SlashCommander {
       },
       xkcd: {
         handler: 'xkcd',
-        global: true,
-        channels: false,
+        global: false,
+        channels: ['skynet'],
         name: 'xkcd',
         description: 'Returns a the best match xkcd comic for the specified number of lines of conversation, or returns the specific comic.',
         options: [

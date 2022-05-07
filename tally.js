@@ -474,12 +474,15 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
           console.log('Missing Voted:', missingVoted);
           const notifiedMessage = messages.filter((msg) => msg.content.includes('Missing Voted:')).first();
           console.log(notifiedMessage);
-          await notifiedMessage.mentions.users.fetch();
-          const notifiedMentions = notifiedMessage.mentions.users.cache.map((u) => u.username);
-          console.log(notifiedMentions);
+          if (notifiedMessage) {
+            await notifiedMessage.mentions.users.fetch();
+            const notifiedMentions = notifiedMessage.mentions.users.cache.map((u) => u.username);
+            console.log(notifiedMentions);
+            // eslint-disable-next-line max-len
+            missingVoted.filter((mv) => !notifiedMentions.includes(mv.map((mmvv) => mmvv.username)));
+            console.log('Filtered MV:', missingVoted);
+          }
           // eslint-disable-next-line max-len
-          missingVoted.filter((mv) => !notifiedMentions.includes(mv.map((mmvv) => mmvv.username)));
-          console.log('Filtered MV:', missingVoted);
           const deadbeatTagList = await missingVoted.map((u) => `<@!${u.id}>`).join(', ');
           console.log(deadbeatTagList);
           let msg = `Missing Check-Outs: ${deadbeatTagList}`;
