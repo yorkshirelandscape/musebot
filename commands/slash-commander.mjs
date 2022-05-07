@@ -116,6 +116,9 @@ export default class SlashCommander {
       case 'BOOLEAN':
         val = options.getBoolean(name);
         break;
+      case 'INTEGER':
+        val = options.getInteger(name);
+        break;
       default:
         throw new Error(`Unrecognized option type ${type}`);
     }
@@ -320,7 +323,7 @@ export default class SlashCommander {
       this.logger.debug({ args }, 'Handling xkcd command.');
       let response = '';
       try {
-        response = await xkcd(this.client, ...args);
+        response = await xkcd(this.client, interaction.channel, ...args);
       } catch (e) {
         response = e.message;
       }
