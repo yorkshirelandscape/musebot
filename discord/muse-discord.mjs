@@ -266,18 +266,4 @@ export default class MuseDiscord {
     });
     return checksReturn;
   }
-
-  // function to return an embedded image from a specified url
-  async embedImage(url, options) {
-    this.requireInit();
-    this.logger.info(`Getting image from ${url}`);
-    this.logger.debug({ url }, `Getting image from ${url}`);
-    const msg = new MessageEmbed()
-      .setTitle(options.title)
-      .setURL(url)
-      .setImage(url)
-      .setFooter({ text: options.footer });
-
-    return msg;
-  }
 }

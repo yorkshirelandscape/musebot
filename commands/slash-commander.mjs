@@ -2,6 +2,8 @@ import tzstamp from './tzstamp.mjs';
 import disc from './disc.mjs';
 import tight from './tight.mjs';
 import xkcd from './xkcd.mjs';
+import xkcd as xkcdDb from './xkcd/xkcd.mjs';
+
 
 export default class SlashCommander {
   static get CONFIG() {
@@ -76,19 +78,21 @@ export default class SlashCommander {
         global: false,
         channels: ['skynet'],
         name: 'xkcd',
-        description: 'Returns a the best match xkcd comic for the specified number of lines of conversation, or returns the specific comic.',
+        description: 'Returns the best match xkcd comic for the specified number of lines of conversation, or returns the specified comic.',
         options: [
+          {
+            name: 'context',
+            type: 'INTEGER',
+            description: 'The number of lines of conversation to read from the current channel as context.',
+            required: false,
+            defaultValue: 10,
+          },
           {
             name: 'num',
             type: 'INTEGER',
-            description: 'The number of lines of conversation to parse or the comic to fetch.',
-            required: true,
-          },
-          {
-            name: 'get',
-            type: 'BOOLEAN',
-            description: 'Return the specified comic.',
+            description: 'Ignore context and return the specified comic.',
             required: false,
+            defaultValue: null,
           },
         ],
       },
@@ -171,6 +175,7 @@ export default class SlashCommander {
     this.logger = logger.child({ class: 'SlashCommander' });
     this.client = client;
     this.initialized = false;
+    this.xkcdDb = new xkcdDb(this.logger);
   }
 
   /**
@@ -180,7 +185,10 @@ export default class SlashCommander {
    */
   async init() {
     this.logger.info('Initializing SlashCommander');
-    await this.client.ready();
+    await Promise.all([
+      this.client.ready(),
+      this.xkcdDb.init(),
+    ]);
     this.initialized = true;
   }
 
@@ -323,7 +331,7 @@ export default class SlashCommander {
       this.logger.debug({ args }, 'Handling xkcd command.');
       let response = '';
       try {
-        response = await xkcd(this.client, interaction.channel, ...args);
+        response = await xkcd(this.xkcdDb, this.client.client, interaction.channel, ...args);
       } catch (e) {
         response = e.message;
       }
@@ -331,8 +339,12 @@ export default class SlashCommander {
       await interaction.reply(response);
     } else {
       this.logger.info({ args }, 'Testing xkcd.');
-      const response = await xkcd(this.client, interaction.channel, ...args);
-      this.logger.info({ args }, response);
+      this.logger.debug({ channel: this.client.infoChannel, args }, 'Using info channel to read message context from');
+      try {
+        this.logger.info({ args }, await xkcd(this.xkcdDb, this.client.client, this.client.infoChannel, ...args));
+      } catch (e) {
+        this.logger.info(e.message);
+      }
     }
   }
 

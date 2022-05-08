@@ -20,6 +20,7 @@ export default class MuseBot {
       'slashTest',
       'slashStart',
       'slashCreate',
+      'xkcdUpdate',
     ];
   }
 
@@ -187,6 +188,12 @@ export default class MuseBot {
         this.slashCommander.createCommands(args);
         this.logger.info({ args }, 'Slash command creation complete');
         break;
+      case 'xkcdUpdate':
+        this.logger.info({ args }, 'Updating the XKCD DB');
+        xkcdClient = new xkcd(this.logger);
+        await xkcdClient.init();
+        await xkcdClient.update(...args);
+        this.logger.info({ args }, 'Done updating the XKCD DB');
       default:
         this.logger.error(`Unknown action: "${action}"`);
     }
