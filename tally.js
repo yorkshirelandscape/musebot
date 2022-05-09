@@ -472,7 +472,7 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
           // eslint-disable-next-line max-len
           const missingVoted = await missing.filter((m) => rmrMerged.every((r) => r.includes(m.user)));
           console.log('Missing Voted:', missingVoted);
-          const notifiedMessage = messages.filter((msg) => msg.content.includes('Missing Voted:')).first();
+          const notifiedMessage = messages.filter((msg) => msg.content.includes('Missing Check-Outs:')).first();
           console.log(notifiedMessage);
           if (notifiedMessage) {
             await notifiedMessage.mentions.users.fetch();
