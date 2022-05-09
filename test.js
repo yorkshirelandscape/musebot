@@ -1,111 +1,131 @@
+/* eslint-disable no-unreachable */
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable consistent-return */
 /* eslint-disable no-console */
-/* eslint-disable max-len */
+/* eslint-disable no-use-before-define */
+/* eslint-disable radix */
 const dotenv = require('dotenv');
 
 dotenv.config();
 
-const fs = require('fs');
-const readline = require('readline');
-const { google } = require('googleapis');
+const { Client, Intents, Collection } = require('discord.js');
 
-// If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
-const TOKEN_PATH = 'token.json';
+const client = new Client({
+  intents:
+  [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    Intents.FLAGS.GUILD_MEMBERS],
+});
 
-const MASTER_ID = '1mBjOr2bNpNbPHmRGcPmxpAi3GlF6a5WhtRcjt8TvvP0';
-let SPREADSHEET_ID = MASTER_ID;
+const testing = false;
 
-const YEAR_RANGES = {
-  READ_RANGE: 'TestBracket!G2:J',
-  WRITE_RANGE: 'TestBracket!J2:J',
-  COPY_RANGE: 'TestBracket!I2:I',
-  ACTIVE_YEAR: 'Lists!L2',
-  TEST_YEAR: 'Lists!L8',
-};
+const SKYNET = '864768873270345788';
+const TEST_VOTES = '876135378346733628';
+const DOM_MUSIC = '246342398123311104';
+const DOM_VOTES = '751893730117812225';
+const CHANNEL_ID = (testing === true ? TEST_VOTES : DOM_VOTES);
+const MUSIC_ID = (testing === true ? SKYNET : DOM_MUSIC);
 
-const getNewToken = async (oAuth2Client) => {
-  // TODO split this into a separate utility or separate flow?
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: SCOPES,
+// function to fetch more than the limit of 100 messages
+async function fetchMany(channel, limit = 250) {
+  if (!channel) {
+    throw new Error(`Expected channel, got ${typeof channel}.`);
+  }
+  if (limit <= 100) {
+    return channel.messages.fetch({ limit });
+  }
+
+  let collection = new Collection();
+  let lastId = null;
+  const options = {};
+  let remaining = limit;
+
+  while (remaining > 0) {
+    options.limit = remaining > 100 ? 100 : remaining;
+    remaining = remaining > 100 ? remaining - 100 : 0;
+
+    if (lastId) {
+      options.before = lastId;
+    }
+
+    // eslint-disable-next-line no-await-in-loop
+    const messages = await channel.messages.fetch(options);
+
+    if (!messages.last()) {
+      break;
+    }
+
+    collection = collection.concat(messages);
+    lastId = messages.last().id;
+  }
+
+  return collection;
+}
+
+// function that pulls it all together
+const checkRound = async () => {
+  const channel = client.channels.cache.get(CHANNEL_ID);
+
+  // fetch the last 200 messages (this should cover even the longest rounds)
+  fetchMany(channel, 200).then(async (messages) => {
+    // isolate the check-out messages and convert to an array
+    // const msgDelims = messages.filter((msg) => msg.content.includes('you have checked in and are done voting') && msg.deleted === false);
+    // // filter all the messages for those between the two most recent delimiters
+    // const rndMatches = messages.filter((msg) => (
+    //   msg.createdTimestamp < msgDelims.first(2)[0].createdTimestamp
+    //   && msg.createdTimestamp > msgDelims.first(2)[1].createdTimestamp
+    //   && msg.deleted === false && msg.content.includes('Match')
+    // ));
+
+    // // create an array of the reacted users for each message
+    // const rndMatchesResults = await Promise.all(rndMatches.map((rm) => {
+    //   const matchReacts = rm.reactions.cache.map(async (r) => {
+    //     await r.users.fetch();
+    //     return r.users.cache.map((u) => u.username);
+    //   });
+    //   return Promise.all(matchReacts);
+    // }));
+
+    // const rmrMerged = rndMatchesResults.map((mr) => mr[0].concat(mr[1]));
+    // // eslint-disable-next-line max-len
+    // const missingVoted = await missing.filter((m) => rmrMerged.every((r) => r.includes(m.user)));
+    // console.log('Missing Voted:', missingVoted);
+    const notifiedMessage = messages.find((msg) => msg.content.includes('Missing Check-Outs:'));
+    console.log(notifiedMessage);
+    // if (notifiedMessage) {
+    //   await notifiedMessage.mentions.users.fetch();
+    //   const notifiedMentions = notifiedMessage.mentions.users.cache.map((u) => u.username);
+    //   console.log(notifiedMentions);
+    //   // eslint-disable-next-line max-len
+    //   missingVoted.filter((mv) => !notifiedMentions.includes(mv.map((mmvv) => mmvv.username)));
+    //   console.log('Filtered MV:', missingVoted);
+    // }
+    // // eslint-disable-next-line max-len
+    // const deadbeatTagList = await missingVoted.map((u) => `<@!${u.id}>`).join(', ');
+    // console.log(deadbeatTagList);
+    // let msg = `Missing Check-Outs: ${deadbeatTagList}`;
+
+    // if (missingVoted.length > 0) {
+    //   await musicChan.send(msg);
+    //   if (testing === false) { await testMusic.send(msg); }
+    // }
+
+    // msg = 'Awaiting 80%.';
+    // testMusic.send(msg);
+    // // console.log(msg);
+    // console.log(`${(pctCheckedIn * 100).toFixed(1)}%`);
+    // console.log('MaxWarn:', roundEndTime.plus({ hours: roundMaxWarn }).toFormat('M/d/yyyy HH:mm'));
+    // console.log('Missing:', missingList);
+    // console.log('Extra:', extraList);
   });
-  console.log('Authorize this app by visiting this url:', authUrl);
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  // TODO util.promisify this https://nodejs.org/api/readline.html#readline_rl_question_query_options_callback
-  rl.question('Enter the code from that page here: ', (code) => {
-    rl.close();
-    oAuth2Client.getToken(code, (err, token) => {
-      if (err) return console.error('Error while trying to retrieve access token', err);
-      oAuth2Client.setCredentials(token);
-      // Store the token to disk for later program executions
-      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (errAuth) => {
-        if (errAuth) return console.error(err);
-        console.log('Token stored to', TOKEN_PATH);
-      });
-    });
-  });
-  // This should await readline.question and
-  // there's probably a similar thing to do with oAuth2Client.getToken
 };
 
-const loadCredentials = () => {
-  // Load client secrets from a local file.
-  try {
-    return JSON.parse(fs.readFileSync('credentials.json'));
-  } catch (err) {
-    console.log('Error loading client secret file:', err);
-    throw err;
-  }
-};
+client.once('ready', () => {
+  console.log('Ready!');
+});
 
-const authorize = async (credentials) => {
-// eslint-disable-next-line camelcase
-  const { client_secret, client_id, redirect_uris } = credentials.installed;
-  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+client.on('ready', async () => {
+  await checkRound();
+});
 
-  try {
-    oAuth2Client.setCredentials(JSON.parse(fs.readFileSync(TOKEN_PATH)));
-  } catch (err) {
-    console.log('Unable to load credentials from file, getting new token from user');
-    await getNewToken(oAuth2Client);
-  }
-  return oAuth2Client;
-};
-
-const getAuthClient = async () => authorize(loadCredentials());
-
-const getMsgs = async (rng, cell, ss, auth) => {
-  const sheets = google.sheets({ version: 'v4', auth });
-  try {
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: ss,
-      range: rng,
-    });
-    return cell === true ? response.data.values[0][0] : response.data.values;
-  } catch (err) {
-    console.log(`getMsg API returned an error for range "${rng}"`, err);
-    throw err;
-  }
-};
-
-const getValues = async (rng, cell = false, ss = SPREADSHEET_ID) => getMsgs(rng, cell, ss, await getAuthClient());
-
-const test = async () => {
-  const activeYear = await getValues(YEAR_RANGES.ACTIVE_YEAR, true);
-  const testYear = await getValues(YEAR_RANGES.TEST_YEAR, true);
-
-  if (activeYear !== testYear) {
-    const oldData = await getValues(YEAR_RANGES.WRITE_RANGE);
-    const isUpdated = oldData.map((y) => y[0]).includes(testYear);
-    console.log(oldData);
-    console.log(isUpdated);
-  }
-};
-
-test();
+client.login(process.env.TOKEN);
