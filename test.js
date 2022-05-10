@@ -1,131 +1,35 @@
-/* eslint-disable no-unreachable */
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable consistent-return */
-/* eslint-disable no-console */
-/* eslint-disable no-use-before-define */
-/* eslint-disable radix */
-const dotenv = require('dotenv');
+const missingVoted = [
+  { user: 'yugret', id: '123492862741577728' },
+  { user: 'Wonko', id: '129050991516581889' },
+  { user: 'quoth', id: '180777442112176128' },
+  { user: 'jsh', id: '212657778114822144' },
+  { user: 'Valendale', id: '213122118437699584' },
+  { user: 'assemble_me', id: '231894050075181057' },
+  { user: 'tufftaeh', id: '243074406979469313' },
+  { user: 'nottoobad', id: '243190843777875970' },
+  { user: 'markusin', id: '249526255551119360' },
+  { user: 'aku chi', id: '258397497297207297' },
+  { user: 'pproteus', id: '272826977382301696' },
+  { user: 'Sharur', id: '286950779187625984' },
+  { user: 'threelinewhip', id: '390624515308257281' },
+  { user: 'SuperDuper', id: '434314094519123968' },
+  { user: 'Donkey-Dude', id: '520369197872578571' },
+  { user: 'Komaitho', id: '700079863159324774' },
+  { user: 'Mollo8', id: '711095408511942716' },
+  { user: 'Volkrath', id: '718819516263432224' },
+  { user: 'strumphf', id: '721711867898232922' },
+  { user: 'alatar224', id: '807760790244294709' },
+  { user: 'biscuitsjoe', id: '842607559922679829' },
+];
 
-dotenv.config();
+const notifiedMentions = ['286950779187625984'];
 
-const { Client, Intents, Collection } = require('discord.js');
+const test = missingVoted.map((mv) => !notifiedMentions.includes(mv.id));
 
-const client = new Client({
-  intents:
-  [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-    Intents.FLAGS.GUILD_MEMBERS],
-});
+console.log(test);
 
-const testing = false;
+const test2 = missingVoted.filter((mv) => !notifiedMentions.includes(mv.id));
 
-const SKYNET = '864768873270345788';
-const TEST_VOTES = '876135378346733628';
-const DOM_MUSIC = '246342398123311104';
-const DOM_VOTES = '751893730117812225';
-const CHANNEL_ID = (testing === true ? TEST_VOTES : DOM_VOTES);
-const MUSIC_ID = (testing === true ? SKYNET : DOM_MUSIC);
+console.log(test2);
 
-// function to fetch more than the limit of 100 messages
-async function fetchMany(channel, limit = 250) {
-  if (!channel) {
-    throw new Error(`Expected channel, got ${typeof channel}.`);
-  }
-  if (limit <= 100) {
-    return channel.messages.fetch({ limit });
-  }
-
-  let collection = new Collection();
-  let lastId = null;
-  const options = {};
-  let remaining = limit;
-
-  while (remaining > 0) {
-    options.limit = remaining > 100 ? 100 : remaining;
-    remaining = remaining > 100 ? remaining - 100 : 0;
-
-    if (lastId) {
-      options.before = lastId;
-    }
-
-    // eslint-disable-next-line no-await-in-loop
-    const messages = await channel.messages.fetch(options);
-
-    if (!messages.last()) {
-      break;
-    }
-
-    collection = collection.concat(messages);
-    lastId = messages.last().id;
-  }
-
-  return collection;
-}
-
-// function that pulls it all together
-const checkRound = async () => {
-  const channel = client.channels.cache.get(CHANNEL_ID);
-
-  // fetch the last 200 messages (this should cover even the longest rounds)
-  fetchMany(channel, 200).then(async (messages) => {
-    // isolate the check-out messages and convert to an array
-    // const msgDelims = messages.filter((msg) => msg.content.includes('you have checked in and are done voting') && msg.deleted === false);
-    // // filter all the messages for those between the two most recent delimiters
-    // const rndMatches = messages.filter((msg) => (
-    //   msg.createdTimestamp < msgDelims.first(2)[0].createdTimestamp
-    //   && msg.createdTimestamp > msgDelims.first(2)[1].createdTimestamp
-    //   && msg.deleted === false && msg.content.includes('Match')
-    // ));
-
-    // // create an array of the reacted users for each message
-    // const rndMatchesResults = await Promise.all(rndMatches.map((rm) => {
-    //   const matchReacts = rm.reactions.cache.map(async (r) => {
-    //     await r.users.fetch();
-    //     return r.users.cache.map((u) => u.username);
-    //   });
-    //   return Promise.all(matchReacts);
-    // }));
-
-    // const rmrMerged = rndMatchesResults.map((mr) => mr[0].concat(mr[1]));
-    // // eslint-disable-next-line max-len
-    // const missingVoted = await missing.filter((m) => rmrMerged.every((r) => r.includes(m.user)));
-    // console.log('Missing Voted:', missingVoted);
-    const notifiedMessage = messages.find((msg) => msg.content.includes('Missing Check-Outs:'));
-    console.log(notifiedMessage);
-    // if (notifiedMessage) {
-    //   await notifiedMessage.mentions.users.fetch();
-    //   const notifiedMentions = notifiedMessage.mentions.users.cache.map((u) => u.username);
-    //   console.log(notifiedMentions);
-    //   // eslint-disable-next-line max-len
-    //   missingVoted.filter((mv) => !notifiedMentions.includes(mv.map((mmvv) => mmvv.username)));
-    //   console.log('Filtered MV:', missingVoted);
-    // }
-    // // eslint-disable-next-line max-len
-    // const deadbeatTagList = await missingVoted.map((u) => `<@!${u.id}>`).join(', ');
-    // console.log(deadbeatTagList);
-    // let msg = `Missing Check-Outs: ${deadbeatTagList}`;
-
-    // if (missingVoted.length > 0) {
-    //   await musicChan.send(msg);
-    //   if (testing === false) { await testMusic.send(msg); }
-    // }
-
-    // msg = 'Awaiting 80%.';
-    // testMusic.send(msg);
-    // // console.log(msg);
-    // console.log(`${(pctCheckedIn * 100).toFixed(1)}%`);
-    // console.log('MaxWarn:', roundEndTime.plus({ hours: roundMaxWarn }).toFormat('M/d/yyyy HH:mm'));
-    // console.log('Missing:', missingList);
-    // console.log('Extra:', extraList);
-  });
-};
-
-client.once('ready', () => {
-  console.log('Ready!');
-});
-
-client.on('ready', async () => {
-  await checkRound();
-});
-
-client.login(process.env.TOKEN);
+console.log(test);

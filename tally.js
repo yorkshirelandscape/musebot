@@ -470,17 +470,19 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
 
           const rmrMerged = rndMatchesResults.map((mr) => mr[0].concat(mr[1]));
           // eslint-disable-next-line max-len
-          const missingVoted = await missing.filter((m) => rmrMerged.every((r) => r.includes(m.user)));
+          let missingVoted = await missing.filter((m) => rmrMerged.every((r) => r.includes(m.user)));
           console.log('Missing Voted:', missingVoted);
-          const recentTestMusic = testMusic.messages.fetch(5);
+          const recentTestMusic = await testMusic.messages.fetch({ limit: 5 });
           const notifiedMessage = recentTestMusic.find((msg) => msg.content.includes('Missing Check-Outs:'));
           console.log(notifiedMessage);
           if (notifiedMessage) {
-            await notifiedMessage.mentions.users.fetch();
-            const notifiedMentions = notifiedMessage.mentions.users.cache.map((u) => u.username);
+            const notifiedMentions = notifiedMessage.content.match(/(?<=@!)[0-9]+/g);
+            // await notifiedMessage.mentions.users.fetch();
+            // const notifiedMentions = notifiedMessage.mentions.users.cache.map((u) => u.username);
             console.log(notifiedMentions);
             // eslint-disable-next-line max-len
-            missingVoted.filter((mv) => !notifiedMentions.includes(mv.map((mmvv) => mmvv.username)));
+            // missingVoted.filter((mv) => !notifiedMentions.includes(mv.map((mmvv) => mmvv.username)));
+            missingVoted = missingVoted.filter((mv) => !notifiedMentions.includes(mv.id));
             console.log('Filtered MV:', missingVoted);
           }
           // eslint-disable-next-line max-len
