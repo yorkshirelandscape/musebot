@@ -2,8 +2,7 @@ import tzstamp from './tzstamp.mjs';
 import disc from './disc.mjs';
 import tight from './tight.mjs';
 import xkcd from './xkcd.mjs';
-import xkcd as xkcdDb from './xkcd/xkcd.mjs';
-
+import xkcdDb from '../xkcd/xkcd.mjs';
 
 export default class SlashCommander {
   static get CONFIG() {

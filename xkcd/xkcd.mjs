@@ -3,12 +3,11 @@ import fs from 'fs';
 import similarity from 'sentence-similarity';
 import simScore from 'similarity-score';
 
-import utils from './utils.mjs';
+import utils from '../utils.mjs';
 
-DB_PATH = process.env.XKCD_DB_PATH || './commands/xkcd.json';
+const DB_PATH = process.env.XKCD_DB_PATH || './commands/xkcd.json';
 
-SIMILARITY_OPTIONS = { f: simScore.winklerMetaphone, options: { threshold: 0 } };
-
+const SIMILARITY_OPTIONS = { f: simScore.winklerMetaphone, options: { threshold: 0 } };
 
 export default class xkcd {
   /**
@@ -172,7 +171,7 @@ export default class xkcd {
   * Searches all (and only) comics already in the database.
   */
   async getBestComic(input) {
-    const scores = Object.keys(this.db).map((k) => { k, score: this.getScore(input, k) });
+    const scores = Object.keys(this.db).map((k) => ({ k, score: this.getScore(input, k) }));
     return this.get(scores.reduce((prev, current) => (prev.score > current.score) ? prev : current));
   }
 
