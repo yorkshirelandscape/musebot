@@ -243,13 +243,15 @@ const yearCall = async () => {
     const subCount = new Set(submitters).size;
     const counts = {};
 
-    for (const year of oldData) {
-      counts[year] = counts[year] ? counts[year] + 1 : 1;
-    }
+    if (oldData) {
+      for (const year of oldData) {
+        counts[year] = counts[year] ? counts[year] + 1 : 1;
+      }
 
-    const isUpdated = (counts[testYear] >= subCount);
-    if (!isUpdated) {
-      await clearRanges(YEAR_RANGES.WRITE_RANGE);
+      const isUpdated = (counts[testYear] >= subCount);
+      if (!isUpdated) {
+        await clearRanges(YEAR_RANGES.WRITE_RANGE);
+      }
     }
   }
 
