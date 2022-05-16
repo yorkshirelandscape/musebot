@@ -7,7 +7,7 @@
 - ~~handle unicode emoji submissions~~
 - ~~emoji collision check and fallback~~
 - ~~emoji failure check and fallback~~
-- check emojis before year starts
+- ~~check emojis before year starts~~
 - ~~handle 3P properly~~
 - add slash command for DXV and Bluey to trigger nextMatch
 - consolidate (g/s)etValue(s)
@@ -21,10 +21,10 @@
 - react to manual match posts
 - ~~year end automatic estimates~~
 - ~~reminders to submit for next year~~
-- check eligibility before year starts
-- run genreCall
-- fix token expiration problem
+- ~~check eligibility before year starts~~
+- ~~run genreCall~~
+- ~~fix token expiration problem~~
 - ~~clear results for when year ends~~
 - ~~inform submitters when their song dupes~~
 - ~~unpin messages~~
-- genre set, announce, and API call
+- ~~genre set, announce, and API call~~
