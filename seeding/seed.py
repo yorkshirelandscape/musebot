@@ -3,6 +3,7 @@
 import argparse
 import collections
 import csv
+import functools
 import itertools
 import math
 import operator
@@ -18,6 +19,7 @@ import uuid
 BADNESS_MAX_ARTIST = 20
 BADNESS_MAX_SUBMITTER = 50
 BADNESS_MAX_SEED = 100
+BADNESS_MAX_DUPER = 20
 ITERATIONS = 10000
 ATTEMPTS = 10
 ATTEMPT_ITERATIONS = 200
@@ -144,14 +146,23 @@ def get_analysis(seeds, submissions):
                     if len(g) not in allowed_sizes
                 }
 
-    # Special case to list any {0, 1} vs. {0, 1} matches in the first round
+    # Special case to list specific collisions in the first round:
+    # - {0, 1} vs. {0, 1}
+    # - submitter vs dupe
     match = 0
     for submission1, submission2 in chunk(ordered_submissions, 2):
         match += 1
         if submission1.seed in {0, 1} and submission2.seed in {0, 1}:
             results[1]["seeds"][match] = (submission1, submission2)
+        results[1]["dupes"][match] = []
+        if submission1.submitter_cmp in submission2.dupers:
+            results[1]["dupes"][match].append((submission1.submitter, submission2))
+        if submission2.submitter_cmp in submission1.dupers:
+            results[1]["dupes"][match].append((submission2.submitter, submission1))
 
-    # Special case to list any {0, 1} vs. {0, 1} matches in the second round
+    # Special case to list specific collisions in the second round:
+    # - {0, 1} vs. {0, 1}
+    # - submitter vs dupe
     match = 0
     for submissions_chunk in chunk(ordered_submissions, 4):
         match += 1
@@ -165,6 +176,16 @@ def get_analysis(seeds, submissions):
             submission1 = next(s for s in submissions_chunk[:2] if s.seed in {0, 1})
             submission2 = next(s for s in submissions_chunk[2:] if s.seed in {0, 1})
             results[2]["seeds"][match] = (submission1, submission2)
+        # Could generate this by being tricky, but probably better to be explicit
+        # Checks all potential matchups within the chunk
+        results[2]["dupes"][match] = []
+        for i, j in ((0, 2), (0, 3), (1, 2), (1, 3)):
+            submission1 = submissions_chunk[i]
+            submission2 = submissions_chunk[j]
+            if submission1.submitter_cmp in submission2.dupers:
+                results[2]["dupes"][match].append((submission1.submitter, submission2))
+            if submission2.submitter_cmp in submission1.dupers:
+                results[2]["dupes"][match].append((submission2.submitter, submission1))
 
     # If we have any byes, make sure they match against the lowest possible seeds
     # Also make sure they are in the expected slots
@@ -261,6 +282,11 @@ def print_analysis_results(results, total_submissions):
                 num_matches = 2 ** (num_rounds - round)
                 print(f"Round {round} / {num_rounds} | Match {match} / {num_matches} | {submission_pair[0]} | {submission_pair[1]}")
 
+        if "dupes" in round_results:
+            for match, submission_pairs in round_results["dupes"].items():
+                for submitter, submission in submission_pairs:
+                    print(f"Round {round} / {num_rounds} | Duper {submitter} | Dupe {submission}")
+
         if "byes" in round_results:
             for match, submission_pair in round_results["byes"].items():
                 if match == "totals":
@@ -335,6 +361,10 @@ def get_canonical_artist(artist):
     )
 
 
+def get_canonical_submitter(submitter):
+    return submitter.lower()
+
+
 class Submission:
     """
     Container class for an individual submission
@@ -343,14 +373,14 @@ class Submission:
     def __init__(self, *, artist, song, submitter, seed, slot=None, is_bye=False, **kwargs):
         """
         Constructor for a `Submission` instance.
-        
+
         Requires the following keyword-only arguments:
             - ``artist``
             - ``song``
             - ``submitter``
             - ``seed``
         Any additional keyword arguments will be ignored.
-        
+
         :param artist: The string name of the artist who performed/composed the
             song
         :param song: The string title of the song
@@ -366,9 +396,21 @@ class Submission:
         self.submitter = submitter
         # Ideally we would go by submitter ID
         # but this should be good enough for now
-        self.submitter_cmp = submitter.lower()
+        self.submitter_cmp = get_canonical_submitter(submitter)
         self.seed = int(seed)
         self.slot = slot
+        if "dupers" in kwargs:
+            self.dupers = kwargs["dupers"]
+        else:
+            submitters = kwargs["submitters"]
+            if submitters:
+                if isinstance(submitters, str):
+                    submitters = map(str.strip, submitters.split(";"))
+                submitters = set(map(str.lower, submitters)) - {self.submitter_cmp}
+            else:
+                # Could be blank ("") or not given at all (None)
+                submitters = set()
+            self.dupers = submitters
 
     def __str__(self):
         """
@@ -381,7 +423,8 @@ class Submission:
         if self.is_bye:
             return f"{slot}Bye"
         else:
-            return f"{slot}{self.artist} - {self.song} <{self.submitter}, {self.seed}>"
+            dupers = f" [{', '.join(sorted(self.dupers))}]" if self.dupers else ""
+            return f"{slot}{self.artist} - {self.song} <{self.submitter}, {self.seed}{dupers}>"
 
     @classmethod
     def Bye(cls, *, slot=None, **kwargs):
@@ -465,14 +508,41 @@ def calc_badness(i, submissions):
         # Calculate the number of rounds before these two submissions would meet
         # in a match, starting with 0 if they already are
         distance = get_distance(i, j)
+        distance_factor = (1 - distance / max_distance)
         if submissions[i].artist_cmp == submissions[j].artist_cmp:
-            badness[j] += BADNESS_MAX_ARTIST * (1 - distance / max_distance)
+            badness[j] += BADNESS_MAX_ARTIST * distance_factor
         if submissions[i].submitter_cmp == submissions[j].submitter_cmp:
-            badness[j] += BADNESS_MAX_SUBMITTER * (1 - distance / max_distance)
+            badness[j] += BADNESS_MAX_SUBMITTER * distance_factor
+        elif submissions[i].submitter_cmp in submissions[j].dupers:
+            # We'll still try to space this out some but scale it down based on
+            # number of dupes/dupers
+            duper_factor = 1 / min(
+                # Both of these should have a minimum value of 1 here
+                len(submissions[j].dupers),
+                get_number_of_dupes(submissions[i].submitter_cmp, submissions),
+            )
+            badness[j] += BADNESS_MAX_DUPER * duper_factor * distance_factor
     # We've collected all the same badness in other slots, add here as well
     # This gives us twice the score we want but is evenly distributed
     badness[i] = sum(badness)
     return badness
+
+
+# This is expensive so we want to cache the results, but we can use an unbounded
+# cache because we don't know the number of submissions here but we do know that
+# it won't be too big
+def get_number_of_dupes(submitter, submissions):
+    """
+    For the submitter, returns the number of songs they submitted but don't own.
+    """
+
+    # We have to wrap this so that ``submissions`` remains in the scope of the
+    # wrapped function and the cache only looks at the ``submitter`` argument
+    @functools.lru_cache(maxsize=None)
+    def _get_number_of_dupes(submitter):
+        return sum(1 for submission in submissions if submitter in submission.dupers)
+
+    return _get_number_of_dupes(submitter)
 
 
 def get_badness(seeds, submissions):
@@ -746,6 +816,15 @@ def get_parser():
         action="store_true",
         default=False,
     )
+    parser.add_argument(
+        "--drop-dupes-first",
+        help=(
+            "prioritize dropping songs submitted by people with more dupes "
+            "first"
+        ),
+        action="store_true",
+        default=False,
+    )
 
     group = parser.add_argument_group(
         title="output arguments",
@@ -808,6 +887,12 @@ def get_parser():
         type=int,
     )
     group.add_argument(
+        "--badness-duper",
+        help="how much to weigh duper collisions",
+        default=BADNESS_MAX_SEED,
+        type=int,
+    )
+    group.add_argument(
         "--iterations",
         help="total number of iterations to run",
         default=ITERATIONS,
@@ -853,6 +938,7 @@ def read_csv_from_file(file):
         - ``song``
         - ``artist``
         - ``link``
+        - ``submitters``
 
     If a tab character is present in the first row, assumes the data is
     tab-delimited, otherwise assumes comma-delimited.
@@ -870,7 +956,7 @@ def read_csv_from_file(file):
         try:
             int(col)
             # Found an integer, no headers present
-            headers = ["order", "seed", "submitter", "year", "song", "artist", "link"]
+            headers = ["order", "seed", "submitter", "year", "song", "artist", "link", "submitters"]
             break
         except ValueError:
             pass
@@ -902,7 +988,16 @@ def get_csv_data(csv_path):
     return data
 
 
-def choose_submissions(data):
+def get_submission_counts(rows):
+    submissions = [Submission(**row) for row in rows]
+    counts = collections.Counter()
+    for submission in submissions:
+        counts[submission.submitter_cmp] += 1
+        counts.update(submission.dupers)
+    return counts
+
+
+def choose_submissions(data, drop_dupes_first=False):
     """
     Creates a power of two bracket by randomly eliminating larger seed songs
 
@@ -920,6 +1015,8 @@ def choose_submissions(data):
     original list as well as the data itself.
 
     :param data: List of dicts from the input CSV
+    :param drop_dupes_first: Optional Boolean indicating whether to prioritize
+        dropping songs by submitters who have more dupes first [default: False]
     :returns: A tuple with a new list with a number of elements that is a power
         of two and another list containing tuples with the original index and
         the dropped data for all removed rows
@@ -932,12 +1029,26 @@ def choose_submissions(data):
         target_size = 48
     else:
         target_size = 2 ** math.floor(math.log2(len(data)))
+
     new_data = data.copy()
+
     while len(new_data) > target_size:
         target_seed = max(row["seed"] for row in new_data)
-        to_remove = random.choice(
-            [row for row in new_data if row["seed"] == target_seed]
-        )
+        choices = [row for row in new_data if row["seed"] == target_seed]
+        if drop_dupes_first:
+            # Further filter choices list to only be submissions from people
+            # tied for having the most songs counting dupes
+            counts = get_submission_counts(new_data)
+            # We have to filter the counts to only submitters we're considering
+            # eliminating
+            submitters = {get_canonical_submitter(row["submitter"]) for row in choices}
+            counts = [submitter_count for submitter_count in counts.most_common() if submitter_count[0] in submitters]
+            # Whatever is left is already sorted by submission count
+            max_count = counts[0][1]
+            most_submissions = {submitter for submitter, count in counts if count == max_count}
+            choices = [row for row in choices if get_canonical_submitter(row["submitter"]) in most_submissions]
+            print(f"Found {len(choices)} songs by submitters with {max_count} submissions")
+        to_remove = random.choice(choices)
         print(f"Eliminating submission {Submission(**to_remove)}")
         dropped.append((data.index(to_remove), len(new_data), to_remove))
         new_data.remove(to_remove)
@@ -1064,6 +1175,7 @@ def main(
     output_csv_tabs,
     output_bracket_order,
     output_dropped,
+    drop_dupes_first,
 ):
     """
     Main entry point for the script.
@@ -1075,11 +1187,12 @@ def main(
     :param output_csv_path: Path to output CSV file, or ``None`` for STDOUT
     :param force_output: If output file already exists overwrite it, if
         intermediate directories on the path do not exist, create them
+    :param drop_dupes_first: Prioritize dropping songs by submitters with dupes
     :returns: None
     """
 
     data = get_csv_data(input_csv_path)
-    data, dropped = choose_submissions(data)
+    data, dropped = choose_submissions(data, drop_dupes_first)
     seeds = get_seed_order(data)
     write_csv_data(
         output_csv_path,
@@ -1098,6 +1211,7 @@ if __name__ == "__main__":
     input_csv_path = args.INPUT
     output_csv_path = args.OUTPUT
     force_output = args.force
+    drop_dupes_first = args.drop_dupes_first
 
     output_csv_tabs = args.output_csv_tabs
     output_order = args.output_order
@@ -1107,6 +1221,7 @@ if __name__ == "__main__":
     BADNESS_MAX_ARTIST = args.badness_artist
     BADNESS_MAX_SUBMITTER = args.badness_submitter
     BADNESS_MAX_SEED = args.badness_seed
+    BADNESS_MAX_DUPER = args.badness_duper
     ITERATIONS = args.iterations
     ATTEMPTS = args.attempts
     ATTEMPT_ITERATIONS = args.attempt_iterations
@@ -1118,4 +1233,5 @@ if __name__ == "__main__":
         output_csv_tabs,
         output_order,
         output_dropped,
+        drop_dupes_first,
     )
