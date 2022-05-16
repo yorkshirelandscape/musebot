@@ -402,7 +402,7 @@ class Submission:
         if "dupers" in kwargs:
             self.dupers = kwargs["dupers"]
         else:
-            submitters = kwargs["submitters"]
+            submitters = kwargs.get("submitters")
             if submitters:
                 if isinstance(submitters, str):
                     submitters = map(str.strip, submitters.split(";"))
