@@ -46,7 +46,7 @@ const getComics = async (x, n = 1) => {
     comic.summary = summarize(data);
 
     try {
-      appendJSON('./commands/xkcd.json', comic);
+      appendJSON('xkcd.json', comic);
       console.log(`Imported comic #${i}.`);
     } catch (err) {
       console.log(`Comic #${i} already imported.`);
@@ -61,7 +61,7 @@ const getMaxComic = (file) => {
 };
 
 setTimeout(() => {
-  const mc = getMaxComic('./commands/xkcd.json');
+  const mc = getMaxComic('xkcd.json');
   getComics(mc + 1);
 }, 24 * 60 * 60 * 1000);
 

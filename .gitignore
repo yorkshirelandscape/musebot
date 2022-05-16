@@ -35,3 +35,5 @@ temp.js
 __pycache__
 deadbeat_test.js
 commands/xkcd.json
+seeding/input.csv
+seeding/output.csv

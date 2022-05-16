@@ -152,16 +152,16 @@ const checkRound = async () => {
     fetchMany(channel, 200).then(async (messages) => {
       // of those, find the most recent messages that begin and end a round
       const roundStart = await messages.find((msg) => msg.content.includes('Begins————'));
-      console.log(roundStart);
+      // console.log(roundStart);
       const roundEnd = await messages.find((msg) => msg.content.includes('you have checked in and are done voting'));
-      console.log(roundEnd);
+      // console.log(roundEnd);
       // if the most recent round is complete,
       // fetch the reactions from the check-in and check-out messages
       if (roundStart.createdTimestamp < roundEnd.createdTimestamp) {
         const checkIns = await getChecks(channel, `if you plan on voting in the ${year}`);
-        console.log(checkIns);
+        // console.log(checkIns);
         const checkOuts = await getChecks(channel, 'you have checked in and are done voting');
-        console.log(checkOuts);
+        // console.log(checkOuts);
 
         // find the check-ins without check-outs and vice versa, then calculate the pct checked in
         const missing = checkIns.filter((x) => !checkOuts.map((u) => u.user).includes(x.user));
@@ -468,19 +468,21 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
             });
             return Promise.all(matchReacts);
           }));
+          console.log('rndMatchesResults: ', rndMatchesResults);
 
           const rmrMerged = rndMatchesResults.map((mr) => mr[0].concat(mr[1]));
+          console.log('rmrMerged: ', rmrMerged);
           // eslint-disable-next-line max-len
           let missingVoted = await missing.filter((m) => rmrMerged.every((r) => r.includes(m.user)));
           console.log('Missing Voted:', missingVoted);
           const recentTestMusic = await testMusic.messages.fetch({ limit: 5 });
           const notifiedMessage = recentTestMusic.find((msg) => msg.content.includes('Missing Check-Outs:'));
-          console.log(notifiedMessage);
+          // console.log(notifiedMessage);
           if (notifiedMessage) {
             const notifiedMentions = notifiedMessage.content.match(/(?<=@!)[0-9]+/g);
             // await notifiedMessage.mentions.users.fetch();
             // const notifiedMentions = notifiedMessage.mentions.users.cache.map((u) => u.username);
-            console.log(notifiedMentions);
+            // console.log(notifiedMentions);
             // eslint-disable-next-line max-len
             // missingVoted.filter((mv) => !notifiedMentions.includes(mv.map((mmvv) => mmvv.username)));
             missingVoted = missingVoted.filter((mv) => !notifiedMentions.includes(mv.id));

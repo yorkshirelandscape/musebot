@@ -75426,5 +75426,63 @@
         }
       ]
     ]
+  },
+  {
+    "month": "5",
+    "num": 2617,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Maps",
+    "transcript": "",
+    "alt": "OpenStreetMap was always pretty good but is also now *really* good? And Apple Maps's new zoomed-in design in certain cities like NYC and London is just gorgeous. It's cool how there are all these good maps now!",
+    "img": "https://imgs.xkcd.com/comics/maps.png",
+    "title": "Maps",
+    "day": "9",
+    "summary": [
+      [
+        {
+          "term": "maps",
+          "probability": 0.19
+        },
+        {
+          "term": "good",
+          "probability": 0.19
+        },
+        {
+          "term": "zoomedin",
+          "probability": 0.063
+        }
+      ]
+    ]
+  },
+  {
+    "month": "5",
+    "num": 2618,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Selection Bias",
+    "transcript": "",
+    "alt": "We carefully sampled the general population and found that most people are familiar with acquiescence bias.",
+    "img": "https://imgs.xkcd.com/comics/selection_bias.png",
+    "title": "Selection Bias",
+    "day": "11",
+    "summary": [
+      [
+        {
+          "term": "bias",
+          "probability": 0.2
+        },
+        {
+          "term": "selection",
+          "probability": 0.1
+        },
+        {
+          "term": "sampled",
+          "probability": 0.1
+        }
+      ]
+    ]
   }
 ]
