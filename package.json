@@ -5,6 +5,7 @@
     "discord-emoji": "^2.0.1",
     "discord.js": "^13.0.1",
     "dotenv": "^10.0.0",
+    "draftlog": "^1.0.13",
     "emoji-name-map": "^1.2.9",
     "googleapis": "^84.0.0",
     "jquery": "^3.6.0",

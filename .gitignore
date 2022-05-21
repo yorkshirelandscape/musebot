@@ -31,7 +31,6 @@ credentials.json
 token.json
 *.log
 temp.js
-.vscode
 __pycache__
 deadbeat_test.js
 commands/xkcd.json

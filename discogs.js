@@ -2,6 +2,10 @@
 /* eslint-disable max-len */
 const dotenv = require('dotenv');
 
+const DraftLog = require('draftlog');
+
+DraftLog(console);
+
 dotenv.config();
 
 const { Client, Intents } = require('discord.js');
@@ -76,6 +80,18 @@ const YEAR_RANGES = {
 //   WRITE_RANGE: 'TestBracket!K2:K',
 //   ACTIVE_YEAR: 'Dashboard!B1',
 // };
+
+// Input progess goes from 0 to 100
+const ProgressBar = (progress) => {
+  // Make it 50 characters length
+  const units = Math.round(progress / 2);
+  return `[${'='.repeat(units)}${' '.repeat(50 - units)}] ${Math.round(progress * 10) / 10}%`;
+};
+
+const barLine = console.draft('Preparing API Call...');
+const callProgress = (progress) => {
+  barLine(ProgressBar(progress));
+};
 
 const getNewToken = async (oAuth2Client) => {
   // TODO split this into a separate utility or separate flow?
@@ -193,6 +209,12 @@ const genreCall = async () => {
 
   await setValues(GENRE_RANGES.COPY_RANGE, dataSet.map((row) => [row[0]]));
 
+  callProgress(0);
+
+  const dataSetLen = dataSet.length;
+  let i = 0;
+  let errLog = '';
+
   for (const r of dataSet) {
     if (typeof r[10] === 'undefined') {
       try {
@@ -202,8 +224,7 @@ const genreCall = async () => {
 
         if (sortMap.length === 0) {
           r[3] = 'No Match';
-          console.log(r[1], '-', r[0]);
-          console.log('No match.');
+          errLog += `\n${r[1]} - ${r[0]}`;
         } else {
           const {
             genre, style,
@@ -216,14 +237,18 @@ const genreCall = async () => {
         }
         await sleep(1000);
       } catch (err) {
-        console.log(err);
+        errLog += `\n${err}`;
       }
     }
+    i++;
+    callProgress((i / dataSetLen) * 100);
   }
 
   const writeResults = dataSet.map((row) => [row[3], row[4]]);
 
   await setValues(GENRE_RANGES.WRITE_RANGE, writeResults);
+
+  console.log(errLog);
 };
 
 const yearCall = async () => {
@@ -254,6 +279,10 @@ const yearCall = async () => {
       }
     }
   }
+
+  const dataSetLen = dataSet.length;
+  let i = 0;
+  let errLog = '';
 
   for (const r of dataSet) {
     const artist = r[1];
@@ -286,7 +315,7 @@ const yearCall = async () => {
         ));
 
         if (filtArr.length === 0) {
-          console.log(`No match: ${artist} ${track}`);
+          errLog += `No match: ${artist} ${track}`;
         } else {
           const {
             year,
@@ -300,14 +329,18 @@ const yearCall = async () => {
         }
         await sleep(1000);
       } catch (err) {
-        console.log(err);
+        errLog += err;
       }
     }
+    i++;
+    callProgress((i / dataSetLen) * 100);
   }
 
   const writeResults = dataSet.map((row) => [row[3]]);
 
   await setValues(YEAR_RANGES.WRITE_RANGE, writeResults);
+
+  console.log(errLog);
 };
 
 // const yearCheck = async () => {

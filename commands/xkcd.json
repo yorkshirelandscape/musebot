@@ -75484,5 +75484,92 @@
         }
       ]
     ]
+  },
+  {
+    "month": "5",
+    "num": 2619,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Crêpe",
+    "transcript": "",
+    "alt": "A medicine that makes you put two dots over your letters more often is a diäretic.",
+    "img": "https://imgs.xkcd.com/comics/crepe.png",
+    "title": "Crêpe",
+    "day": "13",
+    "summary": [
+      [
+        {
+          "term": "put",
+          "probability": 0.17
+        },
+        {
+          "term": "medicine",
+          "probability": 0.17
+        },
+        {
+          "term": "letters",
+          "probability": 0.17
+        }
+      ]
+    ]
+  },
+  {
+    "month": "5",
+    "num": 2620,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Health Data",
+    "transcript": "",
+    "alt": "Donate now to help us find a cure for causality. No one should have to suffer through events because of other events.",
+    "img": "https://imgs.xkcd.com/comics/health_data.png",
+    "title": "Health Data",
+    "day": "16",
+    "summary": [
+      [
+        {
+          "term": "events",
+          "probability": 0.22
+        },
+        {
+          "term": "suffer",
+          "probability": 0.11
+        },
+        {
+          "term": "health",
+          "probability": 0.11
+        }
+      ]
+    ]
+  },
+  {
+    "month": "5",
+    "num": 2621,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Mainly Known For",
+    "transcript": "",
+    "alt": "Oh sure, I know Keira Knightly, from the first movie in that series by The Land Before Time producer. You know, the franchise with the guy from Jurassic Park and Ghostwriter, and script work by Billie Lourd's mom?",
+    "img": "https://imgs.xkcd.com/comics/mainly_known_for.png",
+    "title": "Mainly Known For",
+    "day": "18",
+    "summary": [
+      [
+        {
+          "term": "work",
+          "probability": 0.059
+        },
+        {
+          "term": "time",
+          "probability": 0.059
+        },
+        {
+          "term": "series",
+          "probability": 0.059
+        }
+      ]
+    ]
   }
 ]
