@@ -1139,7 +1139,7 @@ def output_seeded_csv(file, seeds, data, use_tabs, order, dropped):
     writer.writerows(ordered_data)
 
 
-def write_csv_data(csv_path, force, seeds, data, use_tabs, use_bracket_order, dropped):
+def write_csv_data(csv_path, force, seeds, data, use_tabs, output_order, dropped):
     """
     Given an output path and force flag, sorts data by seeds and writes it.
 
@@ -1155,7 +1155,7 @@ def write_csv_data(csv_path, force, seeds, data, use_tabs, use_bracket_order, dr
     """
 
     if csv_path is None:
-        return output_seeded_csv(sys.stdout, seeds, data, use_tabs, use_bracket_order, dropped)
+        return output_seeded_csv(sys.stdout, seeds, data, use_tabs, output_order, dropped)
 
     if force:
         dirs = os.path.dirname(csv_path)
@@ -1165,7 +1165,7 @@ def write_csv_data(csv_path, force, seeds, data, use_tabs, use_bracket_order, dr
     mode = "w" if force else "x"
 
     with open(csv_path, mode, newline="") as csv_file:
-        return output_seeded_csv(csv_file, seeds, data, use_tabs, use_bracket_order, dropped)
+        return output_seeded_csv(csv_file, seeds, data, use_tabs, output_order, dropped)
 
 
 def main(
@@ -1173,7 +1173,7 @@ def main(
     output_csv_path,
     force_output,
     output_csv_tabs,
-    output_bracket_order,
+    output_order,
     output_dropped,
     drop_dupes_first,
 ):
@@ -1187,6 +1187,11 @@ def main(
     :param output_csv_path: Path to output CSV file, or ``None`` for STDOUT
     :param force_output: If output file already exists overwrite it, if
         intermediate directories on the path do not exist, create them
+    :param output_csv_tabs: Output tabs instead of commas to separate tabular
+        fields
+    :param output_order: Order to print output lines in
+    :param output_dropped: Whether or not to include dropped submissions in the
+        output
     :param drop_dupes_first: Prioritize dropping songs by submitters with dupes
     :returns: None
     """
@@ -1200,7 +1205,7 @@ def main(
         seeds,
         data,
         output_csv_tabs,
-        output_bracket_order,
+        output_order,
         dropped if output_dropped else None,
     )
 
