@@ -913,6 +913,11 @@ def get_parser():
         default=ATTEMPT_ITERATIONS,
         type=int,
     )
+    group.add_argument(
+        "--random-seed",
+        help="value to seed Python's random module with",
+        default=None,
+    )
 
     return parser
 
@@ -1168,6 +1173,18 @@ def write_csv_data(csv_path, force, seeds, data, use_tabs, output_order, dropped
         return output_seeded_csv(csv_file, seeds, data, use_tabs, output_order, dropped)
 
 
+def seed_rng(seed):
+    if seed is None:
+        print("Using default RNG seed")
+        return
+    try:
+        seed = int(seed)
+        print(f"Seeding RNG with integer {seed}")
+    except ValueError:
+        print(f"Seeding RNG with string '{seed}'")
+    random.seed(seed)
+
+
 def main(
     input_csv_path,
     output_csv_path,
@@ -1176,6 +1193,7 @@ def main(
     output_order,
     output_dropped,
     drop_dupes_first,
+    random_seed=None,
 ):
     """
     Main entry point for the script.
@@ -1193,9 +1211,12 @@ def main(
     :param output_dropped: Whether or not to include dropped submissions in the
         output
     :param drop_dupes_first: Prioritize dropping songs by submitters with dupes
+    :param random_seed: If given, a string or integer to use as a seed for the
+        RNG before dropping any songs or populating bracket
     :returns: None
     """
 
+    seed_rng(random_seed)
     data = get_csv_data(input_csv_path)
     data, dropped = choose_submissions(data, drop_dupes_first)
     seeds = get_seed_order(data)
@@ -1217,6 +1238,7 @@ if __name__ == "__main__":
     output_csv_path = args.OUTPUT
     force_output = args.force
     drop_dupes_first = args.drop_dupes_first
+    random_seed = args.random_seed
 
     output_csv_tabs = args.output_csv_tabs
     output_order = args.output_order
@@ -1239,4 +1261,5 @@ if __name__ == "__main__":
         output_order,
         output_dropped,
         drop_dupes_first,
+        random_seed,
     )
