@@ -42,7 +42,7 @@ export default class MuseBot {
    * - Initializes SlashCommander for managing slash commands
    */
   async init() {
-    this.logger.info('Initializing Discord client');
+    this.logger.info('Initializing MuseBot');
     this.discordClient = new MuseDiscord(this.logger);
     this.googleClient = new MuseGoogle(this.logger);
     this.slashCommander = new SlashCommander(this.logger, this.discordClient);
