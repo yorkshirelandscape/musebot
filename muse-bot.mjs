@@ -42,7 +42,7 @@ export default class MuseBot {
    * - Initializes SlashCommander for managing slash commands
    */
   async init() {
-    this.logger.info('Initializing Discord client');
+    this.logger.info('Initializing MuseBot');
     this.discordClient = new MuseDiscord(this.logger);
     this.googleClient = new MuseGoogle(this.logger);
     this.slashCommander = new SlashCommander(this.logger, this.discordClient);
@@ -96,13 +96,14 @@ export default class MuseBot {
    */
   async process(actions) {
     this.requireInit();
+    this.logger.debug({ actions }, 'Processing requested actions');
     // this.logger.info(this.discordClient.client.application, 'application')
     // this.logger.info(this.discordClient.client.application.commands, 'application.commands')
     // this.logger.info(this.discordClient.guild, 'guild')
     // this.logger.info(this.discordClient.guild.commands, 'guild.commands')
     while (actions.length) {
       if (!MuseBot.ACTIONS.includes(actions[0])) {
-        throw new Error(`Invalid action ${actions[0]}`);
+        throw new Error(`Invalid action '${actions[0]}'`);
       }
       const i = actions.slice(1).findIndex((element) => MuseBot.ACTIONS.includes(element));
       const toHandle = i === -1 ? actions.splice(0) : actions.splice(0, i + 1);
