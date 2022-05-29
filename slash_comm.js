@@ -58,7 +58,7 @@ const ADDURL = {
 };
 
 const LISTSONGS = {
-  READ_RANGE: 'SongsStaging!B2:J',
+  READ_RANGE: 'SongsStaging!B2:K',
   HIST_RANGE: 'Submissions!A2:F',
   YEAR_RANGE: 'Lists!K2',
   ACTIVE_YEAR: 'Dashboard!B1',
@@ -216,11 +216,12 @@ client.on('interactionCreate', async (interaction) => {
     SPREADSHEET_ID = (hist === true ? HISTORICAL_ID : MASTER_ID);
     // eslint-disable-next-line max-len
     const readVals = await getValue((hist === true ? LISTSONGS.HIST_RANGE : LISTSONGS.READ_RANGE), SPREADSHEET_ID);
+    if (histYear !== null && histYear === activeYear && currYear !== activeYear) hist = true;
 
-    const filtArr = readVals.filter((s) => s[3] === year
-    && (interaction.user.username.startsWith(s[2])
-    || ((typeof interaction.member?.nickname !== 'undefined' && interaction.member?.nickname !== null) ? interaction.member?.nickname.startsWith(s[2]) : false)));
-    const thinArr = removeCols(filtArr, [2, 3, 6, 7]);
+    const filtArr = readVals.filter((s) => s[4] === year
+    && (interaction.user.username.startsWith(s[3])
+    || ((typeof interaction.member?.nickname !== 'undefined' && interaction.member?.nickname !== null) ? interaction.member?.nickname.startsWith(s[3]) : false)));
+    const thinArr = removeCols(filtArr, [3, 4, 7, 8]);
     const strArr = thinArr.map((r) => r.join('\t'));
     const table = `${interaction.user.username} : ${year}\n${strArr.join('\n')}`;
 
