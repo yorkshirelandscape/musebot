@@ -44,12 +44,16 @@ const main = async () => {
   dotenv.config({ path: opt.options.testing ? 'dev.env' : 'prod.env' });
   const logger = getLogger(getLogLevel(opt.options.verbose), !opt.options.json);
   const bot = new MuseBot(logger, opt.options);
-  await bot.init();
-  await bot.process(opt.argv || []);
-  await bot.teardown();
+  try {
+    await bot.init();
+    await bot.process(opt.argv || []);
+    await bot.teardown();
+  } catch (e) {
+    logger.error(e, 'Uncaught exception');
+  }
 };
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // Script is invoked directly rather than imported
-  main();
+  await main();
 }

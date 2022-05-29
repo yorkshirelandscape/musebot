@@ -38,6 +38,7 @@ export default class MuseDiscord {
    * Must be called before doing any real work with the client.
    */
   async init() {
+    this.logger.info('Initializing Discord client');
     await this.client.login(process.env.TOKEN);
     await this.initPromise;
     this.guild = this.client.guilds.cache.get(process.env.GUILD_ID);
