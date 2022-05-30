@@ -17,8 +17,8 @@ import uuid
 # Default values for these settings
 # May be modified by command line arguments
 BADNESS_MAX_ARTIST = 20
-BADNESS_MAX_SUBMITTER = 50
-BADNESS_MAX_SEED = 100
+BADNESS_MAX_SUBMITTER = 75
+BADNESS_MAX_SEED = 75
 BADNESS_MAX_DUPER = 20
 ITERATIONS = 10000
 ATTEMPTS = 10
