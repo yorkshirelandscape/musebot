@@ -59,7 +59,7 @@ const ADDURL = {
 
 const LISTSONGS = {
   READ_RANGE: 'SongsStaging!B2:K',
-  HIST_RANGE: 'Submissions!A2:F',
+  HIST_RANGE: 'Submissions!A2:G',
   YEAR_RANGE: 'Lists!K2',
   ACTIVE_YEAR: 'Dashboard!B1',
 };
@@ -221,6 +221,7 @@ client.on('interactionCreate', async (interaction) => {
     const filtArr = readVals.filter((s) => s[4] === year
     && (interaction.user.username.startsWith(s[3])
     || ((typeof interaction.member?.nickname !== 'undefined' && interaction.member?.nickname !== null) ? interaction.member?.nickname.startsWith(s[3]) : false)));
+
     const thinArr = removeCols(filtArr, [3, 4, 7, 8]);
     const strArr = thinArr.map((r) => r.join('\t'));
     const table = `${interaction.user.username} : ${year}\n${strArr.join('\n')}`;

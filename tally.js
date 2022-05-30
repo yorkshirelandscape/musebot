@@ -418,25 +418,17 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
                 msgMax = maxFiveamNext;
               } else { msgMax = maxSubTime; }
 
-              let pins = await channel.messages.fetchPinned();
-              let delPins = pins.filter((p) => p.content.includes('are due between'));
-              delPins.each((p) => {
-                try {
-                  p.unpin();
-                } catch (err) {
-                  console.log('No messages to unpin.', err);
-                }
-              });
-
-              pins = await testChan.messages.fetchPinned();
-              delPins = pins.filter((p) => p.content.includes('are due between'));
-              delPins.each((p) => {
-                try {
-                  p.unpin();
-                } catch (err) {
-                  console.log('No messages to unpin.', err);
-                }
-              });
+              for (const chan of [channel, testChan, musicChan, testMusic]) {
+                const pins = await chan.messages.fetchPinned();
+                const delPins = pins.filter((p) => p.content.includes('are due between'));
+                delPins.each((p) => {
+                  try {
+                    p.unpin();
+                  } catch (err) {
+                    console.log('No messages to unpin.', err);
+                  }
+                });
+              }
 
               msg = `Submissions for ${nextYear} are due between approximately <t:${Math.round(msgMin.valueOf() / 1000)}:F> and <t:${Math.round(msgMax.valueOf() / 1000)}:F>.`;
 
