@@ -107,13 +107,18 @@ def get_analysis(seeds, submissions):
     max_round = get_distance(0, len(seeds) - 1) + 1
 
     for submission in ordered_submissions:
+        counts[submission.submitter][0] = 0
+        counts[submission.submitter][1] = 0
+        counts[submission.submitter][2] = 0
+        counts[submission.submitter][3] = 0
+
+    for submission in ordered_submissions:
         counts[submission.submitter][submission.q] += 1
 
-    max_key = max(kk for k, v in counts.items() for kk, vv in v.items())
-    empty = dict.fromkeys(range(max_key + 1), 0)
-    for k, v in sorted(counts.items()):
-        print(f"{k}: {','.join('{}: {}'.format(kk, vv) for kk, vv in sorted({**empty, **v}.items()))}")
-    pprint(counts)
+    # max_key = max(kk for k, v in counts.items() for kk, vv in v.items())
+    # empty = dict.fromkeys(range(max_key + 1), 0)
+    for key, value in sorted(counts.items()):
+        print("{:<15}".format(key), *(v for k, v in sorted(value.items())), sep='\t')
 
     def get_keyfunc(round):
         return lambda x: x // (2 ** round)
@@ -234,10 +239,6 @@ def get_analysis(seeds, submissions):
                 for k in set(allowed_counts) | set(actual_counts):
                     if allowed_counts[k] != actual_counts[k]:
                         results[1]["byes"]["totals"][k] = (allowed_counts[k], actual_counts[k])
-    
-    for submission in ordered_submissions: counts[submission.slot // (len(submissions) / 4)][submission.submitter] += 1
-
-    results["ordered_submissions"] = c
 
     return results
 
@@ -271,9 +272,6 @@ def print_analysis_results(results, total_submissions):
     :param total_submission: Integer number of total submissions
     :returns: None
     """
-
-    for key, value in sorted(c).items():
-        print(f"{key}: {value}")
 
     num_rounds = get_distance(0, total_submissions - 1) + 1
     print(f"Analysis results:")
