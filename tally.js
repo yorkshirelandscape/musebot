@@ -290,6 +290,8 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
           resultsArray.sort(compare);
 
           if (round === '3P') {
+            console.log('trying 3P');
+            console.log(resultsArray);
             const pushArray1 = [];
             const pushArray2 = [];
             resultsArray.first().forEach((r) => {
@@ -298,6 +300,9 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
             resultsArray.last().forEach((r) => {
               pushArray2.push([r.c1, r.c2, r.tie]);
             });
+
+            console.log(pushArray1);
+            console.log(pushArray2);
 
             // set the range to push the results to and push them
             let resultsRange = 'R6!K2:M2';
