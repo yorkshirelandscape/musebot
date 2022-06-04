@@ -13,17 +13,24 @@ import re
 import sys
 import unicodedata
 import uuid
-from pprint import pprint
+
+TESTING = False
 
 # Default values for these settings
 # May be modified by command line arguments
-BADNESS_MAX_ARTIST = 20
-BADNESS_MAX_SUBMITTER = 50
+BADNESS_MAX_ARTIST = 50
+BADNESS_MAX_SUBMITTER = 500
 BADNESS_MAX_SEED = 100
-BADNESS_MAX_DUPER = 20
-ITERATIONS = 10000
-ATTEMPTS = 10
-ATTEMPT_ITERATIONS = 200
+BADNESS_MAX_DUPER = 25
+ITERATIONS = 15000
+ATTEMPTS = 15
+ATTEMPT_ITERATIONS = 400
+
+force_output = True
+drop_dupes_first = True
+output_csv_tabs = True
+output_order = 'bracket'
+output_dropped = True
 
 ORDERS = {
     128: [
@@ -115,8 +122,6 @@ def get_analysis(seeds, submissions):
     for submission in ordered_submissions:
         counts[submission.submitter][submission.q] += 1
 
-    # max_key = max(kk for k, v in counts.items() for kk, vv in v.items())
-    # empty = dict.fromkeys(range(max_key + 1), 0)
     for key, value in sorted(counts.items()):
         print("{:<15}".format(key), *(v for k, v in sorted(value.items())), sep='\t')
 
@@ -1224,25 +1229,44 @@ def main(
 
 
 if __name__ == "__main__":
-    # parser = get_parser()
-    # args = parser.parse_args()
-    input_csv_path = 'seeding/new-sample.csv' #args.INPUT
-    output_csv_path = 'seeding/test.csv' #args.OUTPUT
-    force_output = True #args.force
-    drop_dupes_first = True #args.drop_dupes_first
+    if TESTING is False:
+        parser = get_parser()
+        args = parser.parse_args()
+        input_csv_path =  args.INPUT
+        output_csv_path = args.OUTPUT
+        force_output = args.force
+        drop_dupes_first = args.drop_dupes_first
 
-    output_csv_tabs = True #args.output_csv_tabs
-    output_order = 'bracket' #args.output_order
-    output_dropped = True #args.output_dropped
+        output_csv_tabs = args.output_csv_tabs
+        output_order = args.output_order
+        output_dropped = args.output_dropped
 
-    # Reset variables with anything passed in on the command line
-    BADNESS_MAX_ARTIST = 20 #args.badness_artist
-    BADNESS_MAX_SUBMITTER = 100 #args.badness_submitter
-    BADNESS_MAX_SEED = 100 #args.badness_seed
-    BADNESS_MAX_DUPER = 20 #args.badness_duper
-    ITERATIONS = 15000 #args.iterations
-    ATTEMPTS = 1 #args.attempts
-    ATTEMPT_ITERATIONS = 1 #args.attempt_iterations
+        # Reset variables with anything passed in on the command line
+        BADNESS_MAX_ARTIST = args.badness_artist
+        BADNESS_MAX_SUBMITTER = args.badness_submitter
+        BADNESS_MAX_SEED = args.badness_seed
+        BADNESS_MAX_DUPER = args.badness_duper
+        ITERATIONS = args.iterations
+        ATTEMPTS = args.attempts
+        ATTEMPT_ITERATIONS = args.attempt_iterations
+    else:
+        input_csv_path =  'seeding/new-sample.csv'
+        output_csv_path = 'seeding/test_output.csv'
+        force_output = True
+        drop_dupes_first = True
+
+        output_csv_tabs = True
+        output_order = 'bracket'
+        output_dropped = True
+
+        # Reset variables with anything passed in on the command line
+        BADNESS_MAX_ARTIST = 20
+        BADNESS_MAX_SUBMITTER = 100
+        BADNESS_MAX_SEED = 100
+        BADNESS_MAX_DUPER = 20
+        ITERATIONS = 15000 
+        ATTEMPTS = 1
+        ATTEMPT_ITERATIONS = 1
 
     main(
         input_csv_path,
