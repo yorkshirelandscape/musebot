@@ -46,11 +46,13 @@ const REFS = {
 let skipstat = false;
 let testing = false;
 let once = false;
+let oneMatch = false;
 
 process.argv.forEach((val) => {
   if (val === '-s') { skipstat = true; }
   if (val === '-t') { testing = true; }
   if (val === '-o') { once = true; }
+  if (val === '-m') { oneMatch = true; }
 });
 
 const GUILD_ID = (testing === true ? '782213860337647636' : '212660788786102272');
@@ -361,7 +363,11 @@ client.once('ready', () => {
 
 client.on('ready', async () => {
   if (once === true) {
-    await nextMatch();
+    if (oneMatch === true) {
+      await nextMatch(1);
+    } else {
+      await nextMatch();
+    }
     // client.destroy();
   } else {
     // Number of seconds until the next even hour
