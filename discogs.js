@@ -262,15 +262,17 @@ const yearCall = async () => {
   const activeYear = await getValues(YEAR_RANGES.ACTIVE_YEAR, true);
   const testYear = await getValues(YEAR_RANGES.TEST_YEAR, true);
 
+  const oldData = await getValues(YEAR_RANGES.WRITE_RANGE);
+  const subArr = await getValues(YEAR_RANGES.SUBMITTERS);
+
   if (activeYear !== testYear) {
-    const oldData = await getValues(YEAR_RANGES.WRITE_RANGE);
-    const submitters = await getValues(YEAR_RANGES.SUBMITTERS);
+    const submitters = subArr.map((sub) => sub[0]);
     const subCount = new Set(submitters).size;
     const counts = {};
 
     if (oldData) {
       for (const year of oldData) {
-        counts[year] += 1;
+        counts[year] = counts[year] ? counts[year] + 1 : 1;
       }
 
       const isUpdated = (counts[testYear] >= subCount);

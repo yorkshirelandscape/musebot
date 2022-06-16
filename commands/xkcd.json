@@ -75803,5 +75803,121 @@
         }
       ]
     ]
+  },
+  {
+    "month": "6",
+    "num": 2630,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Shuttle Skeleton",
+    "transcript": "",
+    "alt": "It's believed to be related to the Stellar Sea Cow.",
+    "img": "https://imgs.xkcd.com/comics/shuttle_skeleton.png",
+    "title": "Shuttle Skeleton",
+    "day": "8",
+    "summary": [
+      [
+        {
+          "term": "stellar",
+          "probability": 0.14
+        },
+        {
+          "term": "skeleton",
+          "probability": 0.14
+        },
+        {
+          "term": "shuttle",
+          "probability": 0.14
+        }
+      ]
+    ]
+  },
+  {
+    "month": "6",
+    "num": 2631,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Exercise Progression",
+    "transcript": "",
+    "alt": "They said after I got into a routine, I'd enjoy getting progressively stronger and stop whining so much about how hard exercise was. Well, they were half right!",
+    "img": "https://imgs.xkcd.com/comics/exercise_progression.png",
+    "title": "Exercise Progression",
+    "day": "10",
+    "summary": [
+      [
+        {
+          "term": "progression",
+          "probability": 0.2
+        },
+        {
+          "term": "exercise",
+          "probability": 0.2
+        },
+        {
+          "term": "whining",
+          "probability": 0.1
+        }
+      ]
+    ]
+  },
+  {
+    "month": "6",
+    "num": 2632,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Greatest Scientist",
+    "transcript": "",
+    "alt": "\"Ow! One of the petri dishes I left on the tower railing fell and hit me on the head! Hey, that gives me an idea...\"",
+    "img": "https://imgs.xkcd.com/comics/greatest_scientist.png",
+    "title": "Greatest Scientist",
+    "day": "13",
+    "summary": [
+      [
+        {
+          "term": "tower",
+          "probability": 0.077
+        },
+        {
+          "term": "scientist",
+          "probability": 0.077
+        },
+        {
+          "term": "railing",
+          "probability": 0.077
+        }
+      ]
+    ]
+  },
+  {
+    "month": "6",
+    "num": 2633,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Astronomer Hotline",
+    "transcript": "",
+    "alt": "Employment statistics have to correct for the fact that the Weird Bug Hotline hires on a bunch of extra temporary staff every 17 years.",
+    "img": "https://imgs.xkcd.com/comics/astronomer_hotline.png",
+    "title": "Astronomer Hotline",
+    "day": "15",
+    "summary": [
+      [
+        {
+          "term": "hotline",
+          "probability": 0.12
+        },
+        {
+          "term": "years",
+          "probability": 0.063
+        },
+        {
+          "term": "weird",
+          "probability": 0.063
+        }
+      ]
+    ]
   }
 ]
