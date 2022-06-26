@@ -44,7 +44,7 @@ const REFS = {
 };
 
 let testing = false;
-let once = false;
+let once = true;
 let force = false;
 
 process.argv.forEach((val) => {
@@ -233,7 +233,7 @@ const checkRound = async () => {
             || force === true) {
           if (pctCheckedIn < 1 && force === false) {
             const msg = `One-Hour Warning
-${(pctCheckedIn * 100).toFixed(1)}% checked in.
+${(pctCheckedIn * 100).toFixed(1)}% checked out.
 Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
             await musicChan.send(msg);
             await testMusic.send(msg);
@@ -455,6 +455,7 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
             msg.createdTimestamp < msgDelims.first(2)[0].createdTimestamp
             && msg.createdTimestamp > msgDelims.first(2)[1].createdTimestamp
             && msg.deleted === false && msg.content.includes('Match')
+            && !msg.content.includes('Play')
           ));
 
           // create an array of the reacted users for each message
@@ -515,7 +516,8 @@ client.once('ready', () => {
 client.on('ready', async () => {
   if (once === true) {
     await checkRound();
-    // client.destroy();
+    client.destroy();
+    process.exit();
   } else {
     // run at quarter to every odd hour
     now = DateTime.now();

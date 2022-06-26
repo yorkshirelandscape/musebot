@@ -166,6 +166,7 @@ client.on('interactionCreate', async (interaction) => {
 
   // BEGIN addurl
   if (interaction.commandName === 'addurl' && SOURCE_CHANNELS.find(({ id }) => id === interaction.channel?.id)) {
+    await interaction.reply('Please wait...');
     const match = interaction.options.getInteger('match');
     const song = interaction.options.getInteger('song');
     const url = interaction.options.getString('url');
@@ -174,7 +175,7 @@ client.on('interactionCreate', async (interaction) => {
     const targetMatch = await messages.find((msg) => parseInt(msg.content.slice(8, msg.content.indexOf(':'))) === match);
 
     if (typeof targetMatch === 'undefined') {
-      await interaction.reply('Could not find match.');
+      await interaction.editReply('Could not find match.');
     } else {
       const currentText = targetMatch.content;
       let newText = '';
@@ -197,10 +198,10 @@ client.on('interactionCreate', async (interaction) => {
       if (writeIndex > -1) {
         await setValue(writeRange, ` | <${url}>`);
       } else {
-        await interaction.reply(`${interaction.user.username} added a link to song ${song} of match ${match}, but error writing to spreadsheet.`);
+        await interaction.editReply(`${interaction.user.username} added a link to song ${song} of match ${match}, but error writing to spreadsheet.`);
       }
 
-      await interaction.reply(`${interaction.user.username} added a link to song ${song} of match ${match}.`);
+      await interaction.editReply(`${interaction.user.username} added a link to song ${song} of match ${match}.`);
     }
   }
   // END addurl
@@ -208,6 +209,7 @@ client.on('interactionCreate', async (interaction) => {
   // BEGIN listSongs
   let hist = false;
   if (interaction.commandName === 'songs') {
+    await interaction.reply('Please wait...');
     const histYear = interaction.options.getString('year');
     const currYear = (await getValue(LISTSONGS.YEAR_RANGE, SPREADSHEET_ID)).toString();
     const activeYear = (await getValue(LISTSONGS.ACTIVE_YEAR, SPREADSHEET_ID)).toString();
@@ -227,12 +229,12 @@ client.on('interactionCreate', async (interaction) => {
     const table = `${interaction.user.username} : ${year}\n${strArr.join('\n')}`;
 
     if (typeof table !== 'string') {
-      await interaction.reply('Could not find any submissions.');
+      await interaction.editReply('Could not find any submissions.');
     } else if (interaction.guildId === null || hist === true) {
-      await interaction.reply(`${table}`);
+      await interaction.editReply(`${table}`);
     } else {
       interaction.user.send(table);
-      await interaction.reply('List sent. Check your DMs.');
+      await interaction.editReply('List sent. Check your DMs.');
     }
   }
   // END listSongs

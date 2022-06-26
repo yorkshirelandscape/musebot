@@ -14,15 +14,23 @@ import sys
 import unicodedata
 import uuid
 
+TESTING = False
+
 # Default values for these settings
 # May be modified by command line arguments
-BADNESS_MAX_ARTIST = 20
+BADNESS_MAX_ARTIST = 50
 BADNESS_MAX_SUBMITTER = 500
 BADNESS_MAX_SEED = 100
-BADNESS_MAX_DUPER = 20
+BADNESS_MAX_DUPER = 25
 ITERATIONS = 15000
 ATTEMPTS = 15
 ATTEMPT_ITERATIONS = 400
+
+force_output = True
+drop_dupes_first = True
+output_csv_tabs = True
+output_order = 'bracket'
+output_dropped = True
 
 ORDERS = {
     128: [
@@ -100,9 +108,22 @@ def get_analysis(seeds, submissions):
     :returns: The data structure described above, which may be an empty dict
     """
 
-    ordered_submissions = [Submission.copy(submissions[j], slot=i) for i, j in enumerate(seeds)]
+    ordered_submissions = [Submission.copy(submissions[j], slot=i, q=int(i // (len(submissions) / 4))) for i, j in enumerate(seeds)]
+    counts = collections.defaultdict(collections.Counter)
     results = collections.defaultdict(lambda: collections.defaultdict(dict))
     max_round = get_distance(0, len(seeds) - 1) + 1
+
+    for submission in ordered_submissions:
+        counts[submission.submitter][0] = 0
+        counts[submission.submitter][1] = 0
+        counts[submission.submitter][2] = 0
+        counts[submission.submitter][3] = 0
+
+    for submission in ordered_submissions:
+        counts[submission.submitter][submission.q] += 1
+
+    for key, value in sorted(counts.items()):
+        print("{:<15}".format(key), *(v for k, v in sorted(value.items())), sep='\t')
 
     def get_keyfunc(round):
         return lambda x: x // (2 ** round)
@@ -265,6 +286,7 @@ def print_analysis_results(results, total_submissions):
             print(f"Round {round} / {num_rounds} | No issues found")
             continue
 
+      
         if "submitters" in round_results:
             for submitter, submission_groups in round_results["submitters"].items():
                 for group_number, group in submission_groups.items():
@@ -370,7 +392,7 @@ class Submission:
     Container class for an individual submission
     """
 
-    def __init__(self, *, artist, song, submitter, seed, slot=None, is_bye=False, **kwargs):
+    def __init__(self, *, artist, song, submitter, seed, slot=None, q=None, is_bye=False, **kwargs):
         """
         Constructor for a `Submission` instance.
 
@@ -399,6 +421,7 @@ class Submission:
         self.submitter_cmp = get_canonical_submitter(submitter)
         self.seed = int(seed)
         self.slot = slot
+        self.q = q
         if "dupers" in kwargs:
             self.dupers = kwargs["dupers"]
         else:
@@ -913,11 +936,6 @@ def get_parser():
         default=ATTEMPT_ITERATIONS,
         type=int,
     )
-    group.add_argument(
-        "--random-seed",
-        help="value to seed Python's random module with",
-        default=None,
-    )
 
     return parser
 
@@ -1144,7 +1162,7 @@ def output_seeded_csv(file, seeds, data, use_tabs, order, dropped):
     writer.writerows(ordered_data)
 
 
-def write_csv_data(csv_path, force, seeds, data, use_tabs, output_order, dropped):
+def write_csv_data(csv_path, force, seeds, data, use_tabs, use_bracket_order, dropped):
     """
     Given an output path and force flag, sorts data by seeds and writes it.
 
@@ -1160,7 +1178,7 @@ def write_csv_data(csv_path, force, seeds, data, use_tabs, output_order, dropped
     """
 
     if csv_path is None:
-        return output_seeded_csv(sys.stdout, seeds, data, use_tabs, output_order, dropped)
+        return output_seeded_csv(sys.stdout, seeds, data, use_tabs, use_bracket_order, dropped)
 
     if force:
         dirs = os.path.dirname(csv_path)
@@ -1170,19 +1188,7 @@ def write_csv_data(csv_path, force, seeds, data, use_tabs, output_order, dropped
     mode = "w" if force else "x"
 
     with open(csv_path, mode, newline="") as csv_file:
-        return output_seeded_csv(csv_file, seeds, data, use_tabs, output_order, dropped)
-
-
-def seed_rng(seed):
-    if seed is None:
-        print("Using default RNG seed")
-        return
-    try:
-        seed = int(seed)
-        print(f"Seeding RNG with integer {seed}")
-    except ValueError:
-        print(f"Seeding RNG with string '{seed}'")
-    random.seed(seed)
+        return output_seeded_csv(csv_file, seeds, data, use_tabs, use_bracket_order, dropped)
 
 
 def main(
@@ -1190,10 +1196,9 @@ def main(
     output_csv_path,
     force_output,
     output_csv_tabs,
-    output_order,
+    output_bracket_order,
     output_dropped,
     drop_dupes_first,
-    random_seed=None,
 ):
     """
     Main entry point for the script.
@@ -1205,18 +1210,10 @@ def main(
     :param output_csv_path: Path to output CSV file, or ``None`` for STDOUT
     :param force_output: If output file already exists overwrite it, if
         intermediate directories on the path do not exist, create them
-    :param output_csv_tabs: Output tabs instead of commas to separate tabular
-        fields
-    :param output_order: Order to print output lines in
-    :param output_dropped: Whether or not to include dropped submissions in the
-        output
     :param drop_dupes_first: Prioritize dropping songs by submitters with dupes
-    :param random_seed: If given, a string or integer to use as a seed for the
-        RNG before dropping any songs or populating bracket
     :returns: None
     """
 
-    seed_rng(random_seed)
     data = get_csv_data(input_csv_path)
     data, dropped = choose_submissions(data, drop_dupes_first)
     seeds = get_seed_order(data)
@@ -1226,32 +1223,50 @@ def main(
         seeds,
         data,
         output_csv_tabs,
-        output_order,
+        output_bracket_order,
         dropped if output_dropped else None,
     )
 
 
 if __name__ == "__main__":
-    parser = get_parser()
-    args = parser.parse_args()
-    input_csv_path = args.INPUT
-    output_csv_path = args.OUTPUT
-    force_output = args.force
-    drop_dupes_first = args.drop_dupes_first
-    random_seed = args.random_seed
+    if TESTING is False:
+        parser = get_parser()
+        args = parser.parse_args()
+        input_csv_path =  args.INPUT
+        output_csv_path = args.OUTPUT
+        force_output = args.force
+        drop_dupes_first = args.drop_dupes_first
 
-    output_csv_tabs = args.output_csv_tabs
-    output_order = args.output_order
-    output_dropped = args.output_dropped
+        output_csv_tabs = args.output_csv_tabs
+        output_order = args.output_order
+        output_dropped = args.output_dropped
 
-    # Reset variables with anything passed in on the command line
-    BADNESS_MAX_ARTIST = args.badness_artist
-    BADNESS_MAX_SUBMITTER = args.badness_submitter
-    BADNESS_MAX_SEED = args.badness_seed
-    BADNESS_MAX_DUPER = args.badness_duper
-    ITERATIONS = args.iterations
-    ATTEMPTS = args.attempts
-    ATTEMPT_ITERATIONS = args.attempt_iterations
+        # Reset variables with anything passed in on the command line
+        BADNESS_MAX_ARTIST = args.badness_artist
+        BADNESS_MAX_SUBMITTER = args.badness_submitter
+        BADNESS_MAX_SEED = args.badness_seed
+        BADNESS_MAX_DUPER = args.badness_duper
+        ITERATIONS = args.iterations
+        ATTEMPTS = args.attempts
+        ATTEMPT_ITERATIONS = args.attempt_iterations
+    else:
+        input_csv_path =  'seeding/new-sample.csv'
+        output_csv_path = 'seeding/test_output.csv'
+        force_output = True
+        drop_dupes_first = True
+
+        output_csv_tabs = True
+        output_order = 'bracket'
+        output_dropped = True
+
+        # Reset variables with anything passed in on the command line
+        BADNESS_MAX_ARTIST = 20
+        BADNESS_MAX_SUBMITTER = 100
+        BADNESS_MAX_SEED = 100
+        BADNESS_MAX_DUPER = 20
+        ITERATIONS = 15000
+        ATTEMPTS = 1
+        ATTEMPT_ITERATIONS = 1
 
     main(
         input_csv_path,
@@ -1261,5 +1276,4 @@ if __name__ == "__main__":
         output_order,
         output_dropped,
         drop_dupes_first,
-        random_seed,
     )
