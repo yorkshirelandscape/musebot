@@ -2,7 +2,6 @@
 
 import argparse
 import collections
-import csv
 import functools
 import itertools
 import math
@@ -10,9 +9,11 @@ import operator
 import os
 import random
 import re
-import sys
 import unicodedata
 import uuid
+
+import csv_tools
+import utils
 
 TESTING = False
 
@@ -25,63 +26,6 @@ BADNESS_MAX_DUPER = 25
 ITERATIONS = 15000
 ATTEMPTS = 15
 ATTEMPT_ITERATIONS = 400
-
-force_output = True
-drop_dupes_first = True
-output_csv_tabs = True
-output_order = 'bracket'
-output_dropped = True
-
-ORDERS = {
-    128: [
-        1, 128, 64, 65, 32, 97,  33, 96, 16, 113, 49, 80, 17, 112, 48, 81,
-        8, 121, 57, 72, 25, 104, 40, 89, 9,  120, 56, 73, 24, 105, 41, 88,
-        4, 125, 61, 68, 29, 100, 36, 93, 13, 116, 52, 77, 20, 109, 45, 84,
-        5, 124, 60, 69, 28, 101, 37, 92, 12, 117, 53, 76, 21, 108, 44, 85,
-        2, 127, 63, 66, 31, 98,  34, 95, 15, 114, 50, 79, 18, 111, 47, 82,
-        7, 122, 58, 71, 26, 103, 39, 90, 10, 119, 55, 74, 23, 106, 42, 87,
-        3, 126, 62, 67, 30, 99,  35, 94, 14, 115, 51, 78, 19, 110, 46, 83,
-        6, 123, 59, 70, 27, 102, 38, 91, 11, 118, 54, 75, 22, 107, 43, 86,
-    ],
-    96: [
-        64, 65, 1, 33, 96, 32, 49, 80, 16, 48, 81, 17,
-        57, 72, 8, 40, 89, 25, 56, 73, 9,  41, 88, 24,
-        61, 68, 4, 36, 93, 29, 52, 77, 13, 45, 84, 20,
-        60, 69, 5, 37, 92, 28, 53, 76, 12, 44, 85, 21,
-        63, 66, 2, 34, 95, 31, 50, 79, 15, 47, 82, 18,
-        58, 71, 7, 39, 90, 26, 55, 74, 10, 42, 87, 23,
-        62, 67, 3, 35, 94, 30, 51, 78, 14, 46, 83, 19,
-        59, 70, 6, 38, 91, 27, 54, 75, 11, 43, 86, 22,
-    ],
-    64: [
-        1, 64, 32, 33, 16, 49, 17, 48, 8, 57, 25, 40, 9,  56, 24, 41,
-        4, 61, 29, 36, 13, 52, 20, 45, 5, 60, 28, 37, 12, 53, 21, 44,
-        2, 63, 31, 34, 15, 50, 18, 47, 7, 58, 26, 39, 10, 55, 23, 42,
-        3, 62, 30, 35, 14, 51, 19, 46, 6, 59, 27, 38, 11, 54, 22, 43,
-    ],
-    48: [
-        32, 33, 17, 48, 25, 40, 24, 41, 29, 36, 20, 45,
-        28, 37, 21, 44, 31, 34, 18, 47, 26, 39, 23, 42,
-        30, 35, 19, 46, 27, 38, 22, 43, 1,  16, 8,  9,
-        4,  13, 5,  12, 2,  15, 7,  10, 3,  14, 6,  11,
-    ]
-}
-
-
-def get_distance(i, j):
-    """
-    Calculates the number of rounds before two songs would meet in a match.
-
-    If the songs would meet in the first round, returns 0. To determine a more
-    human-readable (1-indexed) round number for when two songs would meet (or,
-    the maximum number of rounds), call with 0 and the maximum slot number (i.e.
-    ``len(submissions) - 1``).
-
-    :param i: The 0-based index position of the first song
-    :param j: The 0-based index position of the second song
-    :returns: Integer indicating the number of rounds until these two songs meet
-    """
-    return math.floor(math.log2(i ^ j))
 
 
 def get_analysis(seeds, submissions):
@@ -111,7 +55,7 @@ def get_analysis(seeds, submissions):
     ordered_submissions = [Submission.copy(submissions[j], slot=i, q=int(i // (len(submissions) / 4))) for i, j in enumerate(seeds)]
     counts = collections.defaultdict(collections.Counter)
     results = collections.defaultdict(lambda: collections.defaultdict(dict))
-    max_round = get_distance(0, len(seeds) - 1) + 1
+    max_round = utils.get_distance(0, len(seeds) - 1) + 1
 
     for submission in ordered_submissions:
         counts[submission.submitter][0] = 0
@@ -171,7 +115,7 @@ def get_analysis(seeds, submissions):
     # - {0, 1} vs. {0, 1}
     # - submitter vs dupe
     match = 0
-    for submission1, submission2 in chunk(ordered_submissions, 2):
+    for submission1, submission2 in utils.chunk(ordered_submissions, 2):
         match += 1
         if submission1.seed in {0, 1} and submission2.seed in {0, 1}:
             results[1]["seeds"][match] = (submission1, submission2)
@@ -185,7 +129,7 @@ def get_analysis(seeds, submissions):
     # - {0, 1} vs. {0, 1}
     # - submitter vs dupe
     match = 0
-    for submissions_chunk in chunk(ordered_submissions, 4):
+    for submissions_chunk in utils.chunk(ordered_submissions, 4):
         match += 1
         if (
             {submissions_chunk[0].seed, submissions_chunk[1].seed} & {0, 1}
@@ -217,7 +161,7 @@ def get_analysis(seeds, submissions):
         ][:int(len(submissions) / 4)]
         max_allowed_seed = max(allowed_seeds)
         match = 0
-        for submission1, submission2 in chunk(ordered_submissions, 2):
+        for submission1, submission2 in utils.chunk(ordered_submissions, 2):
             match += 1
             # Only the second submission of even numbered matches can be a bye,
             # and it *must* be a bye
@@ -248,23 +192,6 @@ def get_analysis(seeds, submissions):
     return results
 
 
-# https://stackoverflow.com/a/22045226
-def chunk(lst, n):
-    """
-    Returns successive tuples of length n from input iterator.
-
-    The last tuple may be shorter than n if it reaches the end of the iterator
-    early.
-
-    :param lst: Input iterator to chunk
-    :param n: Desired length of output tuples
-    :returns: Iterator of tuples of length n (except, possibly, the last tuple)
-    """
-
-    it = iter(lst)
-    return iter(lambda: tuple(itertools.islice(it, n)), ())
-
-
 def print_analysis_results(results, total_submissions):
     """
     Prints the anomalous results, one issue per line.
@@ -278,7 +205,7 @@ def print_analysis_results(results, total_submissions):
     :returns: None
     """
 
-    num_rounds = get_distance(0, total_submissions - 1) + 1
+    num_rounds = utils.get_distance(0, total_submissions - 1) + 1
     print(f"Analysis results:")
     for round, round_results in sorted(results.items()):
         # We only record problems, so this should never come up
@@ -530,7 +457,7 @@ def calc_badness(i, submissions):
     for j in range(i + 1, n):
         # Calculate the number of rounds before these two submissions would meet
         # in a match, starting with 0 if they already are
-        distance = get_distance(i, j)
+        distance = utils.get_distance(i, j)
         distance_factor = (1 - distance / max_distance)
         if submissions[i].artist_cmp == submissions[j].artist_cmp:
             badness[j] += BADNESS_MAX_ARTIST * distance_factor
@@ -694,7 +621,7 @@ def get_new_seeds(submissions):
         # will give a bye submission index
         seeds = list(
             itertools.chain.from_iterable(
-                trio + (i + n,) for i, trio in enumerate(chunk(seeds, 3))
+                trio + (i + n,) for i, trio in enumerate(utils.chunk(seeds, 3))
             )
         )
     badness = get_badness(seeds, submissions)
@@ -731,10 +658,9 @@ def get_seed_order(data):
     """
 
     submissions = [Submission(**row) for row in data]
-    has_byes = False
+    has_byes = utils.has_byes(len(data))
 
-    if len(data) in {48, 96}:
-        has_byes = True
+    if has_byes:
         # Make dummy submissions at the end until we have an even power of two
         submissions += [
             Submission.Bye() for i in range(2 ** (math.floor(math.log2(len(data))) - 1))
@@ -798,6 +724,73 @@ def get_seed_order(data):
     return best_seeds
 
 
+def get_submission_counts(rows):
+    submissions = [Submission(**row) for row in rows]
+    counts = collections.Counter()
+    for submission in submissions:
+        counts[submission.submitter_cmp] += 1
+        counts.update(submission.dupers)
+    return counts
+
+
+def choose_submissions(data, drop_dupes_first=False):
+    """
+    Creates a power of two bracket by randomly eliminating larger seed songs
+
+    Creates a copy of the input list and then, for the submissions with larger
+    seed numbers, randomly eliminates them until the length of the list is an
+    even power of two.
+
+    As a special case, if there are 96 or more songs but not enough for a 128
+    bracket, it'll return 96 submissions. When creating the seeds, every fourth
+    submissions will need to be populated with dummy bye submissions. Similarly,
+    it will return 48 submissions if there are not enough for a 64 bracket.
+
+    Returns a tuple containing both the new data and a list of what was removed.
+    The dropped list contains tuple with the index of the dropped data in the
+    original list as well as the data itself.
+
+    :param data: List of dicts from the input CSV
+    :param drop_dupes_first: Optional Boolean indicating whether to prioritize
+        dropping songs by submitters who have more dupes first [default: False]
+    :returns: A tuple with a new list with a number of elements that is a power
+        of two and another list containing tuples with the original index and
+        the dropped data for all removed rows
+    """
+
+    size = len(data)
+    dropped = []
+    target_size = utils.get_bracket_size(size)
+    new_data = data.copy()
+
+    while len(new_data) > target_size:
+        target_seed = max(row["seed"] for row in new_data)
+        choices = [row for row in new_data if row["seed"] == target_seed]
+        if drop_dupes_first:
+            # Further filter choices list to only be submissions from people
+            # tied for having the most songs counting dupes
+            counts = get_submission_counts(new_data)
+            # We have to filter the counts to only submitters we're considering
+            # eliminating
+            submitters = {get_canonical_submitter(row["submitter"]) for row in choices}
+            counts = [submitter_count for submitter_count in counts.most_common() if submitter_count[0] in submitters]
+            # Whatever is left is already sorted by submission count
+            max_count = counts[0][1]
+            most_submissions = {submitter for submitter, count in counts if count == max_count}
+            choices = [row for row in choices if get_canonical_submitter(row["submitter"]) in most_submissions]
+            print(f"Found {len(choices)} songs by submitters with {max_count} submissions")
+        to_remove = random.choice(choices)
+        print(f"Eliminating submission {Submission(**to_remove)}")
+        dropped.append((data.index(to_remove), len(new_data), to_remove))
+        new_data.remove(to_remove)
+    print(
+        f"Eliminated {size - len(new_data)} submissions for a "
+        f"{len(new_data)} bracket"
+    )
+    # Sort `dropped` list by original index (the first element in each tuple)
+    return new_data, sorted(dropped)
+
+
 def get_parser():
     """
     Creates and return the ArgumentParser for the script.
@@ -811,34 +804,8 @@ def get_parser():
         usage=f"{os.path.basename(__file__ or 'seed.py')} [OPTIONS] INPUT [OUTPUT]",
     )
 
-    parser.add_argument(
-        "INPUT",
-        help=(
-            "path to the input CSV. If given the special value `-`, instead "
-            "reads input from STDIN"
-        ),
-    )
-    parser.add_argument(
-        "OUTPUT",
-        help=(
-            "desired path to the output CSV file. If not given, defaults to "
-            "printing to STDOUT. If file exists or intermediate directories do "
-            "not, operation will fail (and output will be directed to STDOUT), "
-            "unless the `--force` flag is specified"
-        ),
-        nargs="?",
-    )
-    parser.add_argument(
-        "--force",
-        "-f",
-        help=(
-            "force output to the given file path, overwriting contents if the "
-            "file already exists and creating any intermediate directories, if "
-            "necessary"
-        ),
-        action="store_true",
-        default=False,
-    )
+    csv_tools.add_input_output_arguments(parser)
+
     parser.add_argument(
         "--drop-dupes-first",
         help=(
@@ -849,40 +816,7 @@ def get_parser():
         default=False,
     )
 
-    group = parser.add_argument_group(
-        title="output arguments",
-        description="Configure output CSV formatting",
-    )
-    group.add_argument(
-        "--output-csv-tabs",
-        help="use a tab delimiter when outputting the CSV data",
-        action="store_true",
-        default=False,
-    )
-    group.add_argument(
-        "--output-order",
-        help=(
-            "the order to sort and/or transform the output seeding by. For "
-            "`sorted`, submissions are sorted by the new seeding order. For "
-            "`original`, submissions retain their original positioning within "
-            "the input data. For `bracket`, the generated seeding order is "
-            "transformed so that when the spreadsheet creates matches it'll end "
-            "up with them in the proposed ordering. Output order is the same as "
-            "the input data."
-        ),
-        choices=["sorted", "original", "bracket"],
-        default="sorted",
-    )
-    group.add_argument(
-        "--output-dropped",
-        help=(
-            "include dropped songs in the output CSV data. Dropped rows will "
-            "have an empty value for the new seed position. In `sorted` output "
-            "order, dropped submissions will be at the end."
-        ),
-        action="store_true",
-        default=False,
-    )
+    csv_tools.add_output_parser_group(parser)
 
     group = parser.add_argument_group(
         title="behavioral arguments",
@@ -940,257 +874,6 @@ def get_parser():
     return parser
 
 
-def read_csv_from_file(file):
-    """
-    Reads the CSV data from the open file handle and returns a list of dicts.
-
-    Assumes the CSV data includes a header row and uses that header row as
-    fieldnames in the dict. The following fields are required and are
-    case-sensitive:
-        - ``artist``
-        - ``song``
-        - ``submitter``
-        - ``seed``
-    Other fields are ultimately preserved untouched in the output CSV.
-
-    If the CSV doesn't have a header row, uses the following hardcoded list:
-        - ``order``
-        - ``seed``
-        - ``submitter``
-        - ``year``
-        - ``song``
-        - ``artist``
-        - ``link``
-        - ``submitters``
-
-    If a tab character is present in the first row, assumes the data is
-    tab-delimited, otherwise assumes comma-delimited.
-
-    :returns: All parsed data from the already-opened CSV file given, as a list
-        of dicts as generated by `csv.DictReader`
-    """
-
-    data = list(file)
-    delimiter = "\t" if "\t" in data[0] else ","
-    # Look for a header row
-    reader = csv.reader([data[0]], delimiter=delimiter)
-    row = next(reader)
-    for col in row:
-        try:
-            int(col)
-            # Found an integer, no headers present
-            headers = ["order", "seed", "submitter", "year", "song", "artist", "link", "submitters"]
-            break
-        except ValueError:
-            pass
-    else:
-        # Unable to find an integer here, must be a header row
-        # Pop the header row off the data list and create a new reader just to
-        # parse that row
-        data.pop(0)
-        headers = row
-    return list(csv.DictReader(data, fieldnames=headers, delimiter=delimiter))
-
-
-def get_csv_data(csv_path):
-    """
-    Given a path to a CSV file (or ``"-"``), returns the parsed data.
-
-    :param csv_path: Path to the CSV input file, or ``"-"`` for STDIN
-    :returns: Parsed CSV data as a list of dicts
-
-    .. seealso:: `read_csv_from_file` for more details regarding the specific
-        output format and required columns
-    """
-
-    if csv_path == '-':
-        data = read_csv_from_file(sys.stdin)
-    else:
-        with open(csv_path, newline='') as csv_file:
-            data = read_csv_from_file(csv_file)
-    return data
-
-
-def get_submission_counts(rows):
-    submissions = [Submission(**row) for row in rows]
-    counts = collections.Counter()
-    for submission in submissions:
-        counts[submission.submitter_cmp] += 1
-        counts.update(submission.dupers)
-    return counts
-
-
-def choose_submissions(data, drop_dupes_first=False):
-    """
-    Creates a power of two bracket by randomly eliminating larger seed songs
-
-    Creates a copy of the input list and then, for the submissions with larger
-    seed numbers, randomly eliminates them until the length of the list is an
-    even power of two.
-
-    As a special case, if there are 96 or more songs but not enough for a 128
-    bracket, it'll return 96 submissions. When creating the seeds, every fourth
-    submissions will need to be populated with dummy bye submissions. Similarly,
-    it will return 48 submissions if there are not enough for a 64 bracket.
-
-    Returns a tuple containing both the new data and a list of what was removed.
-    The dropped list contains tuple with the index of the dropped data in the
-    original list as well as the data itself.
-
-    :param data: List of dicts from the input CSV
-    :param drop_dupes_first: Optional Boolean indicating whether to prioritize
-        dropping songs by submitters who have more dupes first [default: False]
-    :returns: A tuple with a new list with a number of elements that is a power
-        of two and another list containing tuples with the original index and
-        the dropped data for all removed rows
-    """
-
-    dropped = []
-    if 96 <= len(data) < 128:
-        target_size = 96
-    elif 48 <= len(data) < 64:
-        target_size = 48
-    else:
-        target_size = 2 ** math.floor(math.log2(len(data)))
-
-    new_data = data.copy()
-
-    while len(new_data) > target_size:
-        target_seed = max(row["seed"] for row in new_data)
-        choices = [row for row in new_data if row["seed"] == target_seed]
-        if drop_dupes_first:
-            # Further filter choices list to only be submissions from people
-            # tied for having the most songs counting dupes
-            counts = get_submission_counts(new_data)
-            # We have to filter the counts to only submitters we're considering
-            # eliminating
-            submitters = {get_canonical_submitter(row["submitter"]) for row in choices}
-            counts = [submitter_count for submitter_count in counts.most_common() if submitter_count[0] in submitters]
-            # Whatever is left is already sorted by submission count
-            max_count = counts[0][1]
-            most_submissions = {submitter for submitter, count in counts if count == max_count}
-            choices = [row for row in choices if get_canonical_submitter(row["submitter"]) in most_submissions]
-            print(f"Found {len(choices)} songs by submitters with {max_count} submissions")
-        to_remove = random.choice(choices)
-        print(f"Eliminating submission {Submission(**to_remove)}")
-        dropped.append((data.index(to_remove), len(new_data), to_remove))
-        new_data.remove(to_remove)
-    print(
-        f"Eliminated {len(data) - len(new_data)} submissions for a "
-        f"{len(new_data)} bracket"
-    )
-    # Sort `dropped` list by original index (the first element in each tuple)
-    return new_data, sorted(dropped)
-
-
-def output_seeded_csv(file, seeds, data, use_tabs, order, dropped):
-    """
-    Given an open file, seed list, and input CSV data, writes data as a CSV.
-
-    Any open file or file-like handle can be given, the input data will be
-    sorted according to the order specified in the seed list (as returned by
-    `get_seed_order`).
-
-    :param file: Open file or file-like handle
-    :param seeds: List of integers to sort data by
-    :param data: List of dicts parsed from the input CSV rows, to be written in
-        the order specified by ``seeds``. Column ordering should be preserved
-        from the input data
-    :returns: None
-    """
-
-    delimiter = "\t" if use_tabs else ","
-    quoting = csv.QUOTE_NONE if use_tabs else csv.QUOTE_MINIMAL
-
-    if order == "bracket" and len(seeds) not in ORDERS:
-        print(
-            f"ERROR Bracket ordering requested but no ordering defined for a "
-            f"{len(seeds)} bracket, using `original`"
-        )
-        order = "original"
-
-    print(f"Writing CSV in {order} order")
-    writer = csv.writer(file, delimiter=delimiter, quoting=quoting)
-    # Write header row first
-    writer.writerow(["new_order"] + list(data[0].keys()))
-
-    if order == "sorted":
-        ordered_data = (
-            [i + 1] + list(data[j].values())
-            for i, j in enumerate(seeds)
-        )
-    elif order == "original":
-        # Invert the seeding list so we can iterate in original order
-        original_seeds = [None] * len(seeds)
-        for i, j in enumerate(seeds):
-            original_seeds[j] = i
-        ordered_data = (
-            [original_seeds[i] + 1] + list(row.values())
-            for i, row in enumerate(data)
-        )
-    elif order == "bracket":
-        # Invert the seeding list so we can iterate in original order
-        original_seeds = [None] * len(seeds)
-        for i, j in enumerate(seeds):
-            original_seeds[j] = i
-        # Now transform these values to fit the traversal order hardcoded into
-        # the spreadsheet
-        bracket_order = ORDERS[len(seeds)]
-        ordered_data = (
-            [bracket_order[original_seeds[i]]] + list(row.values())
-            for i, row in enumerate(data)
-        )
-
-    if dropped:
-        if order == "sorted":
-            # Put the dropped stuff at the end, in original index order
-            ordered_data = itertools.chain(ordered_data, ([seed] + list(row.values()) for i, seed, row in dropped))
-        else:
-            # Interleave the dropped rows into the rest of the data
-            # Cast to a list so we can slice
-            seeded_data = list(ordered_data)
-            # Start this over and rebuild the list from scratch
-            ordered_data = []
-            prev_i = 0
-            for i, seed, row in dropped:
-                ordered_data += seeded_data[prev_i:i] + [[seed] + list(row.values())]
-                prev_i = i
-            else:
-                # `i` will still be whatever the last value was
-                ordered_data += seeded_data[i:]
-
-    writer.writerows(ordered_data)
-
-
-def write_csv_data(csv_path, force, seeds, data, use_tabs, use_bracket_order, dropped):
-    """
-    Given an output path and force flag, sorts data by seeds and writes it.
-
-    :param csv_path: Path to the desired output file, or ``None`` for STDOUT
-    :param force: Boolean flag indicated whether to overwrite existing files and
-        create intermediate directories in the path
-    :param seeds: List of integers to sort data by
-    :param data: List of dicts parsed from the input CSV rows
-    :returns: None
-
-    .. seealso:: `output_seeded_csv` for more details on the specific output
-        format
-    """
-
-    if csv_path is None:
-        return output_seeded_csv(sys.stdout, seeds, data, use_tabs, use_bracket_order, dropped)
-
-    if force:
-        dirs = os.path.dirname(csv_path)
-        if dirs:
-            os.makedirs(dirs, exist_ok=True)
-
-    mode = "w" if force else "x"
-
-    with open(csv_path, mode, newline="") as csv_file:
-        return output_seeded_csv(csv_file, seeds, data, use_tabs, use_bracket_order, dropped)
-
-
 def main(
     input_csv_path,
     output_csv_path,
@@ -1214,10 +897,10 @@ def main(
     :returns: None
     """
 
-    data = get_csv_data(input_csv_path)
+    data = csv_tools.get_csv_data(input_csv_path)
     data, dropped = choose_submissions(data, drop_dupes_first)
     seeds = get_seed_order(data)
-    write_csv_data(
+    csv_tools.write_csv_data(
         output_csv_path,
         force_output,
         seeds,
