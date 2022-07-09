@@ -791,6 +791,18 @@ def choose_submissions(data, drop_dupes_first=False):
     return new_data, sorted(dropped)
 
 
+def seed_rng(seed):
+    if seed is None:
+        print("Using default RNG seed")
+        return
+    try:
+        seed = int(seed)
+        print(f"Seeding RNG with integer {seed}")
+    except ValueError:
+        print(f"Seeding RNG with string '{seed}'")
+    random.seed(seed)
+
+
 def get_parser():
     """
     Creates and return the ArgumentParser for the script.
@@ -870,6 +882,11 @@ def get_parser():
         default=ATTEMPT_ITERATIONS,
         type=int,
     )
+    group.add_argument(
+        "--random-seed",
+        help="value to seed Python's random module with",
+        default=None,
+    )
 
     return parser
 
@@ -879,9 +896,10 @@ def main(
     output_csv_path,
     force_output,
     output_csv_tabs,
-    output_bracket_order,
+    output_order,
     output_dropped,
     drop_dupes_first,
+    random_seed=None,
 ):
     """
     Main entry point for the script.
@@ -893,10 +911,18 @@ def main(
     :param output_csv_path: Path to output CSV file, or ``None`` for STDOUT
     :param force_output: If output file already exists overwrite it, if
         intermediate directories on the path do not exist, create them
+    :param output_csv_tabs: Output tabs instead of commas to separate tabular
+        fields
+    :param output_order: Order to print output lines in
+    :param output_dropped: Whether or not to include dropped submissions in the
+        output
     :param drop_dupes_first: Prioritize dropping songs by submitters with dupes
+    :param random_seed: If given, a string or integer to use as a seed for the
+        RNG before dropping any songs or populating bracket
     :returns: None
     """
 
+    seed_rng(random_seed)
     data = csv_tools.get_csv_data(input_csv_path)
     data, dropped = choose_submissions(data, drop_dupes_first)
     seeds = get_seed_order(data)
@@ -906,7 +932,7 @@ def main(
         seeds,
         data,
         output_csv_tabs,
-        output_bracket_order,
+        output_order,
         dropped if output_dropped else None,
     )
 
@@ -919,6 +945,7 @@ if __name__ == "__main__":
         output_csv_path = args.OUTPUT
         force_output = args.force
         drop_dupes_first = args.drop_dupes_first
+        random_seed = args.random_seed
 
         output_csv_tabs = args.output_csv_tabs
         output_order = args.output_order
@@ -959,4 +986,5 @@ if __name__ == "__main__":
         output_order,
         output_dropped,
         drop_dupes_first,
+        random_seed,
     )

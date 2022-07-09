@@ -300,7 +300,7 @@ def output_seeded_csv(file, seeds, data, use_tabs, order, dropped):
     writer.writerows(ordered_data)
 
 
-def write_csv_data(csv_path, force, seeds, data, use_tabs, use_bracket_order, dropped):
+def write_csv_data(csv_path, force, seeds, data, use_tabs, output_order, dropped):
     """
     Given an output path and force flag, sorts data by seeds and writes it.
 
@@ -316,7 +316,7 @@ def write_csv_data(csv_path, force, seeds, data, use_tabs, use_bracket_order, dr
     """
 
     if csv_path is None:
-        return output_seeded_csv(sys.stdout, seeds, data, use_tabs, use_bracket_order, dropped)
+        return output_seeded_csv(sys.stdout, seeds, data, use_tabs, output_order, dropped)
 
     if force:
         dirs = os.path.dirname(csv_path)
@@ -326,7 +326,33 @@ def write_csv_data(csv_path, force, seeds, data, use_tabs, use_bracket_order, dr
     mode = "w" if force else "x"
 
     with open(csv_path, mode, newline="") as csv_file:
-        return output_seeded_csv(csv_file, seeds, data, use_tabs, use_bracket_order, dropped)
+        return output_seeded_csv(csv_file, seeds, data, use_tabs, output_order, dropped)
+
+
+def get_dropped(seeds, data):
+    """
+    Given some input CSV data and a list of seeds, drop submissions that don't fit
+
+    This will return a tuple of (seeds, data, dropped) with the dropped rows
+    removed from both seeds and data. This will not change the input parameters.
+
+    The `dropped` list follows the same format as elsewhere, with each element
+    being a tuple containing the index in the original data, the seed (1-indexed),
+    and the dropped data row.
+    """
+
+    size = utils.get_bracket_size(len(data))
+
+    # Shallow copy is fine, we're not messing with the individual rows
+    new_data = data.copy()
+    dropped = []
+
+    for i, seed in seeds:
+        if seed >= size:
+            dropped.append((i, seed + 1, new_data.pop(i)))
+    new_seeds = [seed for seed in seeds if seed < size]
+
+    return new_seeds, new_data, dropped
 
 
 def add_input_output_arguments(parser):
@@ -452,38 +478,12 @@ def get_parser():
     return parser
 
 
-def get_dropped(seeds, data):
-    """
-    Given some input CSV data and a list of seeds, drop submissions that don't fit
-
-    This will return a tuple of (seeds, data, dropped) with the dropped rows
-    removed from both seeds and data. This will not change the input parameters.
-
-    The `dropped` list follows the same format as elsewhere, with each element
-    being a tuple containing the index in the original data, the seed (1-indexed),
-    and the dropped data row.
-    """
-
-    size = utils.get_bracket_size(len(data))
-
-    # Shallow copy is fine, we're not messing with the individual rows
-    new_data = data.copy()
-    dropped = []
-
-    for i, seed in seeds:
-        if seed >= size:
-            dropped.append((i, seed + 1, new_data.pop(i)))
-    new_seeds = [seed for seed in seeds if seed < size]
-
-    return new_seeds, new_data, dropped
-
-
 def main(
     input_csv_path,
     output_csv_path,
     force_output,
     output_csv_tabs,
-    output_bracket_order,
+    output_order,
     output_dropped,
     reverse_input,
     input_order,
@@ -505,7 +505,7 @@ def main(
         seeds,
         data,
         output_csv_tabs,
-        output_bracket_order,
+        output_order,
         dropped if output_dropped else None,
     )
 
