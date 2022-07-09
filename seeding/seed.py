@@ -144,11 +144,11 @@ def get_badness(seeds, submissions):
 def get_rand_index(n, exclude=None, has_byes=False):
     """
     Return a random integer in range(n), given constraints.
-    
+
     The ``exclude`` parameter excludes a single integer value. The ``has_byes``
     parameter indicates that every fourth integer should be skipped as those are
     occupied by bye slots.
-    
+
     :param n: Integer max value to return (exclusive)
     :param exclude: Optional integer value to specifically exclude from output
     :param has_byes: Optional Boolean value indicating that every fourth integer
