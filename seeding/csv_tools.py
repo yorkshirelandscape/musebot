@@ -7,6 +7,7 @@ import os
 import random
 import sys
 
+import analysis
 import utils
 
 __all__ = (
@@ -474,6 +475,12 @@ def get_parser():
         action="store_true",
         default=False,
     )
+    group.add_argument(
+        "--analyze",
+        help="print an analysis of the output CSV data",
+        action="store_true",
+        default=False,
+    )
 
     return parser
 
@@ -488,16 +495,20 @@ def main(
     reverse_input,
     input_order,
     randomize_seeding,
+    analyze,
 ):
     if reverse_input:
         seeds, data, _, dropped = get_csv_data(input_csv_path, reverse_seeded_csv, input_order)
     else:
         data = get_csv_data(input_csv_path)
         if randomize_seeding:
-            seeds = random.sample(range(len(data)), k=len(data))
+            seeds = utils.get_shuffled_range(len(data))
         else:
             seeds = list(range(len(data)))
         seeds, data, dropped = get_dropped(seeds, data)
+
+    if analyze:
+        analysis.print_analysis(seeds, data)
 
     write_csv_data(
         output_csv_path,
@@ -526,6 +537,8 @@ if __name__ == "__main__":
     reverse_input = args.reverse_input
     input_order = args.output_order if args.input_order is None else args.input_order
 
+    analyze = args.analyze
+
     main(
         input_csv_path,
         output_csv_path,
@@ -536,4 +549,5 @@ if __name__ == "__main__":
         reverse_input,
         input_order,
         randomize_seeding,
+        analyze,
     )

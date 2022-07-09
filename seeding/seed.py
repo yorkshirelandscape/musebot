@@ -5,15 +5,13 @@ import collections
 import functools
 import itertools
 import math
-import operator
 import os
 import random
-import re
-import unicodedata
-import uuid
 
+import analysis
 import csv_tools
 import utils
+from submission import Submission
 
 TESTING = False
 
@@ -26,380 +24,6 @@ BADNESS_MAX_DUPER = 25
 ITERATIONS = 15000
 ATTEMPTS = 15
 ATTEMPT_ITERATIONS = 400
-
-
-def get_analysis(seeds, submissions):
-    """
-    Constructs statistics for anomalous submitter and artist distribution.
-
-    For the given set of submissions and seed order, determines the distribution
-    of songs for each submitter for each artist, returning anything that seems
-    potentially anomalous for manual review.
-
-    The returned data structure is a dict broken down by round number, where
-    each round is a dict that may include any or all of the following keys:
-        - ``submitters`` a per-submitter dict mapping group number to the
-            specific songs submitted by that submitter within the group
-        - ``artists`` the same thing but for artists
-        - ``seeds`` for the first round only, a dict mapping match number to
-            submission pairs for any ``{0, 1}`` seeds matched up against other
-            ``{0, 1}`` seeds
-
-    If a round has nothing to report, it will be omitted from the returned dict.
-
-    :param seeds: Seed order to analyze
-    :param submissions: List of `Submission` instances to sort
-    :returns: The data structure described above, which may be an empty dict
-    """
-
-    ordered_submissions = [Submission.copy(submissions[j], slot=i, q=int(i // (len(submissions) / 4))) for i, j in enumerate(seeds)]
-    counts = collections.defaultdict(collections.Counter)
-    results = collections.defaultdict(lambda: collections.defaultdict(dict))
-    max_round = utils.get_distance(0, len(seeds) - 1) + 1
-
-    for submission in ordered_submissions:
-        counts[submission.submitter][0] = 0
-        counts[submission.submitter][1] = 0
-        counts[submission.submitter][2] = 0
-        counts[submission.submitter][3] = 0
-
-    for submission in ordered_submissions:
-        counts[submission.submitter][submission.q] += 1
-
-    for key, value in sorted(counts.items()):
-        print("{:<15}".format(key), *(v for k, v in sorted(value.items())), sep='\t')
-
-    def get_keyfunc(round):
-        return lambda x: x // (2 ** round)
-
-    for key, attr in [("submitters", "submitter_cmp"), ("artists", "artist_cmp")]:
-        vals = {getattr(submission, attr) for submission in submissions}
-        for val in vals:
-            # The positions of all the relevant songs
-            slots = [
-                i
-                for i, submission in enumerate(ordered_submissions)
-                if getattr(submission, attr) == val
-            ]
-            if len(slots) <= 1:
-                # Only one entry, nothing to meet, much less meet too early
-                continue
-            # Analyze the quartiles, octiles, or respective groupings for each round
-            # Don't analyze the finals, though, everything is allowed there
-            for round in range(1, max_round):
-                # First figure out what we should be seeing
-                num_groups = 2 ** (max_round - round)
-                allowed_sizes = {
-                    math.floor(len(slots) / num_groups),
-                    math.ceil(len(slots) / num_groups),
-                }
-                # Now split into the actual groups
-                # We do this here since we're interested in the size of the groups,
-                # otherwise we could just record while iterating through the groupby
-                groups = {
-                    # Use k + 1 to get 1-indexed numbers here for readability
-                    k + 1: tuple(g)
-                    for k, g in itertools.groupby(slots, get_keyfunc(round))
-                }
-                if all(len(g) in allowed_sizes for g in groups.values()):
-                    # Nothing to record, avoid adding empty dicts to the results
-                    continue
-                # Record any groups with invalid sizes
-                results[round][key][val] = {
-                    k: tuple(ordered_submissions[i] for i in g)
-                    for k, g in groups.items()
-                    if len(g) not in allowed_sizes
-                }
-
-    # Special case to list specific collisions in the first round:
-    # - {0, 1} vs. {0, 1}
-    # - submitter vs dupe
-    match = 0
-    for submission1, submission2 in utils.chunk(ordered_submissions, 2):
-        match += 1
-        if submission1.seed in {0, 1} and submission2.seed in {0, 1}:
-            results[1]["seeds"][match] = (submission1, submission2)
-        results[1]["dupes"][match] = []
-        if submission1.submitter_cmp in submission2.dupers:
-            results[1]["dupes"][match].append((submission1.submitter, submission2))
-        if submission2.submitter_cmp in submission1.dupers:
-            results[1]["dupes"][match].append((submission2.submitter, submission1))
-
-    # Special case to list specific collisions in the second round:
-    # - {0, 1} vs. {0, 1}
-    # - submitter vs dupe
-    match = 0
-    for submissions_chunk in utils.chunk(ordered_submissions, 4):
-        match += 1
-        if (
-            {submissions_chunk[0].seed, submissions_chunk[1].seed} & {0, 1}
-            and {submissions_chunk[2].seed, submissions_chunk[3].seed} & {0, 1}
-        ):
-            # Pick the first {0,1}-seed in each pair to represent something Bad
-            # There may be multiple Bad things here, but just mention the first
-            # one we find
-            submission1 = next(s for s in submissions_chunk[:2] if s.seed in {0, 1})
-            submission2 = next(s for s in submissions_chunk[2:] if s.seed in {0, 1})
-            results[2]["seeds"][match] = (submission1, submission2)
-        # Could generate this by being tricky, but probably better to be explicit
-        # Checks all potential matchups within the chunk
-        results[2]["dupes"][match] = []
-        for i, j in ((0, 2), (0, 3), (1, 2), (1, 3)):
-            submission1 = submissions_chunk[i]
-            submission2 = submissions_chunk[j]
-            if submission1.submitter_cmp in submission2.dupers:
-                results[2]["dupes"][match].append((submission1.submitter, submission2))
-            if submission2.submitter_cmp in submission1.dupers:
-                results[2]["dupes"][match].append((submission2.submitter, submission1))
-
-    # If we have any byes, make sure they match against the lowest possible seeds
-    # Also make sure they are in the expected slots
-    if submissions[-1].is_bye:
-        allowed_seeds = [
-            submission.seed
-            for submission in sorted(submissions, key=operator.attrgetter("seed"))
-        ][:int(len(submissions) / 4)]
-        max_allowed_seed = max(allowed_seeds)
-        match = 0
-        for submission1, submission2 in utils.chunk(ordered_submissions, 2):
-            match += 1
-            # Only the second submission of even numbered matches can be a bye,
-            # and it *must* be a bye
-            if submission1.is_bye or submission2.is_bye is bool(match % 2):
-                results[1]["byes"][match] = (submission1, submission2)
-                # Incorrect layout is all that needs to be reported
-                continue
-            if match % 2:
-                # Odd numbered matches have no bye
-                continue
-            # The layout is correct and we're in a match with a bye
-            # Now make sure the seeds are good
-            if submission1.seed > max_allowed_seed:
-                results[1]["byes"][match] = (submission1, submission2)
-        # If we haven't seen any issues yet, verify that the number of each seed
-        # matched against a bye is exactly what we expect
-        if 1 not in results or "byes" not in results[1]:
-            actual_seeds = sorted(ordered_submissions[i].seed for i in range(2, len(submissions), 4))
-            if allowed_seeds != actual_seeds:
-                # We have a problem, count up each seed and record any disparities
-                allowed_counts = collections.Counter(allowed_seeds)
-                actual_counts = collections.Counter(actual_seeds)
-                results[1]["byes"]["totals"] = {}
-                for k in set(allowed_counts) | set(actual_counts):
-                    if allowed_counts[k] != actual_counts[k]:
-                        results[1]["byes"]["totals"][k] = (allowed_counts[k], actual_counts[k])
-
-    return results
-
-
-def print_analysis_results(results, total_submissions):
-    """
-    Prints the anomalous results, one issue per line.
-
-    The results object may not include enough information on its own to
-    reconstruct the total number of submissions, so this is required as an
-    argument to be able to print slightly more helpful messages.
-
-    :param results: Results dict as returned by `get_analysis`
-    :param total_submission: Integer number of total submissions
-    :returns: None
-    """
-
-    num_rounds = utils.get_distance(0, total_submissions - 1) + 1
-    print(f"Analysis results:")
-    for round, round_results in sorted(results.items()):
-        # We only record problems, so this should never come up
-        if not round_results:
-            print(f"Round {round} / {num_rounds} | No issues found")
-            continue
-
-      
-        if "submitters" in round_results:
-            for submitter, submission_groups in round_results["submitters"].items():
-                for group_number, group in submission_groups.items():
-                    num_groups = 2 ** (num_rounds - round)
-                    print(f"Round {round} / {num_rounds} | Submitter {submitter} | Group {group_number} / {num_groups} | {' | '.join(map(str, group))}")
-
-        if "artists" in round_results:
-            for artist, submission_groups in round_results["artists"].items():
-                for group_number, group in submission_groups.items():
-                    num_groups = 2 ** (num_rounds - round)
-                    print(f"Round {round} / {num_rounds} | Artist {artist} | Group {group_number} / {num_groups} | {' | '.join(map(str, group))}")
-
-        if "seeds" in round_results:
-            for match, submission_pair in round_results["seeds"].items():
-                num_matches = 2 ** (num_rounds - round)
-                print(f"Round {round} / {num_rounds} | Match {match} / {num_matches} | {submission_pair[0]} | {submission_pair[1]}")
-
-        if "dupes" in round_results:
-            for match, submission_pairs in round_results["dupes"].items():
-                for submitter, submission in submission_pairs:
-                    print(f"Round {round} / {num_rounds} | Duper {submitter} | Dupe {submission}")
-
-        if "byes" in round_results:
-            for match, submission_pair in round_results["byes"].items():
-                if match == "totals":
-                    # In this case, we have recorded information about total
-                    # numbers of seeds in a dict so "submission_pair" isn't
-                    # accurate
-                    for seed, counts in submission_pair.items():
-                        print(f"Round {round} / {num_rounds} | Bye Totals | Seed {seed} | Expected {counts[0]} | Actual {counts[1]}")
-                else:
-                    num_matches = 2 ** (num_rounds - round)
-                    print(f"Round {round} / {num_rounds} | Bye Match {match} / {num_matches} | {submission_pair[0]} | {submission_pair[1]}")
-
-    if not results:
-        print(f"No problems found")
-
-
-def print_analysis(seeds, submissions):
-    """
-    Calculate and then print the distribution analysis for the given seeding.
-
-    :param seeds: Seed order to analyze
-    :param submissions: List of `Submission` instances to sort
-    :returns: None
-    """
-    print_analysis_results(get_analysis(seeds, submissions), len(submissions))
-
-
-def get_canonical_artist(artist):
-    """
-    Converts artist name string to canonical version, for comparison.
-
-    This performs the following operations, in order:
-        - lowercases the input string
-        - replaces double hyphens with a space
-        - strips diacritics and many other miscellaneous marks (like ``&``)
-        - collapses multiple spaces in a row to a single space
-        - strips leading "The"
-        - drops featured artists from the end of the artist name by looking for:
-            - ``ft``, ``feat``, or ``featuring``
-            - optional period after the two abbreviations
-            - optional parentheses around the whole thing
-            - must have something following the "featuring" introduction, strips
-              to the end of the artist name
-
-    :param artist: String artist name
-    :returns: Canonical artist name, suitable for comparison
-    """
-
-    def should_keep(c):
-        return unicodedata.category(c)[0] in {"L", "N", "S", "Z"}
-
-    return re.sub(
-        r" (\()?(?:f(?:ea)?t\.?|featuring) .+(?(1)\))$",
-        "",
-        re.sub(
-            r"^the ",
-            "",
-            re.sub(
-                r"\s+",
-                " ",
-                "".join(
-                    filter(
-                        should_keep,
-                        unicodedata.normalize(
-                            "NFKD",
-                            artist.lower().replace("--", " "),
-                        ),
-                    ),
-                ),
-            ),
-        ),
-    )
-
-
-def get_canonical_submitter(submitter):
-    return submitter.lower()
-
-
-class Submission:
-    """
-    Container class for an individual submission
-    """
-
-    def __init__(self, *, artist, song, submitter, seed, slot=None, q=None, is_bye=False, **kwargs):
-        """
-        Constructor for a `Submission` instance.
-
-        Requires the following keyword-only arguments:
-            - ``artist``
-            - ``song``
-            - ``submitter``
-            - ``seed``
-        Any additional keyword arguments will be ignored.
-
-        :param artist: The string name of the artist who performed/composed the
-            song
-        :param song: The string title of the song
-        :param submitter: The string handle of the user who submitted the song
-        :param seed: The 1-indexed seed position within the submitter's list, 0
-            indicates a song was submitted by other users as well
-        """
-
-        self.is_bye = is_bye
-        self.artist = artist
-        self.artist_cmp = get_canonical_artist(artist)
-        self.song = song
-        self.submitter = submitter
-        # Ideally we would go by submitter ID
-        # but this should be good enough for now
-        self.submitter_cmp = get_canonical_submitter(submitter)
-        self.seed = int(seed)
-        self.slot = slot
-        self.q = q
-        if "dupers" in kwargs:
-            self.dupers = kwargs["dupers"]
-        else:
-            submitters = kwargs.get("submitters")
-            if submitters:
-                if isinstance(submitters, str):
-                    submitters = map(str.strip, submitters.split(";"))
-                submitters = set(map(str.lower, submitters)) - {self.submitter_cmp}
-            else:
-                # Could be blank ("") or not given at all (None)
-                submitters = set()
-            self.dupers = submitters
-
-    def __str__(self):
-        """
-        Pretty way of converting the submission to a string.
-
-        Includes the artist, song, submitter, and submitted seed values.
-        """
-
-        slot = "" if self.slot is None else f"{self.slot} "
-        if self.is_bye:
-            return f"{slot}Bye"
-        else:
-            dupers = f" [{', '.join(sorted(self.dupers))}]" if self.dupers else ""
-            return f"{slot}{self.artist} - {self.song} <{self.submitter}, {self.seed}{dupers}>"
-
-    @classmethod
-    def Bye(cls, *, slot=None, **kwargs):
-        """
-        Returns a dummy instance indicating that a slot's opponent gets a bye.
-        """
-
-        # Use UUID for artist and submitter as a hack so they won't count
-        # against us during analysis
-        bye = cls(
-            artist=uuid.uuid4().hex,
-            song="",
-            submitter=uuid.uuid4().hex,
-            seed=6,
-            slot=slot,
-            is_bye=True,
-            **kwargs,
-        )
-        return bye
-
-    @classmethod
-    def copy(cls, instance, **overrides):
-        kwargs = instance.__dict__.copy()
-        kwargs.update(overrides)
-        return cls(**kwargs)
 
 
 def calc_badness(i, submissions):
@@ -614,33 +238,15 @@ def get_new_seeds(submissions):
         n = len([submission for submission in submissions if not submission.is_bye])
     else:
         n = len(submissions)
-    seeds = get_shuffled_range(n)
-    if submissions[-1].is_bye:
-        # Every fourth submission should be a bye
-        # The bye submissions are all at the end, so adding n to a 0-based index
-        # will give a bye submission index
-        seeds = list(
-            itertools.chain.from_iterable(
-                trio + (i + n,) for i, trio in enumerate(utils.chunk(seeds, 3))
-            )
-        )
+
+    # If there are no byes, insert_byes won't do anything anyway
+    seeds = utils.insert_byes(utils.get_shuffled_range(n))
     badness = get_badness(seeds, submissions)
     return badness, seeds
 
 
-def get_shuffled_range(n):
-    """
-    Utility function to generate a random ordering of the integers in [0, n)
-
-    :param n: The length of the returned list
-    :returns: A list of the numbers from 0 to n-1, inclusive, shuffled
-    """
-
-    return random.sample(list(range(n)), k=n)
-
-
 def get_hints(n, skip_byes=False):
-    hints = get_shuffled_range(n)
+    hints = utils.get_shuffled_range(n)
     if skip_byes:
         return [j for i, j in enumerate(hints) if i % 4]
     else:
@@ -657,14 +263,8 @@ def get_seed_order(data):
         in the order specified by the return value to obtain the match order
     """
 
-    submissions = [Submission(**row) for row in data]
+    submissions = Submission.get_submissions(data)
     has_byes = utils.has_byes(len(data))
-
-    if has_byes:
-        # Make dummy submissions at the end until we have an even power of two
-        submissions += [
-            Submission.Bye() for i in range(2 ** (math.floor(math.log2(len(data))) - 1))
-        ]
 
     # Start completely randomly
     badness, seeds = get_new_seeds(submissions)
@@ -715,9 +315,7 @@ def get_seed_order(data):
     badness = get_badness(best_seeds, submissions)
     [print(f"{i:2} {badness[i]:3.0f} {submissions[best_seeds[i]]}") for i in range(n)]
 
-    print_analysis(best_seeds, submissions)
-
-    if submissions[-1].is_bye:
+    if has_byes:
         # Now we need to drop the byes before returning
         best_seeds = [i for i in best_seeds if i < len(data)]
 
@@ -772,12 +370,12 @@ def choose_submissions(data, drop_dupes_first=False):
             counts = get_submission_counts(new_data)
             # We have to filter the counts to only submitters we're considering
             # eliminating
-            submitters = {get_canonical_submitter(row["submitter"]) for row in choices}
+            submitters = {utils.get_canonical_submitter(row["submitter"]) for row in choices}
             counts = [submitter_count for submitter_count in counts.most_common() if submitter_count[0] in submitters]
             # Whatever is left is already sorted by submission count
             max_count = counts[0][1]
             most_submissions = {submitter for submitter, count in counts if count == max_count}
-            choices = [row for row in choices if get_canonical_submitter(row["submitter"]) in most_submissions]
+            choices = [row for row in choices if utils.get_canonical_submitter(row["submitter"]) in most_submissions]
             print(f"Found {len(choices)} songs by submitters with {max_count} submissions")
         to_remove = random.choice(choices)
         print(f"Eliminating submission {Submission(**to_remove)}")
@@ -926,6 +524,7 @@ def main(
     data = csv_tools.get_csv_data(input_csv_path)
     data, dropped = choose_submissions(data, drop_dupes_first)
     seeds = get_seed_order(data)
+    analysis.print_analysis(seeds, data)
     csv_tools.write_csv_data(
         output_csv_path,
         force_output,
