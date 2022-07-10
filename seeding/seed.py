@@ -19,7 +19,7 @@ TESTING = False
 # Default values for these settings
 # May be modified by command line arguments
 BADNESS_MAX_ARTIST = 50
-BADNESS_MAX_SUBMITTER = 500
+BADNESS_MAX_SUBMITTER = 1000
 BADNESS_MAX_SEED = 100
 BADNESS_MAX_DUPER = 25
 ITERATIONS = 15000
@@ -31,6 +31,8 @@ drop_dupes_first = True
 output_csv_tabs = True
 output_order = 'bracket'
 output_dropped = True
+input_csv_path =  'seeding/input.csv'
+output_csv_path = 'seeding/output.csv'
 
 ORDERS = {
     128: [

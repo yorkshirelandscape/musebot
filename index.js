@@ -368,8 +368,8 @@ client.on('ready', async () => {
     } else {
       await nextMatch();
     }
-    client.destroy();
-    process.exit();
+    // client.destroy();
+    // process.exit();
   } else {
     // Number of seconds until the next even hour
     now = DateTime.now();

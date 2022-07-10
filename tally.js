@@ -44,7 +44,7 @@ const REFS = {
 };
 
 let testing = false;
-let once = true;
+let once = false;
 let force = false;
 
 process.argv.forEach((val) => {
@@ -516,8 +516,8 @@ client.once('ready', () => {
 client.on('ready', async () => {
   if (once === true) {
     await checkRound();
-    client.destroy();
-    process.exit();
+    // client.destroy();
+    // process.exit();
   } else {
     // run at quarter to every odd hour
     now = DateTime.now();
