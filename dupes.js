@@ -78,16 +78,17 @@ const dupes = async () => {
     const username = row[0];
     const listKR = parseInt(row[6]);
     const listRep = row[9];
+    const listTied = row[10];
     let msg = '';
-    if (listKR === -1 && listRep === 'X') {
+    if (listKR === -1 && listRep === 'X' && listTied !== 'X') {
       msg = `Hello, ${username}! Your #${row[5]} seed, ${row[2]}, has duped. If you wish to make a direct substitution, please contact an admin with your replacement. Otherwise, submit a replacement using https://docs.google.com/forms/d/e/1FAIpQLScu6rcO8nyxyneyYzAnCUmVO6N7m4o4O78KS31SgPUY1Lt8RA/viewform.`;
-    } else if (listKR === -1 && listRep !== 'X') {
+    } else if (listKR === -1 && listRep !== 'X' && listTied !== 'X') {
       msg = `Hello, ${username}! Your #${row[5]} seed, ${row[2]}, has duped. If you wish to make a direct substitution, please contact an admin with your replacement. Otherwise, your submitted replacements will be promoted in its place.`;
-    } else if (listKR === 1) {
-      const tiedUserRow = dupeList.filter((tieRow) => tieRow[1].localeCompare(row[1],undefined, {sensitivity: 'base'}) === 0
-        && tieRow[2].localeCompare(row[2], undefined, {sensitivity: 'base'}) === 0
-        && tieRow[3].localeCompare(row[3], undefined, {sensitivity: 'base'}) === 0 
-        && tieRow[0].localeCompare(row[0], undefined, {sensitivity: 'base'}) !== 0);
+    } else if (listTied === 'X') {
+      const tiedUserRow = dupeList.filter((tieRow) => tieRow[1].localeCompare(row[1],undefined, { sensitivity: 'base' }) === 0
+        && tieRow[2].localeCompare(row[2], undefined, { sensitivity: 'base' }) === 0
+        && tieRow[3].localeCompare(row[3], undefined, { sensitivity: 'base' }) === 0 
+        && tieRow[0].localeCompare(row[0], undefined, { sensitivity: 'base' }) !== 0);
       const tiedUser = tiedUserRow[0][0];
       msg = `Hello, ${username}! You and ${tiedUser} both submitted ${row[2]} as your ${row[5]} seed. Please determine between you who will keep and replace. Whoever replaces should inform an admin and, if they have not done so already, submit a replacement using https://docs.google.com/forms/d/e/1FAIpQLScu6rcO8nyxyneyYzAnCUmVO6N7m4o4O78KS31SgPUY1Lt8RA/viewform.`;
     }

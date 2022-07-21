@@ -76194,5 +76194,146 @@
     "title": "Cosmologist Gift",
     "day": "8",
     "summary": []
+  },
+  {
+    "month": "7",
+    "num": 2644,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "fMRI Billboard",
+    "transcript": "",
+    "alt": "[other side] If the first word of an instruction you're given starts with the same letter as your crush's name, for that step imagine the experimenter is your crush.",
+    "img": "https://imgs.xkcd.com/comics/fmri_billboard.png",
+    "title": "fMRI Billboard",
+    "day": "11",
+    "summary": [
+      [
+        {
+          "term": "crush's",
+          "probability": 0.17
+        },
+        {
+          "term": "word",
+          "probability": 0.083
+        },
+        {
+          "term": "step",
+          "probability": 0.083
+        }
+      ]
+    ]
+  },
+  {
+    "month": "7",
+    "num": 2645,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "The Best Camera",
+    "transcript": "",
+    "alt": "The best camera is the one at L2.",
+    "img": "https://imgs.xkcd.com/comics/the_best_camera.png",
+    "title": "The Best Camera",
+    "day": "13",
+    "summary": [
+      [
+        {
+          "term": "camera",
+          "probability": 0.67
+        },
+        {
+          "term": "l2",
+          "probability": 0.33
+        }
+      ]
+    ]
+  },
+  {
+    "month": "7",
+    "num": 2646,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Minkowski Space",
+    "transcript": "",
+    "alt": "My liege, we were able to follow the ship into Minkowski space, but now they've jumped to Hilbert space and they could honestly be anywhere.",
+    "img": "https://imgs.xkcd.com/comics/minkowski_space.png",
+    "title": "Minkowski Space",
+    "day": "15",
+    "summary": [
+      [
+        {
+          "term": "space",
+          "probability": 0.27
+        },
+        {
+          "term": "minkowski",
+          "probability": 0.18
+        },
+        {
+          "term": "ship",
+          "probability": 0.091
+        }
+      ]
+    ]
+  },
+  {
+    "month": "7",
+    "num": 2647,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Capri Suns",
+    "transcript": "",
+    "alt": "[As security is dragging me away] \"Come on, at least I didn't make the mistake in the other direction!\"",
+    "img": "https://imgs.xkcd.com/comics/capri_suns.png",
+    "title": "Capri Suns",
+    "day": "18",
+    "summary": [
+      [
+        {
+          "term": "suns",
+          "probability": 0.17
+        },
+        {
+          "term": "security",
+          "probability": 0.17
+        },
+        {
+          "term": "mistake",
+          "probability": 0.17
+        }
+      ]
+    ]
+  },
+  {
+    "month": "7",
+    "num": 2648,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Chemicals",
+    "transcript": "",
+    "alt": "It's hard to believe, but lots of kids these days ONLY know how to buy prepackaged molecules.",
+    "img": "https://imgs.xkcd.com/comics/chemicals.png",
+    "title": "Chemicals",
+    "day": "20",
+    "summary": [
+      [
+        {
+          "term": "prepackaged",
+          "probability": 0.13
+        },
+        {
+          "term": "molecules",
+          "probability": 0.13
+        },
+        {
+          "term": "lots",
+          "probability": 0.13
+        }
+      ]
+    ]
   }
 ]
