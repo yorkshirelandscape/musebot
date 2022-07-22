@@ -7,6 +7,7 @@ import itertools
 import math
 import os
 import random
+import time
 
 import analysis
 import csv_tools
@@ -391,13 +392,14 @@ def choose_submissions(data, drop_dupes_first=False):
 
 def seed_rng(seed):
     if seed is None:
-        print("Using default RNG seed")
-        return
-    try:
-        seed = int(seed)
-        print(f"Seeding RNG with integer {seed}")
-    except ValueError:
-        print(f"Seeding RNG with string '{seed}'")
+        seed = int(time.time())
+        print(f"No seed set, using current timestamp {seed}")
+    else:
+        try:
+            seed = int(seed)
+            print(f"Seeding RNG with integer {seed}")
+        except ValueError:
+            print(f"Seeding RNG with string '{seed}'")
     random.seed(seed)
 
 
@@ -422,8 +424,8 @@ def get_parser():
             "prioritize dropping songs submitted by people with more dupes "
             "first"
         ),
-        action="store_true",
-        default=False,
+        action=utils.BooleanOptionalAction,
+        default=True,
     )
 
     csv_tools.add_output_parser_group(parser)
