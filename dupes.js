@@ -60,10 +60,10 @@ const dupes = async () => {
     const listTied = row[10];
     const listOmit = row[13];
     const toldRange = `Dupes!I${row[14] + 2}`;
-    if (listKR === 1 && listTold === 'X') {
+    if (listKR === 1 && listTold === 'X' && listTied !== 'X') {
       setValue(toldRange, '');
     }
-    if (listYear === year && (listKR === -1 || listTied === 'X')
+    if (listYear === year && (listKR === -1)
       && (listTold === '' || typeof listTold === 'undefined')
       && (listOmit === '' || typeof listOmit === 'undefined')) {
       dupeList.push(row);
@@ -87,7 +87,8 @@ const dupes = async () => {
     } else if (listTied === 'X') {
       const tiedUserRow = dupeList.filter((tieRow) => tieRow[1].localeCompare(row[1],undefined, { sensitivity: 'base' }) === 0
         && tieRow[2].localeCompare(row[2], undefined, { sensitivity: 'base' }) === 0
-        && tieRow[3].localeCompare(row[3], undefined, { sensitivity: 'base' }) === 0 
+        && tieRow[3].localeCompare(row[3], undefined, { sensitivity: 'base' }) === 0
+        && tieRow[5].localeCompare(row[5], undefined, { sensitivity: 'base' }) === 0
         && tieRow[0].localeCompare(row[0], undefined, { sensitivity: 'base' }) !== 0);
       const tiedUser = tiedUserRow[0][0];
       msg = `Hello, ${username}! You and ${tiedUser} both submitted ${row[2]} as your ${row[5]} seed. Please determine between you who will keep and replace. Whoever replaces should inform an admin and, if they have not done so already, submit a replacement using https://docs.google.com/forms/d/e/1FAIpQLScu6rcO8nyxyneyYzAnCUmVO6N7m4o4O78KS31SgPUY1Lt8RA/viewform.`;
