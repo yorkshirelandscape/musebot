@@ -225,7 +225,8 @@ client.on('interactionCreate', async (interaction) => {
     || ((typeof interaction.member?.nickname !== 'undefined' && interaction.member?.nickname !== null) ? interaction.member?.nickname.startsWith(s[3]) : false)));
 
     const thinArr = removeCols(filtArr, [3, 4, 7, 8]);
-    const strArr = thinArr.map((r) => r.join('\t'));
+    const sortArr = thinArr.sort((a, b) => a[2] - b[2]);
+    const strArr = sortArr.map((r) => r.join('\t'));
     const table = `${interaction.user.username} : ${year}\n${strArr.join('\n')}`;
 
     if (typeof table !== 'string') {
