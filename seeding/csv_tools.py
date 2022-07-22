@@ -348,9 +348,10 @@ def get_dropped(seeds, data):
     new_data = data.copy()
     dropped = []
 
-    for i, seed in seeds:
+    for i, seed in enumerate(seeds):
         if seed >= size:
-            dropped.append((i, seed + 1, new_data.pop(i)))
+            dropped.append((i, seed + 1, data[i]))
+            new_data.remove(data[i])
     new_seeds = [seed for seed in seeds if seed < size]
 
     return new_seeds, new_data, dropped
