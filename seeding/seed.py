@@ -422,8 +422,8 @@ def get_parser():
             "prioritize dropping songs submitted by people with more dupes "
             "first"
         ),
-        action="store_true",
-        default=False,
+        action=utils.BooleanOptionalAction,
+        default=True,
     )
 
     csv_tools.add_output_parser_group(parser)

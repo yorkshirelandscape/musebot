@@ -396,8 +396,8 @@ def add_output_parser_group(parser):
     group.add_argument(
         "--output-csv-tabs",
         help="use a tab delimiter when outputting the CSV data",
-        action="store_true",
-        default=False,
+        action=utils.BooleanOptionalAction,
+        default=True,
     )
     group.add_argument(
         "--output-order",
@@ -411,7 +411,7 @@ def add_output_parser_group(parser):
             f"the same as the input data."
         ),
         choices=Order.all(),
-        default=Order.SORTED,
+        default=Order.BRACKET,
     )
     group.add_argument(
         "--output-dropped",
@@ -420,8 +420,8 @@ def add_output_parser_group(parser):
             f"have an empty value for the new seed position. In `{Order.SORTED}` "
             f"output order, dropped submissions will be at the end."
         ),
-        action="store_true",
-        default=False,
+        action=utils.BooleanOptionalAction,
+        default=True,
     )
     return group
 
