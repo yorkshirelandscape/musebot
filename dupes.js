@@ -63,7 +63,7 @@ const dupes = async () => {
     if (listKR === 1 && listTold === 'X' && listTied !== 'X') {
       setValue(toldRange, '');
     }
-    if (listYear === year && (listKR === -1)
+    if (listYear !== year && (listKR === -1)
       && (listTold === '' || typeof listTold === 'undefined')
       && (listOmit === '' || typeof listOmit === 'undefined')) {
       dupeList.push(row);
