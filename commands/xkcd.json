@@ -76335,5 +76335,425 @@
         }
       ]
     ]
+  },
+  {
+    "month": "7",
+    "num": 2649,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Physics Cost-Saving Tips",
+    "transcript": "",
+    "alt": "I got banned from the county fair for handing out Helium-2 balloons. Apparently the instant massive plasma explosions violated some local ordinance or something.",
+    "img": "https://imgs.xkcd.com/comics/physics_cost_saving_tips.png",
+    "title": "Physics Cost-Saving Tips",
+    "day": "22",
+    "summary": [
+      [
+        {
+          "term": "violated",
+          "probability": 0.059
+        },
+        {
+          "term": "tips",
+          "probability": 0.059
+        },
+        {
+          "term": "plasma",
+          "probability": 0.059
+        }
+      ]
+    ]
+  },
+  {
+    "month": "7",
+    "num": 2650,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Deepfakes",
+    "transcript": "",
+    "alt": "If so great a deductive mind as Arthur Conan Doyle can be fooled by the Cottingley Deepfakes, what chance do we mortals have? Soon our very reality will be dictated by the whims of Frances (9) and Elsie (16).",
+    "img": "https://imgs.xkcd.com/comics/deepfakes.png",
+    "title": "Deepfakes",
+    "day": "25",
+    "summary": [
+      [
+        {
+          "term": "deepfakes",
+          "probability": 0.11
+        },
+        {
+          "term": "whims",
+          "probability": 0.056
+        },
+        {
+          "term": "reality",
+          "probability": 0.056
+        }
+      ]
+    ]
+  },
+  {
+    "month": "7",
+    "num": 2651,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Air Gap",
+    "transcript": "",
+    "alt": "You can still do powerline networking, but the bitrate does drop a little depending on the lightbulb warmup and cooldown delay.",
+    "img": "https://imgs.xkcd.com/comics/air_gap.png",
+    "title": "Air Gap",
+    "day": "27",
+    "summary": [
+      [
+        {
+          "term": "warmup",
+          "probability": 0.091
+        },
+        {
+          "term": "powerline",
+          "probability": 0.091
+        },
+        {
+          "term": "networking",
+          "probability": 0.091
+        }
+      ]
+    ]
+  },
+  {
+    "month": "7",
+    "num": 2652,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Proxy Variable",
+    "transcript": "",
+    "alt": "Our work has produced great answers. Now someone just needs to figure out which questions they go with.",
+    "img": "https://imgs.xkcd.com/comics/proxy_variable.png",
+    "title": "Proxy Variable",
+    "day": "29",
+    "summary": [
+      [
+        {
+          "term": "work",
+          "probability": 0.13
+        },
+        {
+          "term": "variable",
+          "probability": 0.13
+        },
+        {
+          "term": "questions",
+          "probability": 0.13
+        }
+      ]
+    ]
+  },
+  {
+    "month": "8",
+    "num": 2653,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Omnitaur",
+    "transcript": "",
+    "alt": "\"My parents were both omnitaurs, which is how I got interested in recombination,\" said the normal human.",
+    "img": "https://imgs.xkcd.com/comics/omnitaur.png",
+    "title": "Omnitaur",
+    "day": "1",
+    "summary": [
+      [
+        {
+          "term": "omnitaur",
+          "probability": 0.28
+        },
+        {
+          "term": "recombination",
+          "probability": 0.14
+        },
+        {
+          "term": "parents",
+          "probability": 0.14
+        }
+      ]
+    ]
+  },
+  {
+    "month": "8",
+    "num": 2654,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Chemtrails",
+    "transcript": "",
+    "alt": "Ants have reverse chemtrails--regular citizens spraying chemicals everywhere they go to control the government.",
+    "img": "https://imgs.xkcd.com/comics/chemtrails.png",
+    "title": "Chemtrails",
+    "day": "3",
+    "summary": [
+      [
+        {
+          "term": "spraying",
+          "probability": 0.11
+        },
+        {
+          "term": "reverse",
+          "probability": 0.11
+        },
+        {
+          "term": "government",
+          "probability": 0.11
+        }
+      ]
+    ]
+  },
+  {
+    "month": "8",
+    "num": 2655,
+    "link": "https://xkcd.com/what-if-2/",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Asking Scientists Questions",
+    "transcript": "",
+    "alt": "'Does the substance feel weird to the touch?' is equally likely to get the answers 'Don't be ridiculous, you would never put your hand near a sample. We have safety protocols.' and 'Yeah, and it tastes AWFUL.'",
+    "img": "https://imgs.xkcd.com/comics/asking_scientists_questions.png",
+    "title": "Asking Scientists Questions",
+    "day": "5",
+    "summary": [
+      [
+        {
+          "term": "'yeah",
+          "probability": 0.056
+        },
+        {
+          "term": "weird",
+          "probability": 0.056
+        },
+        {
+          "term": "touch",
+          "probability": 0.056
+        }
+      ]
+    ]
+  },
+  {
+    "month": "8",
+    "num": 2656,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Scientific Field Prefixes",
+    "transcript": "",
+    "alt": "Massage: Theoretical (10), Quantum (6), High-energy (2), Computational (1), Marine (1), Astro- (None)",
+    "img": "https://imgs.xkcd.com/comics/scientific_field_prefixes.png",
+    "title": "Scientific Field Prefixes",
+    "day": "8",
+    "summary": []
+  },
+  {
+    "month": "8",
+    "num": 2657,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Complex Vowels",
+    "transcript": "",
+    "alt": "Pronouncing [ṡṡċċḣḣẇẇȧȧ] is easy; you just say it like the 'x' in 'fire'.",
+    "img": "https://imgs.xkcd.com/comics/complex_vowels.png",
+    "title": "Complex Vowels",
+    "day": "10",
+    "summary": [
+      [
+        {
+          "term": "vowels",
+          "probability": 0.17
+        },
+        {
+          "term": "sscchhwwaa",
+          "probability": 0.17
+        },
+        {
+          "term": "pronouncing",
+          "probability": 0.17
+        }
+      ]
+    ]
+  },
+  {
+    "month": "8",
+    "num": 2658,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Coffee Cup Holes",
+    "transcript": "",
+    "alt": "Theoretical physicist: At the Planck length, uncountably many.",
+    "img": "https://imgs.xkcd.com/comics/coffee_cup_holes.png",
+    "title": "Coffee Cup Holes",
+    "day": "12",
+    "summary": [
+      [
+        {
+          "term": "uncountably",
+          "probability": 0.13
+        },
+        {
+          "term": "theoretical",
+          "probability": 0.13
+        },
+        {
+          "term": "planck",
+          "probability": 0.13
+        }
+      ]
+    ]
+  },
+  {
+    "month": "8",
+    "num": 2659,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Unreliable Connection",
+    "transcript": "",
+    "alt": "NEGATIVE REVIEWS MENTION: Unreliable internet. POSITIVE REVIEWS MENTION: Unreliable internet.",
+    "img": "https://imgs.xkcd.com/comics/unreliable_connection.png",
+    "title": "Unreliable Connection",
+    "day": "15",
+    "summary": [
+      [
+        {
+          "term": "unreliable",
+          "probability": 0.25
+        },
+        {
+          "term": "reviews",
+          "probability": 0.17
+        },
+        {
+          "term": "mention",
+          "probability": 0.17
+        }
+      ]
+    ]
+  },
+  {
+    "month": "8",
+    "num": 2660,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Gen Z",
+    "transcript": "",
+    "alt": "Curdled milk, of a peculiar kind, made after a Bulgarian recipe and called \"yaghurt,\" is now a Parisian fad and is believed to be a remedy against growing old. A correspondent who has tried it, says he would prefer to die young. (1905, The Elk Falls Journal)",
+    "img": "https://imgs.xkcd.com/comics/gen_z.png",
+    "title": "Gen Z",
+    "day": "17",
+    "summary": [
+      [
+        {
+          "term": "young",
+          "probability": 0.056
+        },
+        {
+          "term": "yaghurt",
+          "probability": 0.056
+        },
+        {
+          "term": "remedy",
+          "probability": 0.056
+        }
+      ]
+    ]
+  },
+  {
+    "month": "8",
+    "num": 2661,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Age Milestone Privileges",
+    "transcript": "",
+    "alt": "If you reach 122, you get complete unrevertible editorial control over Jeanne Calment's Wikipedia article.",
+    "img": "https://imgs.xkcd.com/comics/age_milestone_privileges.png",
+    "title": "Age Milestone Privileges",
+    "day": "19",
+    "summary": [
+      [
+        {
+          "term": "wikipedia",
+          "probability": 0.077
+        },
+        {
+          "term": "unrevertible",
+          "probability": 0.077
+        },
+        {
+          "term": "reach",
+          "probability": 0.077
+        }
+      ]
+    ]
+  },
+  {
+    "month": "8",
+    "num": 2662,
+    "link": "https://xkcd.com/what-if-2/",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Physics Safety Tip",
+    "transcript": "",
+    "alt": "In general, avoid exposure to any temperatures, pressures, particle energies, or states of matter that physicists think are neat.",
+    "img": "https://imgs.xkcd.com/comics/physics_safety_tip.png",
+    "title": "Physics Safety Tip",
+    "day": "22",
+    "summary": [
+      [
+        {
+          "term": "tip",
+          "probability": 0.071
+        },
+        {
+          "term": "temperatures",
+          "probability": 0.071
+        },
+        {
+          "term": "states",
+          "probability": 0.071
+        }
+      ]
+    ]
+  },
+  {
+    "month": "8",
+    "num": 2663,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Tetherball Configurations",
+    "transcript": "",
+    "alt": "Ground-pole-ball-pole can be fun if you shake the first pole to get the second one whipping around dangerously, but the ball at the joint gets torn apart pretty fast.",
+    "img": "https://imgs.xkcd.com/comics/tetherball_configurations.png",
+    "title": "Tetherball Configurations",
+    "day": "24",
+    "summary": [
+      [
+        {
+          "term": "whipping",
+          "probability": 0.077
+        },
+        {
+          "term": "torn",
+          "probability": 0.077
+        },
+        {
+          "term": "tetherball",
+          "probability": 0.077
+        }
+      ]
+    ]
   }
 ]
