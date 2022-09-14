@@ -67,10 +67,10 @@ const GENRE_RANGES = {
 };
 
 const YEAR_RANGES = {
-  READ_RANGE: 'TestBracket!G2:J',
-  WRITE_RANGE: 'TestBracket!J2:J',
-  COPY_RANGE: 'TestBracket!I2:I',
-  SUBMITTERS: 'TestBracket!F2:F',
+  READ_RANGE: 'Test!G2:J',
+  WRITE_RANGE: 'Test!J2:J',
+  COPY_RANGE: 'Test!I2:I',
+  SUBMITTERS: 'Test!F2:F',
   ACTIVE_YEAR: 'Lists!L2',
   TEST_YEAR: 'Lists!L8',
 };

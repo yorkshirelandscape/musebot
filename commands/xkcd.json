@@ -76755,5 +76755,222 @@
         }
       ]
     ]
+  },
+  {
+    "month": "8",
+    "num": 2664,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Cloud Swirls",
+    "transcript": "",
+    "alt": "'Why did you get into fluid dynamics?' 'Well, SOME planet has to have the coolest clouds, odds are it's not ours, and rockets are slow.'",
+    "img": "https://imgs.xkcd.com/comics/cloud_swirls.png",
+    "title": "Cloud Swirls",
+    "day": "26",
+    "summary": [
+      [
+        {
+          "term": "cloud",
+          "probability": 0.2
+        },
+        {
+          "term": "swirls",
+          "probability": 0.1
+        },
+        {
+          "term": "slow",
+          "probability": 0.1
+        }
+      ]
+    ]
+  },
+  {
+    "month": "8",
+    "num": 2665,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "America Songs",
+    "transcript": "",
+    "alt": "Juraaaassic Park, Juraaaassic Park, God shed his grace on theeeee",
+    "img": "https://imgs.xkcd.com/comics/america_songs.png",
+    "title": "America Songs",
+    "day": "29",
+    "summary": []
+  },
+  {
+    "month": "8",
+    "num": 2666,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Universe Price Tiers",
+    "transcript": "",
+    "alt": "In Universe Pro®™ the laws of physics remain unchanged under time reversal, to maintain backward compatibility.",
+    "img": "https://imgs.xkcd.com/comics/universe_price_tiers.png",
+    "title": "Universe Price Tiers",
+    "day": "31",
+    "summary": [
+      [
+        {
+          "term": "universe",
+          "probability": 0.15
+        },
+        {
+          "term": "unchanged",
+          "probability": 0.077
+        },
+        {
+          "term": "time",
+          "probability": 0.077
+        }
+      ]
+    ]
+  },
+  {
+    "month": "9",
+    "num": 2667,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "First Internet Interaction",
+    "transcript": "",
+    "alt": "To that stranger on the KOOL Tree House chat room, I gotta hand it to you: You were, ultimately, not wrong.",
+    "img": "https://imgs.xkcd.com/comics/first_internet_interaction.png",
+    "title": "First Internet Interaction",
+    "day": "2",
+    "summary": [
+      [
+        {
+          "term": "wrong",
+          "probability": 0.083
+        },
+        {
+          "term": "ultimately",
+          "probability": 0.083
+        },
+        {
+          "term": "tree",
+          "probability": 0.083
+        }
+      ]
+    ]
+  },
+  {
+    "month": "9",
+    "num": 2668,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Artemis Quote",
+    "transcript": "",
+    "alt": "Another option: \"It is an honor to be the first human to set foot on the moon.\"",
+    "img": "https://imgs.xkcd.com/comics/artemis_quote.png",
+    "title": "Artemis Quote",
+    "day": "5",
+    "summary": [
+      [
+        {
+          "term": "set",
+          "probability": 0.13
+        },
+        {
+          "term": "quote",
+          "probability": 0.13
+        },
+        {
+          "term": "option",
+          "probability": 0.13
+        }
+      ]
+    ]
+  },
+  {
+    "month": "9",
+    "num": 2669,
+    "link": "https://xkcd.com/what-if-2",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Things You Should Not Do",
+    "transcript": "",
+    "alt": "Now I'm tempted to start telling people that I secretly don't actually know how to do any physics calculations, and so all the answers in What If are based on me actually trying to do the thing and then reporting what happened, but phrased as if it's hypothetical.",
+    "img": "https://imgs.xkcd.com/comics/things_you_should_not_do.png",
+    "title": "Things You Should Not Do",
+    "day": "7",
+    "summary": [
+      [
+        {
+          "term": "tempted",
+          "probability": 0.083
+        },
+        {
+          "term": "start",
+          "probability": 0.083
+        },
+        {
+          "term": "secretly",
+          "probability": 0.083
+        }
+      ]
+    ]
+  },
+  {
+    "month": "9",
+    "num": 2670,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Interruption",
+    "transcript": "",
+    "alt": "It's been extra bad ever since my GPS got stuck on Phoebe Judge mode.",
+    "img": "https://imgs.xkcd.com/comics/interruption.png",
+    "title": "Interruption",
+    "day": "9",
+    "summary": [
+      [
+        {
+          "term": "stuck",
+          "probability": 0.13
+        },
+        {
+          "term": "phoebe",
+          "probability": 0.13
+        },
+        {
+          "term": "mode",
+          "probability": 0.13
+        }
+      ]
+    ]
+  },
+  {
+    "month": "9",
+    "num": 2671,
+    "link": "",
+    "year": "2022",
+    "news": "",
+    "safe_title": "Rotation",
+    "transcript": "",
+    "alt": "It's okay, we can just feed the one-pixel image into an AI upscaler and recover the original image, or at least one that's just as cool.",
+    "img": "https://imgs.xkcd.com/comics/rotation.png",
+    "title": "Rotation",
+    "day": "12",
+    "summary": [
+      [
+        {
+          "term": "image",
+          "probability": 0.2
+        },
+        {
+          "term": "upscaler",
+          "probability": 0.1
+        },
+        {
+          "term": "rotation",
+          "probability": 0.1
+        }
+      ]
+    ]
   }
 ]
