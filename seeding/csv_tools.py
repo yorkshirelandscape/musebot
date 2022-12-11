@@ -3,12 +3,16 @@
 import argparse
 import csv
 import itertools
+import logging
+import operator
 import os
 import random
 import sys
 
 import analysis
 import utils
+
+logger = logging.getLogger(__name__)
 
 __all__ = (
     "add_input_output_arguments",
@@ -243,13 +247,13 @@ def output_seeded_csv(file, seeds, data, use_tabs, order, dropped):
     size = len(seeds)
 
     if order == Order.BRACKET and size not in ORDERS:
-        print(
+        logger.info(
             f"ERROR Bracket ordering requested but no ordering defined for a "
             f"{size} bracket, using `original`"
         )
         order = Order.ORIGINAL
 
-    print(f"Writing CSV in {order} order")
+    logger.info(f"Writing CSV in {order} order")
     writer = csv.writer(file, delimiter=delimiter, quoting=quoting)
     # Write header row first
     writer.writerow(["new_order"] + list(data[0].keys()))
@@ -278,25 +282,15 @@ def output_seeded_csv(file, seeds, data, use_tabs, order, dropped):
         )
 
     if dropped:
-        if order == Order.SORTED:
-            # Put the dropped stuff at the end, in sorted order
-            ordered_data = itertools.chain(
-                ordered_data,
-                sorted([seed] + list(row.values()) for _, seed, row in dropped),
-            )
-        else:
-            # Interleave the dropped rows into the rest of the data
-            # Cast to a list so we can slice
-            seeded_data = list(ordered_data)
-            # Start this over and rebuild the list from scratch
-            ordered_data = []
-            prev_i = 0
-            for i, seed, row in dropped:
-                ordered_data += seeded_data[prev_i:i] + [[seed] + list(row.values())]
-                prev_i = i
-            else:
-                # `i` will still be whatever the last value was
-                ordered_data += seeded_data[i:]
+        # Put the dropped stuff at the end, in sorted order
+        ordered_data = itertools.chain(
+            ordered_data,
+            sorted([seed] + list(row.values()) for _, seed, row in dropped),
+        )
+        if order != Order.SORTED:
+            # For both ORIGINAL and BRACKET, we want them output in the original ordering, including dropped rows
+            order_index = next(i + 1 for i, k in enumerate(data[0]) if k == "order")
+            ordered_data = sorted(ordered_data, key=lambda r: int(r[order_index]))
 
     writer.writerows(ordered_data)
 

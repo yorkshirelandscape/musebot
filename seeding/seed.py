@@ -1,9 +1,11 @@
 #! /bin/env python3
 
+
 import argparse
 import collections
 import functools
 import itertools
+import logging
 import math
 import os
 import random
@@ -14,7 +16,9 @@ import csv_tools
 import utils
 from submission import Submission
 
-TESTING = False
+logger = logging.getLogger()
+
+CUR_TIME = int(time.time())
 
 # Default values for these settings
 # May be modified by command line arguments
@@ -286,7 +290,7 @@ def get_seed_order(data):
         badness, seeds = swap(seeds, submissions, badness, use_max=use_max, hint=hint, has_byes=has_byes)
         total_badness = sum(badness)
         if i % 100 == 0:
-            print(f"Iteration {i} total badness {total_badness:.0f}")
+            logger.info(f"Iteration {i} total badness {total_badness:.0f}")
         if total_badness < prev_total:
             prev_total = total_badness
             prev_i = i
@@ -298,23 +302,23 @@ def get_seed_order(data):
                 best_seeds = seeds.copy()
             # We've tried enough for now
             if attempts > ATTEMPTS:
-                print(f"Iteration {i} max attempts, quitting")
+                logger.info(f"Iteration {i} max attempts, quitting")
                 break
             # Otherwise, start over
             badness, seeds = get_new_seeds(submissions)
             prev_total = sum(badness)
             prev_i = i
             hints = get_hints(n, has_byes)
-            print(f"Iteration {i} new attempt, new badness {prev_total:.0f}")
+            logger.info(f"Iteration {i} new attempt, new badness {prev_total:.0f}")
             continue
     else:
         if total_badness < best_badness:
             best_badness = total_badness
             best_seeds = seeds.copy()
 
-    print(f"Done trying, best badness {best_badness:.0f}")
+    logger.info(f"Done trying, best badness {best_badness:.0f}")
     badness = get_badness(best_seeds, submissions)
-    [print(f"{i:2} {badness[i]:3.0f} {submissions[best_seeds[i]]}") for i in range(n)]
+    [logger.info(f"{i:2} {badness[i]:3.0f} {submissions[best_seeds[i]]}") for i in range(n)]
 
     if has_byes:
         # Now we need to drop the byes before returning
@@ -377,12 +381,12 @@ def choose_submissions(data, drop_dupes_first=False):
             max_count = counts[0][1]
             most_submissions = {submitter for submitter, count in counts if count == max_count}
             choices = [row for row in choices if utils.get_canonical_submitter(row["submitter"]) in most_submissions]
-            print(f"Found {len(choices)} songs by submitters with {max_count} submissions")
+            logger.info(f"Found {len(choices)} songs by submitters with {max_count} submissions")
         to_remove = random.choice(choices)
-        print(f"Eliminating submission {Submission(**to_remove)}")
+        logger.info(f"Eliminating submission {Submission(**to_remove)}")
         dropped.append((data.index(to_remove), len(new_data), to_remove))
         new_data.remove(to_remove)
-    print(
+    logger.info(
         f"Eliminated {size - len(new_data)} submissions for a "
         f"{len(new_data)} bracket"
     )
@@ -392,14 +396,14 @@ def choose_submissions(data, drop_dupes_first=False):
 
 def seed_rng(seed):
     if seed is None:
-        seed = int(time.time())
-        print(f"No seed set, using current timestamp {seed}")
+        seed = CUR_TIME
+        logger.info(f"No seed set, using current timestamp {seed}")
     else:
         try:
             seed = int(seed)
-            print(f"Seeding RNG with integer {seed}")
+            logger.info(f"Seeding RNG with integer {seed}")
         except ValueError:
-            print(f"Seeding RNG with string '{seed}'")
+            logger.info(f"Seeding RNG with string '{seed}'")
     random.seed(seed)
 
 
@@ -539,45 +543,33 @@ def main(
 
 
 if __name__ == "__main__":
-    if TESTING is False:
-        parser = get_parser()
-        args = parser.parse_args()
-        input_csv_path =  args.INPUT
-        output_csv_path = args.OUTPUT
-        force_output = args.force
-        drop_dupes_first = args.drop_dupes_first
-        random_seed = args.random_seed
+    parser = get_parser()
+    args = parser.parse_args()
 
-        output_csv_tabs = args.output_csv_tabs
-        output_order = args.output_order
-        output_dropped = args.output_dropped
+    # If we've made it here, we're actually going to try to do something so start
+    # logging to a file
+    logger.addHandler(logging.StreamHandler())
+    logger.addHandler(logging.FileHandler(f"logs/seed.{CUR_TIME}.log"))
+    logger.setLevel(logging.INFO)
 
-        # Reset variables with anything passed in on the command line
-        BADNESS_MAX_ARTIST = args.badness_artist
-        BADNESS_MAX_SUBMITTER = args.badness_submitter
-        BADNESS_MAX_SEED = args.badness_seed
-        BADNESS_MAX_DUPER = args.badness_duper
-        ITERATIONS = args.iterations
-        ATTEMPTS = args.attempts
-        ATTEMPT_ITERATIONS = args.attempt_iterations
-    else:
-        input_csv_path =  'seeding/new-sample.csv'
-        output_csv_path = 'seeding/test_output.csv'
-        force_output = True
-        drop_dupes_first = True
+    input_csv_path =  args.INPUT
+    output_csv_path = args.OUTPUT
+    force_output = args.force
+    drop_dupes_first = args.drop_dupes_first
+    random_seed = args.random_seed
 
-        output_csv_tabs = True
-        output_order = 'bracket'
-        output_dropped = True
+    output_csv_tabs = args.output_csv_tabs
+    output_order = args.output_order
+    output_dropped = args.output_dropped
 
-        # Reset variables with anything passed in on the command line
-        BADNESS_MAX_ARTIST = 20
-        BADNESS_MAX_SUBMITTER = 100
-        BADNESS_MAX_SEED = 100
-        BADNESS_MAX_DUPER = 20
-        ITERATIONS = 15000
-        ATTEMPTS = 1
-        ATTEMPT_ITERATIONS = 1
+    # Reset variables with anything passed in on the command line
+    BADNESS_MAX_ARTIST = args.badness_artist
+    BADNESS_MAX_SUBMITTER = args.badness_submitter
+    BADNESS_MAX_SEED = args.badness_seed
+    BADNESS_MAX_DUPER = args.badness_duper
+    ITERATIONS = args.iterations
+    ATTEMPTS = args.attempts
+    ATTEMPT_ITERATIONS = args.attempt_iterations
 
     main(
         input_csv_path,

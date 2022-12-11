@@ -1,10 +1,13 @@
 import itertools
 import collections
+import logging
 import math
 import operator
 
 import utils
 from submission import Submission
+
+logger = logging.getLogger(__name__)
 
 __all__ = (
     "print_analysis",
@@ -20,7 +23,7 @@ def get_quarter_counts(submissions):
 
 def print_quarter_counts(counts):
     for submitter, quarters in sorted(counts.items()):
-        print("{:<15}".format(submitter), *(quarters[q] for q in range(4)), sep="\t")
+        logger.info(f"{submitter:<15}\t" + "\t".join(str(quarters[q]) for q in range(4)))
 
 
 def get_analysis(seeds, data):
@@ -196,7 +199,7 @@ def print_analysis_results(results):
     # We stuck this on here just so we wouldn't have to pass it as a separate argument
     num_rounds = results.pop("num_rounds")
 
-    print(f"Analysis results:")
+    logger.info(f"Analysis results:")
 
     # Remove this element from results so we don't throw off the per-round setup
     # of the rest of results
@@ -206,30 +209,30 @@ def print_analysis_results(results):
     for round, round_results in sorted(results.items()):
         # We only record problems, so this should never come up
         if not round_results:
-            print(f"Round {round} / {num_rounds} | No issues found")
+            logger.info(f"Round {round} / {num_rounds} | No issues found")
             continue
 
         if "submitters" in round_results:
             for submitter, submission_groups in round_results["submitters"].items():
                 for group_number, group in submission_groups.items():
                     num_groups = 2 ** (num_rounds - round)
-                    print(f"Round {round} / {num_rounds} | Submitter {submitter} | Group {group_number} / {num_groups} | {' | '.join(map(str, group))}")
+                    logger.info(f"Round {round} / {num_rounds} | Submitter {submitter} | Group {group_number} / {num_groups} | {' | '.join(map(str, group))}")
 
         if "artists" in round_results:
             for artist, submission_groups in round_results["artists"].items():
                 for group_number, group in submission_groups.items():
                     num_groups = 2 ** (num_rounds - round)
-                    print(f"Round {round} / {num_rounds} | Artist {artist} | Group {group_number} / {num_groups} | {' | '.join(map(str, group))}")
+                    logger.info(f"Round {round} / {num_rounds} | Artist {artist} | Group {group_number} / {num_groups} | {' | '.join(map(str, group))}")
 
         if "seeds" in round_results:
             for match, submission_pair in round_results["seeds"].items():
                 num_matches = 2 ** (num_rounds - round)
-                print(f"Round {round} / {num_rounds} | Match {match} / {num_matches} | {submission_pair[0]} | {submission_pair[1]}")
+                logger.info(f"Round {round} / {num_rounds} | Match {match} / {num_matches} | {submission_pair[0]} | {submission_pair[1]}")
 
         if "dupes" in round_results:
             for match, submission_pairs in round_results["dupes"].items():
                 for submitter, submission in submission_pairs:
-                    print(f"Round {round} / {num_rounds} | Duper {submitter} | Dupe {submission}")
+                    logger.info(f"Round {round} / {num_rounds} | Duper {submitter} | Dupe {submission}")
 
         if "byes" in round_results:
             for match, submission_pair in round_results["byes"].items():
@@ -238,13 +241,13 @@ def print_analysis_results(results):
                     # numbers of seeds in a dict so "submission_pair" isn't
                     # accurate
                     for seed, counts in submission_pair.items():
-                        print(f"Round {round} / {num_rounds} | Bye Totals | Seed {seed} | Expected {counts[0]} | Actual {counts[1]}")
+                        logger.info(f"Round {round} / {num_rounds} | Bye Totals | Seed {seed} | Expected {counts[0]} | Actual {counts[1]}")
                 else:
                     num_matches = 2 ** (num_rounds - round)
-                    print(f"Round {round} / {num_rounds} | Bye Match {match} / {num_matches} | {submission_pair[0]} | {submission_pair[1]}")
+                    logger.info(f"Round {round} / {num_rounds} | Bye Match {match} / {num_matches} | {submission_pair[0]} | {submission_pair[1]}")
 
     if not results:
-        print(f"No problems found")
+        logger.info(f"No problems found")
 
 
 def print_analysis(seeds, data):
