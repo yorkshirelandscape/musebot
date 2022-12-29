@@ -1,0 +1,65 @@
+new_order	order	seed	submitter	year	song	artist	link	submitters
+13	1	0	jsh	1925	Bull-Doze Blues	Henry Thomas	https://youtu.be/K1yhaBsD8Vw	jsh; xyrix
+4	2	0	Lemonspawn	1925	Someone to Watch Over Me	George & Ira Gershwin (Gertrude Lawrence)	https://youtu.be/bB7YlkhD70Y	volfied; Lemonspawn
+34	3	0	markusin	1925	Nobody Knows You When You're Down and Out	Bessie Smith	https://www.youtube.com/watch?v=Zea-1Fzi9JQ	markusin; jsh
+32	4	0	SuperDuper	1925	The Big Rock Candy Mountain	Harry McClintock	https://youtu.be/KSGuBNopzBw	alatar224; SuperDuper
+8	5	0	SuperDuper	1925	Boléro	Maurice Ravel	https://youtu.be/J712wgqH6s8	xyrix; volfied; SuperDuper
+35	6	0	SuperDuper	1925	Blue Yodel No. 1 (T for Texas)	Jimmie Rodgers	https://youtu.be/fm7cQojl-JY	SuperDuper; Lemonspawn
+27	7	0	SuperDuper	1925	Singin in the Rain	Annette Hanshaw	https://youtu.be/-Ve8qIePyUw	
+10	8	0	volfied	1925	Rhapsody in Blue	George Gershwin	https://www.youtube.com/watch?v=PA3ryT2HJK4	xyrix; volfied
+7	9	0	wharf_rat	1925	Hotter Than That	Louis Armstrong & His Hot Five	https://www.youtube.com/watch?v=DegptkMFLUY	wharf_rat; alatar224
+16	10	0	xyrix	1925	Die Moritat von Mackie Messer (Mack the Knife)	Bertolt Brecht & Kurt Weill	https://www.youtube.com/watch?v=_QXJ3OXWaOY	xyrix; volfied
+51	11	1	alatar224	1925	The Banshee	Henry Cowell	https://www.youtube.com/watch?v=4MnA-dUY3cY	
+44	12	1	Donald X.	1925	Let's Misbehave	Irving Aaronson and his Commanders	https://www.youtube.com/watch?v=JctNtRfHRLU	
+9	13	1	jsh	1925	Frankie	Mississippi John Hurt	https://youtu.be/JKkmReeFjh8	
+19	14	1	Lemonspawn	1925	When the Red Red Robin (Comes Bob Bob Bobbin' Along)	Cliff Edwards	https://youtu.be/scbn7oK-e4E	
+60	15	1	Mollo8	1925	Sonata Romántica	Manuel M. Ponce	https://youtu.be/K7sYI5SA0ws	
+62	16	1	Sharur	1925	It's Tight Like That	Tampa Red & Georgia Tom	https://youtu.be/5_vSXGER9gM	
+11	17	1	wharf_rat	1925	Lift Him Up That's All	Washington Phillips	https://www.youtube.com/watch?v=L1Sc-dTMYzg	
+42	18	1	xyrix	1925	Turandot, Nessun dorma!	Giacomo Puccini	https://www.youtube.com/watch?v=Sgnzs7HWGcU	
+24	19	2	alatar224	1925	Numb Fumblin'	Fats Waller	https://www.youtube.com/watch?v=ixkW57BJYTg	
+53	20	2	alatar224	1925	Louis Collins	Mississippi John Hurt	https://www.youtube.com/watch?v=dPk-82Qg9Ow	
+50	21	2	Donald X.	1925	You're the Cream in My Coffee	Jack Hylton and his Orchestra	https://www.youtube.com/watch?v=S-P9exeOEsY	
+6	22	2	jsh	1925	Weather Bird	Louis Armstrong	https://youtu.be/dRmc07eoQgY	
+29	23	2	markusin	1925	Nessun Dorma (vocals Antonio Cortis)	Giacomo Puccini	https://www.youtube.com/watch?v=Sgnzs7HWGcU	
+2	24	2	Mollo8	1925	Adiós Muchachos	Carlos Gardel	https://youtu.be/Ot2keLHZ83s	
+1	25	2	Sharur	1925	Fishin' Blues	Henry Thomas	https://youtu.be/6sSLDDS8DOU	
+28	26	2	volfied	1925	East St. Louis Toodle-oo	Duke Ellington	https://www.youtube.com/watch?v=Esde8kvzBD4	
+25	27	2	wharf_rat	1925	Dark Was the Night, Cold Was the Ground	Blind Willie Johnson	https://www.youtube.com/watch?v=ud74hhPqISo	
+48	28	3	alatar224	1925	Always	Irving Kaufman	https://www.youtube.com/watch?v=yHEbjvW65BA	
+20	29	3	Donald X.	1925	The Coat and the Pants Do All the Work	Harry Reser's Six Jumping Jacks	https://www.youtube.com/watch?v=-v7I9j2-6sI	
+18	30	3	Lemonspawn	1925	Piano Concerto: II. Molto moderato	Aaron Copland	https://youtu.be/AFKNIWwSuiI	
+40	31	3	markusin	1925	Down the Lane (With You Again)	Joe Green's Novelty Marimba Band	https://www.youtube.com/watch?v=CrST6l3TFjs	
+17	32	3	Mollo8	1925	Jurame	José Mojica (Maria Grever)	https://youtu.be/Tb1KQnuBaVA	
+47	33	3	Sharur	1925	Misirlou	Theodotos Tetos Demetriades	https://youtu.be/LW6qGy3RtwY	
+22	34	3	volfied	1925	Blue Skies	Whispering Jack Smith	https://www.youtube.com/watch?v=5y5wRxKFCos	
+45	35	3	xyrix	1925	In A Mist	Bix Beiderbecke	https://www.youtube.com/watch?v=J2_Ai8dgBko	
+43	36	4	alatar224	1925	Snowy Morning Blues	James P Johnson	https://www.youtube.com/watch?v=vBB87sltANY	
+33	37	4	Donald X.	1925	Nola	The Revelers	https://www.youtube.com/watch?v=1CG5KGN5CTk	
+15	38	4	jsh	1925	Shave Em Dry Blues	Lucille Bogan	https://youtu.be/gkPCmIxv-3k	
+49	39	4	Lemonspawn	1925	The Titanic	Ernest V. Stoneman	https://youtu.be/43evhqK3p1g	
+12	40	4	markusin	1925	Adeste Fideles (O Come All Ye Faithful)	Associated Glee Clubs of America	https://www.youtube.com/watch?v=f9xkR59xSNo	
+41	41	4	Mollo8	1925	Duerme	Margarita Cueto & Juan Arvizu	https://youtu.be/uYycM6tRM8Y	
+37	42	4	Sharur	1925	It's Nobody's Fault But Mine	Blind Willie Johnson	https://youtu.be/eZogzxAFiNg	
+63	43	4	SuperDuper	1925	The Tempest: Antonio. Dance of the Shapes	Jean Sibelius	https://youtu.be/Bs4CBCEcBVE	
+36	44	4	volfied	1925	Statesboro Blues	Blind Willie McTell	https://www.youtube.com/watch?v=sk4Js6Q58h8	
+64	45	4	wharf_rat	1925	The Coo Coo Bird	Clarence Ashley	https://www.youtube.com/watch?v=jfgnbitzL3g	
+59	46	4	xyrix	1925	Cardillac, Mag Sonne leuchten	Paul Hindemith	https://www.youtube.com/watch?v=bHRzo8VF-kk	
+39	47	5	alatar224	1925	Levee Camp Moan Blues	Texas Alexander	https://www.youtube.com/watch?v=t3cYJ2nPNtE	
+3	48	5	Donald X.	1925	I Want to Be Bad	Helen Kane	https://www.youtube.com/watch?v=AXPh5TvoTAc	
+23	49	5	jsh	1925	Dark Was the Night	Blind Willie Johnson	https://youtu.be/BNj2BXW852g	
+54	50	5	markusin	1925	When You're Smiling (The Whole World Smiles With You)	Louis Armstrong and his Orchestra	https://www.youtube.com/watch?v=CbCUmZIEjkM	
+46	51	5	Mollo8	1925	Sonata Clásica	Manuel M. Ponce	https://youtu.be/_nBJgPX6LmY	
+58	52	5	Sharur	1925	Diddie Wah Diddie	Blind Blake	https://youtu.be/RgoISzqNmDo	
+61	53	5	SuperDuper	1925	Thou Swell	Ben Selvin	https://youtu.be/Iq0jd0ezqoI	
+56	54	5	volfied	1925	St. James Infirmary	Louis Armstrong	https://www.youtube.com/watch?v=QzcpUdBw7gs	
+5	55	5	wharf_rat	1925	Keep On the Sunny Side	The Carter Family	https://www.youtube.com/watch?v=UrI_ZAkgHBI	
+14	56	5	xyrix	1925	Oedipus Rex, Caedit nos pestis	Igor Stravinsky	https://www.youtube.com/watch?v=tF3_tYz8IzA	
+52	57	6	alatar224	1925	Two Step de Eunice	Amédé Ardoin	https://www.youtube.com/watch?v=0NYRahXJoAg	
+55	58	6	Donald X.	1925	I Scream, You Scream, We All Scream for Ice Cream	Waring's Pennsylvanians	https://www.youtube.com/watch?v=O1WKImlPObU	
+21	59	6	jsh	1925	Potato Head Blues	Louis Armstrong	https://youtu.be/jmnfVpdREkc	
+26	60	6	markusin	1925	I'll See You Again (from Bitter Sweet)	Evelyn Laye	https://www.youtube.com/watch?v=QEAX8Cp3V3k	
+38	61	6	Mollo8	1925	El Brujo	Carlos Gardel	https://youtu.be/GRgyQz7a7rg	
+57	62	6	Sharur	1925	Puttin' on the Ritz	Irving Berlin	https://youtu.be/jFzJEZIX-ao	
+31	63	6	volfied	1925	Alabama Song	Bertolt Brecht & Kurt Weill	https://www.youtube.com/watch?v=I6VSBgNWbKY	
+30	64	6	wharf_rat	1925	Mountain Dew	Bascom Lamar Lunsford	https://www.youtube.com/watch?v=ix-3qcf-hO4	
