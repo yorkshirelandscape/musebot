@@ -14,7 +14,7 @@ import sys
 import unicodedata
 import uuid
 
-TESTING = False
+TESTING = True
 
 # Default values for these settings
 # May be modified by command line arguments

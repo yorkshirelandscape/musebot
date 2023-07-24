@@ -21,8 +21,8 @@
 - react to manual match posts
 - ~~year end automatic estimates~~
 - ~~reminders to submit for next year~~
-- check eligibility before year starts
-- run genreCall
+- ~~check eligibility before year starts~~
+- ~~run genreCall~~
 - fix token expiration problem
 - ~~clear results for when year ends~~
 - ~~inform submitters when their song dupes~~

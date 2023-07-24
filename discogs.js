@@ -244,7 +244,7 @@ const yearCall = async () => {
     const counts = {};
 
     for (const year of oldData) {
-      counts[year] = counts[year] ? counts[year] + 1 : 1;
+      counts[year] += 1;
     }
 
     const isUpdated = (counts[testYear] >= subCount);

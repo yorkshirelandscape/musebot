@@ -12,6 +12,7 @@
     "emoji-name-map": "^1.2.9",
     "googleapis": "^84.0.0",
     "jquery": "^3.6.0",
+    "jupyter": "^0.0.0",
     "lda": "^0.2.0",
     "luxon": "^2.0.2",
     "node-fetch": "^3.2.3",
