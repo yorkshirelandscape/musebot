@@ -3,11 +3,11 @@ import tzstamp from './tzstamp.mjs';
 export default class SlashCommander {
   static get CONFIG() {
     return {
-      tzstamp2: {
+      tzstamp: {
         handler: 'tzstamp',
         global: true,
         channels: false,
-        name: 'tzstamp2',
+        name: 'tzstamp',
         description: 'Replaces a message\'s datetimes in yyyy/MM/dd HH:mm format with Discord dynamic time zone format.',
         options: [
           {
@@ -184,7 +184,17 @@ export default class SlashCommander {
   async tzstamp(interaction, args) {
     if (interaction) {
       this.logger.debug({ args }, 'Handling tzstamp command.');
-      await interaction.reply(tzstamp(...args));
+      let response = '';
+      try {
+        response = tzstamp(...args);
+      } catch (e) {
+        response = `ERROR ${e.message}`;
+      }
+      if (response === args[0]) {
+        response = 'Could not find a suitable timestamp. Use `yyyy/MM/dd HH:mm`.';
+      }
+      this.logger.debug({ args, response }, 'Replying to tzstamp command.');
+      await interaction.reply(response);
     } else {
       this.logger.info({ args }, 'Testing tzstamp.');
       if (!args.length) {

@@ -227,9 +227,10 @@ const checkRound = async () => {
         // if 80% are checked in and the round is half over OR
         // the round has one hour left to go, issue the 1-hour warning
         now = DateTime.now();
-        if ((pctCheckedIn >= 0.8
-            && now > roundEndTime.plus({ hours: roundMinWarn }).minus({ minutes: 16 }))
-            || now > roundEndTime.plus({ hours: roundMaxWarn }).minus({ minutes: 16 })) {
+        if (((pctCheckedIn >= 0.8
+            && now > roundEndTime.plus({ hours: roundMinWarn }).minus({ minutes: 30 }))
+            || now > roundEndTime.plus({ hours: roundMaxWarn }).minus({ minutes: 30 }))
+            || force === true) {
           if (pctCheckedIn < 1 && force === false) {
             const msg = `One-Hour Warning
 ${(pctCheckedIn * 100).toFixed(1)}% checked in.
@@ -418,6 +419,14 @@ Missing: ${missingTagList}${extraTagList ? `\nExtra: ${extraTagList}` : ''}`;
               } else { msgMax = maxSubTime; }
               msg = `Submissions for ${nextYear} are due between approximately <t:${Math.round(msgMin.valueOf() / 1000)}:F> and <t:${Math.round(msgMax.valueOf() / 1000)}:F>.`;
 
+              let pins = await channel.messages.fetchPinned();
+              let delPins = pins.filter((p) => p.content.includes('are due between'));
+              delPins.each((p) => { p.unpin(); });
+
+              pins = await testChan.messages.fetchPinned();
+              delPins = pins.filter((p) => p.content.includes('are due between'));
+              delPins.each((p) => { p.unpin(); });
+              
               const sent = await musicChan.send(msg);
               await sent.pin();
               if (testing === false) { await testMusic.send(msg); }

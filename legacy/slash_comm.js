@@ -54,12 +54,18 @@ let SPREADSHEET_ID = (testing === true ? TESTING_ID : MASTER_ID);
 const ADDURL = {
   READ_RANGE: 'Dashboard!H2:H129',
 };
+
 const LISTSONGS = {
-  READ_RANGE: 'SongsStaging!B2:G',
+  READ_RANGE: 'SongsStaging!B2:J',
   HIST_RANGE: 'Submissions!A2:F',
   YEAR_RANGE: 'Lists!K2',
   ACTIVE_YEAR: 'Dashboard!B1'
 };
+
+const REMATCH = {
+  ROUND_RANGE: 'Dashboard!B2',
+  MATCH_RANGE: 'Dashboard!B3'
+}
 
 const ADMINS = [
   { name: 'DonaldX', id: '268846196888567810' },
@@ -85,6 +91,15 @@ function replaceOccurrence(string, regex, n, replace) {
   });
 }
 
+function toTitleCase(str) {
+  return str.replace(
+    /\w\S*/g,
+    function(txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    }
+  );
+}
+
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()
   || (!(interaction.commandName === 'tzstamp') && !(interaction.guildId === null
@@ -98,9 +113,10 @@ client.on('interactionCreate', async (interaction) => {
   if (interaction.commandName === 'disc') {
     const searchArtist = interaction.options.getString('artist');
     const searchTrack = interaction.options.getString('title');
+    const cleanTrack = searchTrack.replaceAll(/['.]/g, '');
 
     const data = await disc.search({
-      artist: searchArtist, track: searchTrack, type: 'release', sort: 'year', sort_order: 'asc',
+      artist: searchArtist, track: cleanTrack, type: 'release', sort: 'year', sort_order: 'asc',
     });
 
     const sortMap = data.results.sort((x, y) => {
@@ -116,10 +132,10 @@ client.on('interactionCreate', async (interaction) => {
         && !r.format.includes('Promo')
         && !r.format.includes('EP')
         && !r.format.includes('Test Pressing')
-        // && !r.format.includes('EP')
         && (r.format.includes('Album')
           || r.format.includes('Single')
-          || r.format.includes('Compilation'))
+          || r.format.includes('Compilation')
+          || r.format.includes('LP'))
     ));
 
     const plusArtist = searchArtist.replaceAll(/ /g, '+');
@@ -135,7 +151,7 @@ client.on('interactionCreate', async (interaction) => {
 
     const embed = new MessageEmbed()
       .setTitle(`${title} (${year})`)
-      .setDescription(`${genre.join(', ')} (${style.join(', ')})`)
+      .setDescription(`${toTitleCase(searchTrack)}\n\n${genre.join(', ')} (${style.join(', ')})`)
       .setImage(cover_image)
       .setURL(master_url)
       .addField('\u200B', `[Discogs Search](${searchURL})`);
@@ -203,7 +219,7 @@ client.on('interactionCreate', async (interaction) => {
     const filtArr = readVals.filter((s) => s[3] === year
     && (interaction.user.username.startsWith(s[2])
     || ((typeof interaction.member?.nickname !== 'undefined' && interaction.member?.nickname !== null) ? interaction.member?.nickname.startsWith(s[2]) : false)));
-    const thinArr = removeCols(filtArr, [2, 3]);
+    const thinArr = removeCols(filtArr, [2, 3, 6, 7]);
     const strArr = thinArr.map((r) => r.join('\t'));
     const table = `${interaction.user.username} : ${year}\n${strArr.join('\n')}`;
 
@@ -302,6 +318,26 @@ client.on('interactionCreate', async (interaction) => {
     }
   }
   // END tzstamp
+
+  // BEGIN rematch
+  if (interaction.commandName === 'rematch') {
+    if (ADMINS.includes(interaction.user.id)) {
+      const match = interaction.options.getInteger('match');
+      const round = parseInt(getValue(REMATCH.ROUND_RANGE).substring(1));
+      const currMatch = getValue(REMATCH.MATCH_RANGE);
+      const roundMatch = match - (128-2^(Math.log2(128)-round));
+      const channel = client.channels.cache.get(CHANNEL_ID);
+      await channel.messages.fetch({ limit: 100 });
+      const msg = await channel.messages.cache.find((m) => m.content.includes(`Match ${match}`));
+      await msg.delete();
+      await setValue(REMATCH.MATCH_RANGE, roundMatch);
+      // post match here
+      await setValue(REMATCH.MATCH_RANGE, currMatch);
+      await interaction.reply('Match replaced.');
+    } else { await interaction.reply('User not authorized.')}
+  }
+
+  // END rematch
 });
 
 const loadCredentials = () => {
